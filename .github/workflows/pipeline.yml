@@ -44,6 +44,8 @@ jobs:
       name: Download Specdown
       shell: bash
     - uses: actions-rs/toolchain@v1.0.7
+      with:
+        toolchain: nightly
     - run: make specdown
   security-audit:
     runs-on: ubuntu-latest
@@ -100,9 +102,7 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - uses: actions-rs/toolchain@v1.0.7
       with:
-        profile: minimal
-        toolchain: stable
-        default: true
+        toolchain: nightly
     - uses: actions-rs/cargo@v1.0.3
       with:
         command: check
@@ -127,9 +127,7 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - uses: actions-rs/toolchain@v1.0.7
       with:
-        profile: minimal
-        toolchain: stable
-        default: true
+        toolchain: nightly
     - uses: actions-rs/cargo@v1.0.3
       with:
         args: ' --locked'
@@ -149,9 +147,7 @@ jobs:
         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
     - uses: actions-rs/toolchain@v1.0.7
       with:
-        profile: minimal
         toolchain: nightly
-        default: true
         components: rustfmt, clippy
     - uses: actions-rs/cargo@v1.0.3
       with:
@@ -221,11 +217,8 @@ jobs:
           ~/.cargo/bin
           target
     - uses: actions-rs/toolchain@v1.0.7
-      name: Install rust toolchain
       with:
-        default: true
-        profile: minimal
-        toolchain: stable
+        toolchain: nightly
     - uses: actions-rs/cargo@v1.0.3
       name: Build release version
       with:
@@ -289,11 +282,8 @@ jobs:
     - uses: actions/download-artifact@v2
       name: Retrieve assets
     - uses: actions-rs/toolchain@v1.0.7
-      name: Install rust toolchain
       with:
-        default: true
-        profile: minimal
-        toolchain: stable
+        toolchain: nightly
     - id: get_repository_name
       name: Calculate repository name
       run: echo ::set-output name=REPOSITORY_NAME::$(echo "$GITHUB_REPOSITORY" | awk
