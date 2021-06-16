@@ -42,6 +42,7 @@ jobs:
       env:
         SPECDOWN_URL: ${{ matrix.specdown }}
       name: Download Specdown
+      shell: bash
     - uses: actions-rs/toolchain@v1.0.7
       with:
         profile: minimal
@@ -116,6 +117,7 @@ jobs:
         include:
         - os: macos-latest
         - os: ubuntu-latest
+        - os: windows-latest
     steps:
     - uses: actions/checkout@v2.3.4
     - uses: actions/cache@v2.1.6
