@@ -27,9 +27,5 @@ function safe_specdown() {
 }
 
 for ARG in "${@:1}"; do
-	if [[ "$(basename "$ARG")" == "README.md" ]]; then
-		safe_specdown "$ARG" /home/your-home
-	else
-		safe_specdown "$ARG"
-	fi
+	safe_specdown "$ARG"
 done

@@ -44,10 +44,6 @@ jobs:
       name: Download Specdown
       shell: bash
     - uses: actions-rs/toolchain@v1.0.7
-      with:
-        profile: minimal
-        toolchain: stable
-        default: true
     - run: make specdown
   security-audit:
     runs-on: ubuntu-latest
@@ -79,16 +75,16 @@ jobs:
       name: Install versio
     - name: Check projects
       run: versio check
-      env:
-        RUST_LOG: versio=trace
-        RUST_BACKTRACE: 1
     - name: Print changes
       run: versio plan
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         GITHUB_USER: ${{ github.actor }}
-        RUST_LOG: versio=trace
-        RUST_BACKTRACE: 1
+    - name: Dry run release
+      run: versio release --dry-run
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_USER: ${{ github.actor }}
   check:
     runs-on: ubuntu-latest
     steps:
