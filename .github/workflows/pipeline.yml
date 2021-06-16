@@ -254,7 +254,7 @@ jobs:
           target: x86_64-unknown-linux-gnu
           install: ''
         - os: windows-latest
-          suffix: '.exe'
+          suffix: .exe
           target: x86_64-pc-windows-msvc
           install: ''
   github-release:

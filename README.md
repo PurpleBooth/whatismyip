@@ -34,7 +34,7 @@ whatismyip
 This should be your ip
 
 ``` shell,script(name="test",expected_exit_code=0)
-cargo run | grep -E '([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-f0-9:]+:+)+[a-f0-9]+)'
+whatismyip | grep -E '([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-f0-9:]+:+)+[a-f0-9]+)'
 ```
 
 ``` shell,skip()
