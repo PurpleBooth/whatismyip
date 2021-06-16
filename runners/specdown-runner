@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+function safe_specdown() {
+	if [ -f "$1" ]; then
+		HOME="${2:-$(mktemp -d)}"
+		MARKDOWN_PATH="$(
+			cd "$(dirname "$1")"
+			pwd -P
+		)/$(basename "$1")"
+
+		(
+			REPOSITORY_DIR="$PWD"
+			TEMPORARY_DIR="$(mktemp -d)"
+			cd "$TEMPORARY_DIR"
+			mkdir "$TEMPORARY_DIR/demo"
+
+			cd "$TEMPORARY_DIR/demo"
+			export PATH="$REPOSITORY_DIR/target/release/:$PATH"
+			specdown run "$MARKDOWN_PATH"
+		)
+	else
+		echo "$1 is not valid"
+		exit 1
+	fi
+}
+
+for ARG in "${@:1}"; do
+	if [[ "$(basename "$ARG")" == "README.md" ]]; then
+		safe_specdown "$ARG" /home/your-home
+	else
+		safe_specdown "$ARG"
+	fi
+done

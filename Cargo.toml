@@ -1,0 +1,17 @@
+[package]
+name = "whatismyip"
+version = "0.6.2"
+authors = ["Billie Thompson <billie@billiecodes.com>"]
+edition = "2018"
+license = "CC0-1.0"
+repository = "https://github.com/PurpleBooth/whatismyip"
+categories = [ "development-tools", "command-line-utilities" ]
+keywords = [ "dns", "ip", "resolve" ]
+description = "Work out what your external ip is"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+clap = "3.0.0-beta.2"
+trust-dns-resolver = "0.20.3"
+anyhow = "1.0"
