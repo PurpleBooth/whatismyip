@@ -9,19 +9,21 @@ mod cli;
 fn main() -> Result<()> {
     cli::app().get_matches();
 
-    let ip = resolver_ip()?;
-    let resolver = resolver(ip)?;
-    println!(
-        "{}",
-        resolver
-            .txt_lookup("o-o.myaddr.l.google.com")?
-            .iter()
-            .map(std::string::ToString::to_string)
-            .collect::<Vec<_>>()
-            .join("\n")
-    );
+    let ns_ip = resolver_ip()?;
+    let resolver = resolver(ns_ip)?;
+    let user_ips = user_ips(&resolver)?;
+    println!("{}", user_ips);
 
     Ok(())
+}
+
+fn user_ips(resolver: &Resolver) -> Result<String> {
+    Ok(resolver
+        .txt_lookup("o-o.myaddr.l.google.com")?
+        .iter()
+        .map(std::string::ToString::to_string)
+        .collect::<Vec<_>>()
+        .join("\n"))
 }
 
 fn resolver(ip: IpAddr) -> Result<Resolver> {
