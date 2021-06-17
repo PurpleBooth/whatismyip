@@ -1,5 +1,7 @@
 use anyhow::anyhow;
 use anyhow::Result;
+use std::net::IpAddr;
+use trust_dns_resolver::config::{NameServerConfigGroup, ResolverConfig, ResolverOpts};
 use trust_dns_resolver::Resolver;
 
 mod cli;
@@ -7,17 +9,36 @@ mod cli;
 fn main() -> Result<()> {
     cli::app().get_matches();
 
-    let error = anyhow!("No ip found");
-
-    let resolver = Resolver::default()?;
+    let ip = resolver_ip()?;
+    let resolver = resolver(ip)?;
     println!(
         "{}",
         resolver
             .txt_lookup("o-o.myaddr.l.google.com")?
             .iter()
-            .next()
-            .ok_or(error)?
+            .map(std::string::ToString::to_string)
+            .collect::<Vec<_>>()
+            .join("\n")
     );
 
     Ok(())
+}
+
+fn resolver(ip: IpAddr) -> Result<Resolver> {
+    Ok(Resolver::new(
+        ResolverConfig::from_parts(
+            None,
+            vec![],
+            NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
+        ),
+        ResolverOpts::default(),
+    )?)
+}
+
+fn resolver_ip() -> Result<IpAddr> {
+    Resolver::default()?
+        .lookup_ip("ns1.google.com")?
+        .iter()
+        .next()
+        .ok_or_else(|| anyhow!("Nameserver ip not found"))
 }
