@@ -4,6 +4,7 @@ use std::time::Duration;
 use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
+use futures::future::join_all;
 use trust_dns_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
@@ -15,36 +16,27 @@ mod cli;
 async fn main() -> Result<()> {
     let matches = cli::app().get_matches();
 
-    match tokio::join!(
-        find_ip(LookupIpStrategy::Ipv4Only),
-        find_ip(LookupIpStrategy::Ipv6Only)
-    ) {
-        (Err(ipv4_error), Err(ipv6_error)) => {
-            bail!(
-                "IPv6 and IPv4 both failed: IPv6 \"{}\" and IPv4 \"{}\"",
-                ipv6_error,
-                ipv4_error
-            );
-        }
-        (Ok(ipv4), Err(_)) => {
-            if !matches.is_present("only-6") {
-                println!("{}", ipv4);
-            }
-        }
-        (Err(_), Ok(ipv6)) => {
-            if !matches.is_present("only-4") {
-                println!("{}", ipv6);
-            }
-        }
-        (Ok(ipv4), Ok(ipv6)) => {
-            if !matches.is_present("only-6") {
-                println!("{}", ipv4);
-            }
-            if !matches.is_present("only-4") {
-                println!("{}", ipv6);
-            }
-        }
+    let mut stategies = vec![];
+    if !matches.is_present("only-6") {
+        stategies.push(find_ip(LookupIpStrategy::Ipv4Only));
     }
+    if !matches.is_present("only-4") {
+        stategies.push(find_ip(LookupIpStrategy::Ipv6Only));
+    }
+
+    let (ok, failures): (Vec<Result<String>>, Vec<Result<String>>) = join_all(stategies)
+        .await
+        .into_iter()
+        .partition(std::result::Result::is_ok);
+
+    if ok.is_empty() {
+        bail!("Failed: {:?}", failures,);
+    }
+
+    println!(
+        "{}",
+        ok.iter().flatten().cloned().collect::<Vec<_>>().join("\n")
+    );
 
     Ok(())
 }
