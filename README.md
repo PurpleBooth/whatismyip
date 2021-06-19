@@ -1,6 +1,20 @@
 # What is my ip
 
-Work out what your external ip is
+Work out what your external ip is. This is done by querying the
+`o-o.myaddr.l.google.com` `TXT` record on the Google DNS servers
+(`ns1.google.com`, `ns2.google.com`, `ns3.google.com`, or
+`ns4.google.com`).
+
+You can do the same thing yourself running using the [dig
+tool](https://en.wikipedia.org/wiki/Dig_(command)):
+
+``` shell,skip()
+dig TXT +short o-o.myaddr.l.google.com @ns1.google.com
+```
+
+I made this tool as a convenient way to do the same thing, including
+making multiple requests via only IPv4 and IPv6, so you can see both
+your IPv4 and IPv6 addresses.
 
 ## Usage
 
