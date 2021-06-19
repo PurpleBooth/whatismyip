@@ -81,7 +81,7 @@ whatismyip
 
 You can also force only v6 IPs
 
-``` shell,script(name="v6-only",expected_exit_code=0)
+``` shell,skip()
 whatismyip -6
 ```
 
