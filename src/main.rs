@@ -13,7 +13,7 @@ mod cli;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    cli::app().get_matches();
+    let matches = cli::app().get_matches();
 
     match tokio::join!(
         find_ip(LookupIpStrategy::Ipv4Only),
@@ -27,14 +27,22 @@ async fn main() -> Result<()> {
             );
         }
         (Ok(ipv4), Err(_)) => {
-            println!("{}", ipv4);
+            if !matches.is_present("only-6") {
+                println!("{}", ipv4);
+            }
         }
         (Err(_), Ok(ipv6)) => {
-            println!("{}", ipv6);
+            if !matches.is_present("only-4") {
+                println!("{}", ipv6);
+            }
         }
         (Ok(ipv4), Ok(ipv6)) => {
-            println!("{}", ipv4);
-            println!("{}", ipv6);
+            if !matches.is_present("only-6") {
+                println!("{}", ipv4);
+            }
+            if !matches.is_present("only-4") {
+                println!("{}", ipv6);
+            }
         }
     }
 

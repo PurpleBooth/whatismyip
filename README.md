@@ -14,10 +14,12 @@ Billie Thompson <billie@billiecodes.com>
 Work out what your external ip is
 
 USAGE:
-    whatismyip
+    whatismyip [FLAGS]
 
 FLAGS:
     -h, --help       Prints help information
+    -4, --only-4     Only print IPv4 addresses
+    -6, --only-6     Only print IPv6 addresses
     -V, --version    Prints version information
 ```
 
