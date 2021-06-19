@@ -34,6 +34,7 @@ FLAGS:
     -h, --help       Prints help information
     -4, --only-4     Only print IPv4 addresses
     -6, --only-6     Only print IPv6 addresses
+    -r, --reverse    Print the reverse DNS entries for the IP addresses
     -V, --version    Prints version information
 ```
 
@@ -59,7 +60,7 @@ whatismyip | grep -E '([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-f0-9
 
 If you have an IPv4 address and an IPv6 address it'll list both
 
-``` shell,skip()
+``` shell,script(name="v4-only-ip",expected_exit_code=0)
 whatismyip
 ```
 
@@ -70,12 +71,44 @@ whatismyip
 
 And if you have only an IPv6 address it'll list that
 
-``` shell,skip()
+``` shell,script(name="v6-only-ip",expected_exit_code=0)
 whatismyip
 ```
 
 ``` shell,skip()
 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+```
+
+You can also force only v6 IPs
+
+``` shell,script(name="v6-only",expected_exit_code=0)
+whatismyip -6
+```
+
+``` shell,skip()
+2001:0db8:85a3:0000:0000:8a2e:0370:7334
+```
+
+Or v4s
+
+``` shell,script(name="v4-only",expected_exit_code=0)
+whatismyip -4
+```
+
+``` shell,skip()
+207.105.7.192
+```
+
+You can also reverse those IPs, which is handy for checking VPNs and
+similar where you want to identify your gateway exit point
+
+``` shell,script(name="reverse",expected_exit_code=0)
+whatismyip -r
+```
+
+``` shell,skip()
+207.105.7.192 (5898c708dfaf.dip0.t-ipconnect.de.)
+2001:0db8:85a3:0000:0000:8a2e:0370:7334 (c06aa6b6af6c4ad5b46473d8d70bc068.dip0.t-ipconnect.de.)
 ```
 
 ## Installing

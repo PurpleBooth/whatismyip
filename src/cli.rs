@@ -20,4 +20,10 @@ pub fn app() -> App<'static> {
                 .about("Only print IPv6 addresses")
                 .conflicts_with("only-4"),
         )
+        .arg(
+            Arg::new("reverse")
+                .long("reverse")
+                .short('r')
+                .about("Print the reverse DNS entries for the IP addresses"),
+        )
 }

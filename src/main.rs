@@ -5,6 +5,7 @@ use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
 use futures::future::join_all;
+use std::ops::Add;
 use std::str::FromStr;
 use trust_dns_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
@@ -37,16 +38,30 @@ async fn main() -> Result<()> {
 
     println!(
         "{}",
-        ok.iter()
-            .flatten()
-            .cloned()
-            .flatten()
-            .map(|x| x.to_string())
-            .collect::<Vec<_>>()
-            .join("\n")
+        join_all(
+            ok.iter()
+                .flatten()
+                .cloned()
+                .flatten()
+                .map(|x| format_ip(x, matches.is_present("reverse")))
+                .collect::<Vec<_>>()
+        )
+        .await
+        .join("\n")
     );
 
     Ok(())
+}
+
+async fn format_ip(x: IpAddr, reverse: bool) -> String {
+    return if reverse {
+        match reverse_ip(&x).await {
+            Some(reversed_ip) => x.to_string().add(" (").add(&*reversed_ip).add(")"),
+            None => x.to_string(),
+        }
+    } else {
+        x.to_string()
+    };
 }
 
 async fn find_ip(strategy: LookupIpStrategy) -> Result<Ips> {
@@ -110,4 +125,15 @@ async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpA
         .iter()
         .next()
         .ok_or_else(|| anyhow!("Nameserver ip not found"))
+}
+
+async fn reverse_ip(ip: &IpAddr) -> Option<String> {
+    AsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
+        .ok()?
+        .reverse_lookup(*ip)
+        .await
+        .ok()?
+        .iter()
+        .map(std::string::ToString::to_string)
+        .next()
 }
