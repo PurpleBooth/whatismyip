@@ -31,7 +31,7 @@ whatismyip
 207.105.7.192
 ```
 
-This should be your ip
+It returns IPs and only IPs
 
 ``` shell,script(name="test",expected_exit_code=0)
 whatismyip | grep -E '([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})|(([a-f0-9:]+:+)+[a-f0-9]+)'
