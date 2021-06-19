@@ -319,7 +319,7 @@ jobs:
       with:
         allowUpdates: true
         token: ${{ secrets.COMMITTER_TOKEN }}
-        bodyFile: "CHANGELOG.md"
+        bodyFile: CHANGELOG.md
         name: Release v${{ needs.release.outputs.current_version }}
         tag: v${{ needs.release.outputs.current_version }}
         artifacts: ./bins/*

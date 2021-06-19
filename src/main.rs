@@ -5,12 +5,14 @@ use anyhow::anyhow;
 use anyhow::bail;
 use anyhow::Result;
 use futures::future::join_all;
+use std::str::FromStr;
 use trust_dns_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
 use trust_dns_resolver::{AsyncResolver, TokioAsyncResolver};
 
 mod cli;
+type Ips = Vec<IpAddr>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -24,7 +26,7 @@ async fn main() -> Result<()> {
         strategies.push(find_ip(LookupIpStrategy::Ipv6Only));
     }
 
-    let (ok, failures): (Vec<Result<String>>, Vec<Result<String>>) = join_all(strategies)
+    let (ok, failures): (Vec<Result<Ips>>, Vec<Result<Ips>>) = join_all(strategies)
         .await
         .into_iter()
         .partition(std::result::Result::is_ok);
@@ -35,13 +37,19 @@ async fn main() -> Result<()> {
 
     println!(
         "{}",
-        ok.iter().flatten().cloned().collect::<Vec<_>>().join("\n")
+        ok.iter()
+            .flatten()
+            .cloned()
+            .flatten()
+            .map(|x| x.to_string())
+            .collect::<Vec<_>>()
+            .join("\n")
     );
 
     Ok(())
 }
 
-async fn find_ip(strategy: LookupIpStrategy) -> Result<String> {
+async fn find_ip(strategy: LookupIpStrategy) -> Result<Ips> {
     let ns_ip = tokio::select! {
         ns_ip = async { resolver_ip("ns1.google.com", strategy).await } => ns_ip,
         ns_ip = async { resolver_ip("ns2.google.com", strategy).await } => ns_ip,
@@ -53,14 +61,14 @@ async fn find_ip(strategy: LookupIpStrategy) -> Result<String> {
     user_ips(&dns_resolver).await
 }
 
-async fn user_ips(resolver: &TokioAsyncResolver) -> Result<String> {
+async fn user_ips(resolver: &TokioAsyncResolver) -> Result<Ips> {
     Ok(resolver
         .txt_lookup("o-o.myaddr.l.google.com")
         .await?
         .iter()
         .map(std::string::ToString::to_string)
-        .collect::<Vec<_>>()
-        .join("\n"))
+        .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
+        .collect::<Vec<_>>())
 }
 
 fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResolver> {
