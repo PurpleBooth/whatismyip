@@ -16,15 +16,15 @@ mod cli;
 async fn main() -> Result<()> {
     let matches = cli::app().get_matches();
 
-    let mut stategies = vec![];
+    let mut strategies = vec![];
     if !matches.is_present("only-6") {
-        stategies.push(find_ip(LookupIpStrategy::Ipv4Only));
+        strategies.push(find_ip(LookupIpStrategy::Ipv4Only));
     }
     if !matches.is_present("only-4") {
-        stategies.push(find_ip(LookupIpStrategy::Ipv6Only));
+        strategies.push(find_ip(LookupIpStrategy::Ipv6Only));
     }
 
-    let (ok, failures): (Vec<Result<String>>, Vec<Result<String>>) = join_all(stategies)
+    let (ok, failures): (Vec<Result<String>>, Vec<Result<String>>) = join_all(strategies)
         .await
         .into_iter()
         .partition(std::result::Result::is_ok);
