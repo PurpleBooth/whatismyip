@@ -16,4 +16,4 @@ clap = "3.0.0-beta.2"
 trust-dns-resolver = "0.20.3"
 anyhow = "1.0"
 futures = "0.3.15"
-tokio = { version = "1.7.0", features = ["full"] }
+tokio = { version = "1.7.1", features = ["full"] }
