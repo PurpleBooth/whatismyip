@@ -23,7 +23,7 @@ whatismyip --help
 ```
 
 ``` text,verify(script_name="help",stream=stdout)
-whatismyip 0.9.4
+whatismyip 0.9.5
 Billie Thompson <billie@billiecodes.com>
 Work out what your external ip is
 
