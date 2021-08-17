@@ -24,18 +24,20 @@ whatismyip --help
 
 ``` text,verify(script_name="help",stream=stdout)
 whatismyip 0.9.9
+
 Billie Thompson <billie@billiecodes.com>
+
 Work out what your external ip is
 
 USAGE:
     whatismyip [FLAGS]
 
 FLAGS:
-    -h, --help       Prints help information
     -4, --only-4     Only print IPv4 addresses
     -6, --only-6     Only print IPv6 addresses
+    -h, --help       Print help information
     -r, --reverse    Print the reverse DNS entries for the IP addresses
-    -V, --version    Prints version information
+    -V, --version    Print version information
 ```
 
 When you run it you should get an IP back
