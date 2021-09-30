@@ -29,17 +29,17 @@ build:
 .PHONY: lint
 ## Lint it
 lint:
-	cargo fmt --all -- --check
-	cargo clippy --all-features -- -D warnings -Dclippy::all -D clippy::pedantic -D clippy::cargo -A clippy::multiple-crate-versions
-	cargo check
-	cargo audit
+	cargo +nightly fmt --all -- --check
+	cargo +nightly clippy --all-features -- -D warnings -Dclippy::all -D clippy::pedantic -D clippy::cargo -A clippy::multiple-crate-versions
+	cargo +nightly check
+	cargo +nightly audit
 
 .PHONY: fmt
 ## Format what can be formatted
 fmt:
-	cargo fix --allow-dirty
+	cargo +nightly fix --allow-dirty
 	cargo +nightly clippy --allow-dirty --fix -Z unstable-options --all-features -- -D warnings -Dclippy::all -D clippy::pedantic
-	cargo fmt --all
+	cargo +nightly fmt --all
 	yamlfmt -w .github/*.yml .github/workflows/*.yml .*.yml
 
 .PHONY: clean
