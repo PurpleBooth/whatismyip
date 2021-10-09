@@ -30,7 +30,7 @@ build:
 ## Lint it
 lint:
 	cargo +nightly fmt --all -- --check
-	cargo +nightly clippy --all-features -- -D warnings -Dclippy::all -D clippy::pedantic -D clippy::cargo -A clippy::multiple-crate-versions
+	cargo +nightly clippy --all-features -- -D warnings -D clippy::all -D clippy::pedantic -D clippy::cargo
 	cargo +nightly check
 	cargo +nightly audit
 
@@ -38,7 +38,7 @@ lint:
 ## Format what can be formatted
 fmt:
 	cargo +nightly fix --allow-dirty
-	cargo +nightly clippy --allow-dirty --fix -Z unstable-options --all-features -- -D warnings -Dclippy::all -D clippy::pedantic
+	cargo +nightly clippy --allow-dirty --fix -Z unstable-options --all-features -- -D warnings -D clippy::all -D clippy::pedantic -D clippy::cargo -D clippy::nursery
 	cargo +nightly fmt --all
 	yamlfmt -w .github/*.yml .github/workflows/*.yml .*.yml
 

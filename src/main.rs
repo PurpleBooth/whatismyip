@@ -100,7 +100,7 @@ fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResol
     )?)
 }
 
-fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
+const fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
     ResolverOpts {
         ndots: 1,
         timeout: Duration::from_secs(5),
