@@ -31,7 +31,7 @@ jobs:
       previous_version: ${{ steps.previous_version.outputs.previous_version }}
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2.3.4
+    - uses: actions/checkout@v2.3.5
       with:
         fetch-depth: 0
     - uses: chaaz/versio-actions/install@v1.2
