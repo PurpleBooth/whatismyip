@@ -57,6 +57,7 @@ jobs:
     uses: PurpleBooth/common-pipelines/.github/workflows/release-rust-binary.yml@main
     with:
       current_version: ${{ needs.release.outputs.current_version }}
+      previous_version: ${{ needs.release.outputs.previous_version }}
     secrets:
       committer_token: ${{ secrets.COMMITTER_TOKEN }}
       gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
