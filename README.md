@@ -30,9 +30,9 @@ Billie Thompson <billie@billiecodes.com>
 Work out what your external ip is
 
 USAGE:
-    whatismyip [FLAGS]
+    whatismyip [OPTIONS]
 
-FLAGS:
+OPTIONS:
     -4, --only-4     Only print IPv4 addresses
     -6, --only-6     Only print IPv6 addresses
     -h, --help       Print help information
