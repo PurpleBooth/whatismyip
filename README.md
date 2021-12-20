@@ -23,7 +23,7 @@ whatismyip --help
 ```
 
 ``` text,verify(script_name="help",stream=stdout)
-whatismyip 0.9.25
+whatismyip 0.9.26
 
 Billie Thompson <billie@billiecodes.com>
 
