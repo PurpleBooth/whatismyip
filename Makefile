@@ -30,7 +30,7 @@ build:
 ## Lint it
 lint:
 	cargo +nightly fmt --all -- --check
-	cargo +nightly clippy --all-features -- -D warnings -D clippy::all -D clippy::pedantic -D clippy::cargo
+	cargo +nightly clippy --all-features -- -D warnings -Dclippy::all -D clippy::pedantic -D clippy::cargo
 	cargo +nightly check
 	cargo +nightly audit
 
