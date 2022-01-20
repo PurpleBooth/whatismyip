@@ -56,7 +56,7 @@ async fn main() -> Result<()> {
 
     println!(
         "{}",
-        stream::iter(ok.iter().flatten().cloned().flatten().collect::<Vec<_>>())
+        stream::iter(ok.iter().flatten().flatten().cloned().collect::<Vec<_>>())
             .then(|my_ip| {
                 async move {
                     if reverse {
