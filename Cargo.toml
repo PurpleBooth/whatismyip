@@ -15,5 +15,5 @@ description = "Work out what your external ip is"
 clap = { version = "3.0.14", features = ["derive", "cargo", "wrap_help", "yaml", "env", "unicode" ] }
 trust-dns-resolver = "0.20.4"
 anyhow = "1.0.53"
-futures = "0.3.19"
+futures = "0.3.21"
 tokio = { version = "1.16.1", features = ["full"] }
