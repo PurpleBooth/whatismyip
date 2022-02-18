@@ -33,7 +33,7 @@ type MyIps = Vec<myip::MyIp>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let matches = cli::app().get_matches();
+    let matches = cli::cli().get_matches();
 
     let reverse = matches.clone().is_present("reverse");
 
