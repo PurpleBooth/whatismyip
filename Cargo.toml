@@ -14,6 +14,6 @@ description = "Work out what your external ip is"
 [dependencies]
 clap = { version = "3.1.1", features = ["derive", "cargo", "wrap_help", "yaml", "env", "unicode" ] }
 trust-dns-resolver = "0.20.4"
-anyhow = "1.0.54"
+anyhow = "1.0.55"
 futures = "0.3.21"
 tokio = { version = "1.17.0", features = ["full"] }
