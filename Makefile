@@ -14,7 +14,7 @@ test:
 .PHONY: specdown
 ## Test the markdown in the docs directory
 specdown: build
-	./runners/specdown-runner ./README.md
+	specdown run --temporary-workspace-dir --add-path "$(CURDIR)/target/release" ./README.md
 
 .PHONY: smoke-test
 ## Run a smoke test and see if the app runs
