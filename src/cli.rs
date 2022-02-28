@@ -1,29 +1,15 @@
-use clap::{crate_authors, crate_version, Arg, Command};
+use clap::Parser;
 
-pub fn cli() -> Command<'static> {
-    Command::new(String::from(env!("CARGO_PKG_NAME")))
-        .bin_name(String::from(env!("CARGO_PKG_NAME")))
-        .version(crate_version!())
-        .author(crate_authors!())
-        .about(env!("CARGO_PKG_DESCRIPTION"))
-        .arg(
-            Arg::new("only-4")
-                .long("only-4")
-                .short('4')
-                .help("Only print IPv4 addresses")
-                .conflicts_with("only-6"),
-        )
-        .arg(
-            Arg::new("only-6")
-                .long("only-6")
-                .short('6')
-                .help("Only print IPv6 addresses")
-                .conflicts_with("only-4"),
-        )
-        .arg(
-            Arg::new("reverse")
-                .long("reverse")
-                .short('r')
-                .help("Print the reverse DNS entries for the IP addresses"),
-        )
+#[derive(Parser, Debug, Copy, Clone)]
+#[clap(author, version, about)]
+pub struct Args {
+    /// Only print IPv4 addresses
+    #[clap(short = '4', long = "only-4", conflicts_with = "only_6")]
+    pub only_4: bool,
+    /// Only print IPv6 addresses
+    #[clap(short = '6', long = "only-6", conflicts_with = "only_4")]
+    pub only_6: bool,
+    /// Print the reverse DNS entries for the IP addresses
+    #[clap(short = 'r', long = "reverse")]
+    pub reverse: bool,
 }

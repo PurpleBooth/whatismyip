@@ -9,7 +9,7 @@
     missing_debug_implementations,
     missing_docs
 )]
-
+use clap::Parser;
 use std::net::IpAddr;
 
 use std::str::FromStr;
@@ -32,15 +32,13 @@ type MyIps = Vec<myip::MyIp>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
-    let matches = cli::cli().get_matches();
-
-    let reverse = matches.clone().is_present("reverse");
+    let args = cli::Args::parse();
 
     let mut strategies = vec![];
-    if !matches.is_present("only-6") {
+    if !args.only_6 {
         strategies.push(find_ip(LookupIpStrategy::Ipv4Only));
     }
-    if !matches.is_present("only-4") {
+    if !args.only_4 {
         strategies.push(find_ip(LookupIpStrategy::Ipv6Only));
     }
 
@@ -58,7 +56,7 @@ async fn main() -> Result<()> {
         stream::iter(ok.iter().flatten().flatten().cloned().collect::<Vec<_>>())
             .then(|my_ip| {
                 async move {
-                    if reverse {
+                    if args.reverse {
                         reverse_ip(&my_ip.clone()).await.map_or_else(
                             || my_ip.clone(),
                             |reversed_ip| MyIp::new_reversed(my_ip.ip(), ReversedIp(reversed_ip)),
