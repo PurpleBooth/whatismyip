@@ -13,7 +13,6 @@ use clap::Parser;
 use std::net::IpAddr;
 
 use std::str::FromStr;
-use std::time::Duration;
 
 use crate::myip::{MyIp, ReversedIp};
 use anyhow::anyhow;
@@ -110,25 +109,10 @@ fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResol
     )?)
 }
 
-const fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
-    ResolverOpts {
-        ndots: 1,
-        timeout: Duration::from_secs(5),
-        attempts: 2,
-        rotate: false,
-        check_names: true,
-        edns0: false,
-        validate: false,
-        ip_strategy,
-        cache_size: 32,
-        use_hosts_file: true,
-        positive_min_ttl: None,
-        negative_min_ttl: None,
-        positive_max_ttl: None,
-        negative_max_ttl: None,
-        num_concurrent_reqs: 2,
-        preserve_intermediates: false,
-    }
+fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
+    let mut opts = ResolverOpts::default();
+    opts.ip_strategy = ip_strategy;
+    opts
 }
 
 async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpAddr> {
