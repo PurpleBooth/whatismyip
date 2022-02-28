@@ -1,3 +1,16 @@
 use_angular: true
 types: [ci]
-scopes: ["deps", "deploy", "Mergify", "Actions", "Homebrew", "FastConventional"]
+scopes:
+    [
+        "versio",
+        "deps",
+        "deploy",
+        "dependabot",
+        "Mergify",
+        "Actions",
+        "Homebrew",
+        "FastConventional",
+        "Justfile",
+        "src",
+        "Changelog",
+    ]
