@@ -19,7 +19,7 @@ your IPv4 and IPv6 addresses.
 ## Usage
 
 ``` shell,script(name="help",expected_exit_code=0)
-whatismyip --help
+whatismyip --help | sed 's/\.exe//'
 ```
 
 ``` text,verify(script_name="help",stream=stdout)
