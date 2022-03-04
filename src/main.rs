@@ -28,6 +28,12 @@ mod myip;
 
 type MyIps = Vec<myip::MyIp>;
 
+const GOOGLE_NS1: &str = "ns1.google.com";
+const GOOGLE_NS2: &str = "ns2.google.com";
+const GOOGLE_NS3: &str = "ns3.google.com";
+const GOOGLE_NS4: &str = "ns4.google.com";
+const MYADDR_RECORD: &str = "o-o.myaddr.l.google.com";
+
 #[tokio::main]
 async fn main() -> Result<()> {
     set_panic_hook();
@@ -73,10 +79,10 @@ async fn main() -> Result<()> {
 
 async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
     let ns_ip = tokio::select! {
-        ns_ip = async { resolver_ip("ns1.google.com", strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip("ns2.google.com", strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip("ns3.google.com", strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip("ns4.google.com", strategy).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS1, strategy).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS2, strategy).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS3, strategy).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS4, strategy).await } => ns_ip,
     }?;
 
     let dns_resolver = resolver(ns_ip, LookupIpStrategy::Ipv4Only)?;
@@ -85,7 +91,7 @@ async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
 
 async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
     Ok(resolver
-        .txt_lookup("o-o.myaddr.l.google.com")
+        .txt_lookup(MYADDR_RECORD)
         .await
         .into_diagnostic()?
         .iter()
