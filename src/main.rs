@@ -59,7 +59,7 @@ async fn main() -> Result<()> {
                     if args.reverse {
                         reverse_ip(&my_ip.clone()).await.map_or_else(
                             || my_ip.clone(),
-                            |reversed_ip| MyIp::new_reversed(my_ip.ip(), ReversedIp(reversed_ip)),
+                            |reversed_ip| MyIp::new_reversed(my_ip.ip(), reversed_ip),
                         )
                     } else {
                         my_ip.clone()
@@ -124,7 +124,7 @@ async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpA
         .ok_or_else(|| anyhow!("Nameserver ip not found"))
 }
 
-async fn reverse_ip(ip: &MyIp) -> Option<String> {
+async fn reverse_ip(ip: &MyIp) -> Option<ReversedIp> {
     AsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
         .ok()?
         .reverse_lookup(ip.ip())
@@ -132,5 +132,6 @@ async fn reverse_ip(ip: &MyIp) -> Option<String> {
         .ok()?
         .iter()
         .map(std::string::ToString::to_string)
+        .map(ReversedIp::from)
         .next()
 }

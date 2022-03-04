@@ -2,14 +2,11 @@ use core::fmt;
 use core::fmt::{Display, Formatter};
 use std::net::IpAddr;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MyIp {
     Reversed { ip: IpAddr, reversed: ReversedIp },
     Plain { ip: IpAddr },
 }
-
-#[derive(Clone, Debug)]
-pub struct ReversedIp(pub String);
 
 impl MyIp {
     pub(crate) const fn new_reversed(ip: IpAddr, reversed: ReversedIp) -> Self {
@@ -22,6 +19,15 @@ impl MyIp {
         match self {
             MyIp::Reversed { ip, .. } | MyIp::Plain { ip } => *ip,
         }
+    }
+}
+
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ReversedIp(pub String);
+
+impl From<String> for ReversedIp {
+    fn from(value: String) -> Self {
+        Self(value)
     }
 }
 
@@ -55,6 +61,13 @@ mod tests {
             )
         );
         assert_eq!(actual, String::from("127.0.0.1 (www.example.com)"));
+    }
+
+    #[test]
+    fn can_create_a_reversed_ip_from_a_string() {
+        let input = "Testing".to_string();
+        let actual: ReversedIp = input.clone().into();
+        assert_eq!(actual, ReversedIp(input));
     }
 
     #[test]
