@@ -15,11 +15,9 @@ use std::net::IpAddr;
 use std::str::FromStr;
 
 use crate::myip::{MyIp, ReversedIp};
-use anyhow::anyhow;
-use anyhow::bail;
-use anyhow::Result;
 use futures::future::join_all;
 use futures::{stream, StreamExt};
+use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
 use trust_dns_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
@@ -32,6 +30,7 @@ type MyIps = Vec<myip::MyIp>;
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    set_panic_hook();
     let args = cli::Args::parse();
 
     let mut strategies = vec![];
@@ -51,26 +50,23 @@ async fn main() -> Result<()> {
         bail!("Failed: {:?}", failures,);
     }
 
-    println!(
-        "{}",
+    let resolution_result =
         stream::iter(ok.iter().flatten().flatten().cloned().collect::<Vec<_>>())
-            .then(|my_ip| {
-                async move {
-                    if args.reverse {
-                        reverse_ip(&my_ip.clone()).await.map_or_else(
-                            || my_ip.clone(),
-                            |reversed_ip| MyIp::new_reversed(my_ip.ip(), reversed_ip),
-                        )
-                    } else {
-                        my_ip.clone()
-                    }
+            .then(|my_ip| async move {
+                if args.reverse {
+                    reverse_ip(&my_ip.clone()).await.map_or_else(
+                        || my_ip.clone(),
+                        |reversed_ip| MyIp::new_reversed(my_ip.ip(), reversed_ip),
+                    )
+                } else {
+                    my_ip.clone()
                 }
             })
             .map(|ip| format!("{}", ip))
             .collect::<Vec<_>>()
             .await
-            .join("\n")
-    );
+            .join("\n");
+    println!("{}", resolution_result);
 
     Ok(())
 }
@@ -90,7 +86,8 @@ async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
 async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
     Ok(resolver
         .txt_lookup("o-o.myaddr.l.google.com")
-        .await?
+        .await
+        .into_diagnostic()?
         .iter()
         .map(std::string::ToString::to_string)
         .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
@@ -99,14 +96,15 @@ async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
 }
 
 fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResolver> {
-    Ok(AsyncResolver::tokio(
+    AsyncResolver::tokio(
         ResolverConfig::from_parts(
             None,
             vec![],
             NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
         ),
         resolver_opts(ip_strategy),
-    )?)
+    )
+    .into_diagnostic()
 }
 
 fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
@@ -116,12 +114,14 @@ fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
 }
 
 async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpAddr> {
-    AsyncResolver::tokio(ResolverConfig::default(), resolver_opts(ip_strategy))?
+    AsyncResolver::tokio(ResolverConfig::default(), resolver_opts(ip_strategy))
+        .into_diagnostic()?
         .lookup_ip(ns_host)
-        .await?
+        .await
+        .into_diagnostic()?
         .iter()
         .next()
-        .ok_or_else(|| anyhow!("Nameserver ip not found"))
+        .ok_or_else(|| miette!("Nameserver ip not found"))
 }
 
 async fn reverse_ip(ip: &MyIp) -> Option<ReversedIp> {
