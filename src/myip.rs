@@ -57,7 +57,7 @@ mod tests {
             "{}",
             MyIp::new_reversed(
                 IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-                ReversedIp(String::from("www.example.com")),
+                "www.example.com".to_string().into(),
             )
         );
         assert_eq!(actual, String::from("127.0.0.1 (www.example.com)"));
@@ -76,7 +76,7 @@ mod tests {
             "{}",
             MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)))
         );
-        assert_eq!(actual, String::from("127.0.0.1"));
+        assert_eq!(actual, "127.0.0.1".to_string());
     }
     #[test]
     fn can_get_the_ip_v4() {
@@ -87,7 +87,7 @@ mod tests {
     fn can_get_the_ip_v6() {
         let actual = MyIp::new_reversed(
             IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
-            ReversedIp(String::from("www.example.com")),
+            "www.example.com".to_string().into(),
         );
         assert_eq!(actual.ip(), IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
     }
