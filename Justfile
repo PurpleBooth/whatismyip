@@ -8,7 +8,7 @@ test:
 
 # Test the markdown in the docs directory
 specdown: build
-        specdown run --temporary-workspace-dir --add-path "$(CURDIR)/target/release" ./README.md
+        specdown run --temporary-workspace-dir --add-path "{{justfile_directory()}}/target/release" ./README.md
 
 # Run a smoke test and see if the app runs
 smoke-test: build
