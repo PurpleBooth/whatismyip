@@ -23,7 +23,7 @@ whatismyip --help | sed 's/\.exe//'
 ```
 
 ``` text,verify(script_name="help",stream=stdout)
-whatismyip 0.10.11
+whatismyip 0.10.12
 Billie Thompson <billie@billiecodes.com>
 Work out what your external ip is
 
