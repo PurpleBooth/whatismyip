@@ -23,19 +23,16 @@ whatismyip --help | sed 's/\.exe//'
 ```
 
 ``` text,verify(script_name="help",stream=stdout)
-whatismyip 0.10.17
-Billie Thompson <billie@billiecodes.com>
 Work out what your external ip is
 
-USAGE:
-    whatismyip [OPTIONS]
+Usage: whatismyip [OPTIONS]
 
-OPTIONS:
-    -4, --only-4     Only print IPv4 addresses
-    -6, --only-6     Only print IPv6 addresses
-    -h, --help       Print help information
-    -r, --reverse    Print the reverse DNS entries for the IP addresses
-    -V, --version    Print version information
+Options:
+  -4, --only-4   Only print IPv4 addresses
+  -6, --only-6   Only print IPv6 addresses
+  -r, --reverse  Print the reverse DNS entries for the IP addresses
+  -h, --help     Print help information
+  -V, --version  Print version information
 ```
 
 When you run it you should get an IP back
