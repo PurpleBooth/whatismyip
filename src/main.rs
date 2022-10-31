@@ -68,11 +68,11 @@ async fn main() -> Result<()> {
                     my_ip.clone()
                 }
             })
-            .map(|ip| format!("{}", ip))
+            .map(|ip| format!("{ip}"))
             .collect::<Vec<_>>()
             .await
             .join("\n");
-    println!("{}", resolution_result);
+    println!("{resolution_result}");
 
     Ok(())
 }

@@ -17,7 +17,7 @@ impl MyIp {
     }
     pub(crate) const fn ip(&self) -> IpAddr {
         match self {
-            MyIp::Reversed { ip, .. } | MyIp::Plain { ip } => *ip,
+            Self::Reversed { ip, .. } | Self::Plain { ip } => *ip,
         }
     }
 }
@@ -34,11 +34,11 @@ impl From<String> for ReversedIp {
 impl Display for MyIp {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self {
-            MyIp::Reversed { ip, reversed } => {
-                write!(f, "{} ({})", ip, reversed.0)
+            Self::Reversed { ip, reversed } => {
+                write!(f, "{ip} ({})", reversed.0)
             }
-            MyIp::Plain { ip } => {
-                write!(f, "{}", ip)
+            Self::Plain { ip } => {
+                write!(f, "{ip}")
             }
         }
     }
