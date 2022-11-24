@@ -16,4 +16,4 @@ clap = { version = "4.0.26", features = ["derive", "cargo", "wrap_help", "env", 
 trust-dns-resolver = "0.22.0"
 futures = "0.3.25"
 tokio = { version = "1.22.0", features = ["full"] }
-miette = { version = "5.4.1", features = ["fancy"] }
+miette = { version = "5.5.0", features = ["fancy"] }
