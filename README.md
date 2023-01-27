@@ -31,8 +31,8 @@ Options:
   -4, --only-4   Only print IPv4 addresses
   -6, --only-6   Only print IPv6 addresses
   -r, --reverse  Print the reverse DNS entries for the IP addresses
-  -h, --help     Print help information
-  -V, --version  Print version information
+  -h, --help     Print help
+  -V, --version  Print version
 ```
 
 When you run it you should get an IP back
