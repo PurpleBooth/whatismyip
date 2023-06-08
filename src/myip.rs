@@ -9,13 +9,13 @@ pub enum MyIp {
 }
 
 impl MyIp {
-    pub(crate) const fn new_reversed(ip: IpAddr, reversed: ReversedIp) -> Self {
+    pub const fn new_reversed(ip: IpAddr, reversed: ReversedIp) -> Self {
         Self::Reversed { ip, reversed }
     }
-    pub(crate) const fn new_plain(ip: IpAddr) -> Self {
+    pub const fn new_plain(ip: IpAddr) -> Self {
         Self::Plain { ip }
     }
-    pub(crate) const fn ip(&self) -> IpAddr {
+    pub const fn ip(&self) -> IpAddr {
         match self {
             Self::Reversed { ip, .. } | Self::Plain { ip } => *ip,
         }

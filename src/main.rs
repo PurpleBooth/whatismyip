@@ -7,8 +7,27 @@
     future_incompatible,
     missing_copy_implementations,
     missing_debug_implementations,
-    missing_docs
+    missing_docs,
+    clippy::all,
+    clippy::pedantic,
+    clippy::nursery,
+    clippy::cargo,
+    clippy::unwrap_used,
+    clippy::missing_assert_message,
+    clippy::todo,
+    clippy::allow_attributes_without_reason,
+    clippy::panic,
+    clippy::panicking_unwrap,
+    clippy::panic_in_result_fn
 )]
+#![deny(warnings)]
+// Allowed as currently it's buggy for macros from external crates
+// https://github.com/rust-lang/rust-clippy/pull/10203
+// https://github.com/rust-lang/rust-clippy/issues/10636
+// https://github.com/tokio-rs/tokio/issues/5616
+#![allow(clippy::redundant_pub_crate)]
+#![allow(clippy::multiple_crate_versions)]
+
 use clap::Parser;
 use std::net::IpAddr;
 
@@ -56,27 +75,28 @@ async fn main() -> Result<()> {
         bail!("Failed: {:?}", failures,);
     }
 
-    let resolution_result =
-        stream::iter(ok.iter().flatten().flatten().cloned().collect::<Vec<_>>())
-            .then(|my_ip| async move {
-                if args.reverse {
-                    reverse_ip(&my_ip.clone()).await.map_or_else(
-                        || my_ip.clone(),
-                        |reversed_ip| MyIp::new_reversed(my_ip.ip(), reversed_ip),
-                    )
-                } else {
-                    my_ip.clone()
-                }
-            })
-            .map(|ip| format!("{ip}"))
-            .collect::<Vec<_>>()
-            .await
-            .join("\n");
+    let resolution_result = stream::iter(ok.iter().flatten().flatten().cloned())
+        .then(|my_ip| async move {
+            if args.reverse {
+                reverse_ip(&my_ip.clone()).await.map_or_else(
+                    || my_ip.clone(),
+                    |reversed_ip| MyIp::new_reversed(my_ip.ip(), reversed_ip),
+                )
+            } else {
+                my_ip.clone()
+            }
+        })
+        .map(|ip| format!("{ip}"))
+        .collect::<Vec<_>>()
+        .await
+        .join("\n");
     println!("{resolution_result}");
 
     Ok(())
 }
 
+// Allowed as this warning is generated from
+#[allow(clippy::redundant_pub_crate)]
 async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
     let ns_ip = tokio::select! {
         ns_ip = async { resolver_ip(GOOGLE_NS1, strategy).await } => ns_ip,
