@@ -21,11 +21,6 @@
     clippy::panic_in_result_fn
 )]
 #![deny(warnings)]
-// Allowed as currently it's buggy for macros from external crates
-// https://github.com/rust-lang/rust-clippy/pull/10203
-// https://github.com/rust-lang/rust-clippy/issues/10636
-// https://github.com/tokio-rs/tokio/issues/5616
-#![allow(clippy::redundant_pub_crate)]
 #![allow(clippy::multiple_crate_versions)]
 
 use clap::Parser;
@@ -105,7 +100,7 @@ async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
         ns_ip = async { resolver_ip(GOOGLE_NS4, strategy).await } => ns_ip,
     }?;
 
-    let dns_resolver = resolver(ns_ip, LookupIpStrategy::Ipv4Only)?;
+    let dns_resolver = resolver(ns_ip, LookupIpStrategy::Ipv4Only);
     user_ips(&dns_resolver).await
 }
 
@@ -121,7 +116,7 @@ async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
         .collect())
 }
 
-fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResolver> {
+fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioAsyncResolver {
     AsyncResolver::tokio(
         ResolverConfig::from_parts(
             None,
@@ -130,7 +125,6 @@ fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioAsyncResol
         ),
         resolver_opts(ip_strategy),
     )
-    .into_diagnostic()
 }
 
 fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
@@ -141,7 +135,6 @@ fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
 
 async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpAddr> {
     AsyncResolver::tokio(ResolverConfig::default(), resolver_opts(ip_strategy))
-        .into_diagnostic()?
         .lookup_ip(ns_host)
         .await
         .into_diagnostic()?
@@ -152,7 +145,6 @@ async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpA
 
 async fn reverse_ip(ip: &MyIp) -> Option<ReversedIp> {
     AsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
-        .ok()?
         .reverse_lookup(ip.ip())
         .await
         .ok()?
