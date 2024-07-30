@@ -21,7 +21,10 @@
     clippy::panic_in_result_fn
 )]
 #![deny(warnings)]
-#![allow(clippy::multiple_crate_versions)]
+#![allow(
+    clippy::multiple_crate_versions,
+    reason = "Allowed to enable faster rolling forwards from vulnerable dependencies"
+)]
 
 use clap::Parser;
 use std::net::IpAddr;
@@ -90,8 +93,10 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-// Allowed as this warning is generated from
-#[allow(clippy::redundant_pub_crate)]
+#[allow(
+    clippy::redundant_pub_crate,
+    reason = "Allowed as this warning is generated from a tokio macro"
+)]
 async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
     let ns_ip = tokio::select! {
         ns_ip = async { resolver_ip(GOOGLE_NS1, strategy).await } => ns_ip,
