@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.1 - 2024-08-03
+#### Bug Fixes
+- **(deps)** update rust crate clap to v4.5.13 - (e4d63fe) - renovate[bot]
+
+- - -
+
 ## v0.11.0 - 2024-08-03
 #### Bug Fixes
 - Add reasons to why we allowing some lints - (3af16ed) - Billie Thompson
