@@ -1,4 +1,4 @@
-//! A little utility to work out the public IP address of a machine
+//! A little utility to work out the IP address of a machine
 #![warn(
     rust_2018_idioms,
     unused,
@@ -27,11 +27,14 @@
 )]
 
 use clap::Parser;
+use local_ip_address::list_afinet_netifas;
+use std::collections::HashSet;
 use std::net::IpAddr;
-
 use std::str::FromStr;
 
+use crate::cli::Args;
 use crate::myip::{MyIp, ReversedIp};
+use crate::IpVersion::{Ipv4, Ipv6};
 use futures::future::join_all;
 use futures::{stream, StreamExt};
 use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
@@ -51,22 +54,51 @@ const GOOGLE_NS3: &str = "ns3.google.com";
 const GOOGLE_NS4: &str = "ns4.google.com";
 const MYADDR_RECORD: &str = "o-o.myaddr.l.google.com";
 
+#[derive(Copy, Debug, Clone)]
+enum IpVersion {
+    Ipv4,
+    Ipv6,
+}
 #[tokio::main]
 async fn main() -> Result<()> {
     set_panic_hook();
     let args = cli::Args::parse();
 
     let mut strategies = vec![];
-    if !args.only_6 {
-        strategies.push(find_ip(LookupIpStrategy::Ipv4Only));
-    }
-    if !args.only_4 {
-        strategies.push(find_ip(LookupIpStrategy::Ipv6Only));
+
+    if !args.only_local {
+        if !args.only_6 && !args.only_local {
+            strategies.push(find_wan_ip(IpVersion::Ipv4));
+        }
+        if !args.only_4 && !args.only_local {
+            strategies.push(find_wan_ip(IpVersion::Ipv6));
+        }
     }
 
     let (ok, failures): (Vec<Result<MyIps>>, Vec<Result<MyIps>>) = join_all(strategies)
         .await
         .into_iter()
+        .chain(match args {
+            Args {
+                only_wan: false,
+                only_6: false,
+                only_4: true,
+                ..
+            } => vec![Ok(find_local_ip(Some(Ipv4)))],
+            Args {
+                only_wan: false,
+                only_6: true,
+                only_4: false,
+                ..
+            } => vec![Ok(find_local_ip(Some(Ipv6)))],
+            Args {
+                only_wan: false,
+                only_6: false,
+                only_4: false,
+                ..
+            } => vec![Ok(find_local_ip(None))],
+            _ => vec![],
+        })
         .partition(std::result::Result::is_ok);
 
     if ok.is_empty() {
@@ -85,8 +117,10 @@ async fn main() -> Result<()> {
             }
         })
         .map(|ip| format!("{ip}"))
-        .collect::<Vec<_>>()
+        .collect::<HashSet<String>>()
         .await
+        .into_iter()
+        .collect::<Vec<_>>()
         .join("\n");
     println!("{resolution_result}");
 
@@ -97,16 +131,36 @@ async fn main() -> Result<()> {
     clippy::redundant_pub_crate,
     reason = "Allowed as this warning is generated from a tokio macro"
 )]
-async fn find_ip(strategy: LookupIpStrategy) -> Result<MyIps> {
+async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
     let ns_ip = tokio::select! {
-        ns_ip = async { resolver_ip(GOOGLE_NS1, strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip(GOOGLE_NS2, strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip(GOOGLE_NS3, strategy).await } => ns_ip,
-        ns_ip = async { resolver_ip(GOOGLE_NS4, strategy).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS1, match strategy {
+        IpVersion::Ipv4 => {LookupIpStrategy::Ipv4Only}IpVersion::Ipv6 => {LookupIpStrategy::Ipv6Only}}).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS2, match strategy {
+
+        IpVersion::Ipv4 => {LookupIpStrategy::Ipv4Only}IpVersion::Ipv6 => {LookupIpStrategy::Ipv6Only}}).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS3, match strategy {
+
+        IpVersion::Ipv4 => {LookupIpStrategy::Ipv4Only}IpVersion::Ipv6 => {LookupIpStrategy::Ipv6Only}}).await } => ns_ip,
+        ns_ip = async { resolver_ip(GOOGLE_NS4, match strategy {
+
+        IpVersion::Ipv4 => {LookupIpStrategy::Ipv4Only}IpVersion::Ipv6 => {LookupIpStrategy::Ipv6Only}}).await } => ns_ip,
     }?;
 
     let dns_resolver = resolver(ns_ip, LookupIpStrategy::Ipv4Only);
     user_ips(&dns_resolver).await
+}
+
+fn find_local_ip(strategy: Option<IpVersion>) -> MyIps {
+    list_afinet_netifas()
+        .into_iter()
+        .flatten()
+        .filter_map(match strategy {
+            Some(Ipv4) => |(_, ip): (String, IpAddr)| if ip.is_ipv6() { None } else { Some(ip) },
+            Some(Ipv6) => |(_, ip): (String, IpAddr)| if ip.is_ipv6() { Some(ip) } else { None },
+            None => |(_, ip): (String, IpAddr)| Some(ip),
+        })
+        .map(MyIp::new_plain)
+        .collect::<Vec<_>>()
 }
 
 async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
