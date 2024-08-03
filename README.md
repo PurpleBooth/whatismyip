@@ -1,6 +1,7 @@
 # What is my ip
 
-I made this tool as a convenient way to get my IPs, be they remote or local.
+I made this tool as a convenient way to get my IPs, be they remote or
+local.
 
 ## Usage
 
@@ -137,10 +138,9 @@ brew install PurpleBooth/repo/whatismyip
 
 ## How the WAN IP detection works
 
-This is done by querying the
-`o-o.myaddr.l.google.com` `TXT` record on the Google DNS servers
-(`ns1.google.com`, `ns2.google.com`, `ns3.google.com`, or
-`ns4.google.com`).
+This is done by querying the `o-o.myaddr.l.google.com` `TXT` record on
+the Google DNS servers (`ns1.google.com`, `ns2.google.com`,
+`ns3.google.com`, or `ns4.google.com`).
 
 You can do the same thing yourself running using the [dig
 tool](https://en.wikipedia.org/wiki/Dig_(command)):
