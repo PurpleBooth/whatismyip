@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.2 - 2024-08-03
+#### Bug Fixes
+- bump deps - (42701b7) - Billie Thompson
+#### Continuous Integration
+- format - (48094e1) - Billie Thompson
+
+- - -
+
 ## v0.11.1 - 2024-08-03
 #### Bug Fixes
 - **(deps)** update rust crate clap to v4.5.13 - (e4d63fe) - renovate[bot]
