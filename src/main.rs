@@ -21,10 +21,8 @@
     clippy::panic_in_result_fn
 )]
 #![deny(warnings)]
-#![allow(
-    clippy::multiple_crate_versions,
-    reason = "Allowed to enable faster rolling forwards from vulnerable dependencies"
-)]
+#![allow(clippy::allow_attributes_without_reason)]
+#![allow(clippy::multiple_crate_versions)]
 
 use clap::Parser;
 use local_ip_address::list_afinet_netifas;
@@ -127,10 +125,7 @@ async fn main() -> Result<()> {
     Ok(())
 }
 
-#[allow(
-    clippy::redundant_pub_crate,
-    reason = "Allowed as this warning is generated from a tokio macro"
-)]
+#[allow(clippy::redundant_pub_crate)]
 async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
     let ns_ip = tokio::select! {
         ns_ip = async { resolver_ip(GOOGLE_NS1, match strategy {
