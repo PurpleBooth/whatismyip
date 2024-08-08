@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.3 - 2024-08-08
+#### Bug Fixes
+- **(deps)** bump clap from 4.5.13 to 4.5.14 - (c57968d) - dependabot[bot]
+
+- - -
+
 ## v0.11.2 - 2024-08-03
 #### Bug Fixes
 - bump deps - (42701b7) - Billie Thompson
