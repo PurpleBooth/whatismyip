@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.4 - 2024-08-11
+#### Bug Fixes
+- **(deps)** update rust crate clap to v4.5.15 - (fbb093a) - renovate[bot]
+
+- - -
+
 ## v0.11.3 - 2024-08-08
 #### Bug Fixes
 - **(deps)** bump clap from 4.5.13 to 4.5.14 - (c57968d) - dependabot[bot]
