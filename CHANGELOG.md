@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.5 - 2024-08-16
+#### Bug Fixes
+- **(deps)** bump clap from 4.5.15 to 4.5.16 - (de41a27) - dependabot[bot]
+#### Build system
+- Update the description in the homebrew repo - (4ddcaee) - Billie Thompson
+
+- - -
+
 ## v0.11.4 - 2024-08-11
 #### Bug Fixes
 - **(deps)** update rust crate clap to v4.5.15 - (fbb093a) - renovate[bot]
