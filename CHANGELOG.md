@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.6 - 2024-08-19
+#### Bug Fixes
+- **(deps)** update rust crate tokio to v1.39.3 - (9822dc2) - renovate[bot]
+
+- - -
+
 ## v0.11.5 - 2024-08-16
 #### Bug Fixes
 - **(deps)** bump clap from 4.5.15 to 4.5.16 - (de41a27) - dependabot[bot]
