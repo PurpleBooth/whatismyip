@@ -36,10 +36,10 @@ use crate::IpVersion::{Ipv4, Ipv6};
 use futures::future::join_all;
 use futures::{stream, StreamExt};
 use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
-use trust_dns_resolver::config::{
+use hickory_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
-use trust_dns_resolver::{AsyncResolver, TokioAsyncResolver};
+use hickory_resolver::{AsyncResolver, TokioAsyncResolver};
 
 mod cli;
 mod myip;
