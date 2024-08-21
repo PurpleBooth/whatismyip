@@ -35,11 +35,11 @@ use crate::myip::{MyIp, ReversedIp};
 use crate::IpVersion::{Ipv4, Ipv6};
 use futures::future::join_all;
 use futures::{stream, StreamExt};
-use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
 use hickory_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
 use hickory_resolver::{AsyncResolver, TokioAsyncResolver};
+use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
 
 mod cli;
 mod myip;
