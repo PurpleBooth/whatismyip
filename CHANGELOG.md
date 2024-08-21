@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.11.7 - 2024-08-21
+#### Bug Fixes
+- Move to new name of trust - (c79c003) - Billie Thompson
+#### Continuous Integration
+- Remove unused file - (c987f87) - Billie Thompson
+#### Miscellaneous Chores
+- Formatting - (41ad185) - Billie Thompson
+
+- - -
+
 ## v0.11.6 - 2024-08-19
 #### Bug Fixes
 - **(deps)** update rust crate tokio to v1.39.3 - (9822dc2) - renovate[bot]
