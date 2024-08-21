@@ -127,41 +127,33 @@ async fn main() -> Result<()> {
 
 #[allow(clippy::redundant_pub_crate)]
 async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
+    let lookup_ip_strategy = match strategy {
+        Ipv4 => LookupIpStrategy::Ipv4Only,
+        Ipv6 => LookupIpStrategy::Ipv6Only,
+    };
     let ns_ip = tokio::select! {
         ns_ip = async {
             resolver_ip(
                 GOOGLE_NS1,
-                match strategy {
-                    Ipv4 => {LookupIpStrategy::Ipv4Only}
-                    Ipv6 => {LookupIpStrategy::Ipv6Only}
-                }
+                lookup_ip_strategy
             ).await
         } => ns_ip,
         ns_ip = async {
             resolver_ip(
                 GOOGLE_NS2,
-                match strategy {
-                    Ipv4 => {LookupIpStrategy::Ipv4Only}
-                    Ipv6 => {LookupIpStrategy::Ipv6Only}
-                }
+                lookup_ip_strategy
             ).await
         } => ns_ip,
         ns_ip = async {
             resolver_ip(
                 GOOGLE_NS3,
-                match strategy {
-                    Ipv4 => {LookupIpStrategy::Ipv4Only}
-                    Ipv6 => {LookupIpStrategy::Ipv6Only}
-                }
+                lookup_ip_strategy
             ).await
         } => ns_ip,
         ns_ip = async {
             resolver_ip(
                 GOOGLE_NS4,
-                match strategy {
-                    Ipv4 => {LookupIpStrategy::Ipv4Only}
-                    Ipv6 => {LookupIpStrategy::Ipv6Only}
-                }
+                lookup_ip_strategy
             ).await
         } => ns_ip,
     }?;
