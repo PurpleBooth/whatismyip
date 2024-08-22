@@ -1,5 +1,6 @@
 FROM rust:1.80 AS builder
 ARG TARGETPLATFORM
+USER 1000
 WORKDIR /usr/src/
 
 RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then  \
@@ -11,23 +12,21 @@ RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then  \
     else exit 1;  \
     fi
 
-RUN USER=root cargo new whatismyip
 WORKDIR /usr/src/whatismyip
-COPY Cargo.toml Cargo.lock ./
+COPY . ./
 
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ] ; then  \
-      cargo build --release --target=x86_64-unknown-linux-musl ;  \
-    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ] ; then  \
-      cargo build --release --target=armv7-unknown-linux-musleabihf ;  \
-    elif [ "$TARGETPLATFORM" = "linux/arm64" ] ; then  \
-      cargo build --release --target=aarch64-unknown-linux-musl ;  \
-    else exit 1 ;  \
+RUN --mount=type=cache,target=/usr/src/whatismyip/target \
+    if [ "$TARGETPLATFORM" = "linux/amd64" ]; then  \
+    cargo build --target=x86_64-unknown-linux-musl --release ;  \
+    elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then  \
+    cargo build --target=armv7-unknown-linux-musleabihf --release ;  \
+    elif [ "$TARGETPLATFORM" = "linux/arm64" ]; then  \
+    cargo build --target=aarch64-unknown-linux-musl --release ;  \
+    else exit 1;  \
     fi
 
-
-COPY src ./src
-
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then  \
+RUN --mount=type=cache,target=/usr/src/whatismyip/target \
+    if [ "$TARGETPLATFORM" = "linux/amd64" ]; then  \
     cargo install --target=x86_64-unknown-linux-musl --path . ;  \
     elif [ "$TARGETPLATFORM" = "linux/arm/v7" ]; then  \
     cargo install --target=armv7-unknown-linux-musleabihf --path . ;  \
