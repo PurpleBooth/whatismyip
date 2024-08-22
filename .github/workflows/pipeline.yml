@@ -6,6 +6,8 @@ on:
   pull_request:
   workflow_dispatch:
 jobs:
+  docker-build:
+    uses: PurpleBooth/common-pipelines/.github/workflows/docker-build.yml@main
   lint-markdown:
     uses: PurpleBooth/common-pipelines/.github/workflows/markdown-check.yml@main
   commit-checks:
@@ -21,6 +23,7 @@ jobs:
     - lint-markdown
     - rust-checks
     - commit-checks
+    - docker-build
     outputs:
       current_version: ${{ steps.current_version.outputs.current_version }}
       previous_version: ${{ steps.previous_version.outputs.previous_version }}
@@ -68,3 +71,11 @@ jobs:
       committer_token: ${{ secrets.COMMITTER_TOKEN }}
       gpg_private_key: ${{ secrets.GPG_PRIVATE_KEY }}
       gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
+
+  docker-push:
+    if: needs.release.outputs.current_version != needs.release.outputs.previous_version
+    needs:
+      - release
+    uses: PurpleBooth/common-pipelines/.github/workflows/docker-push.yml@main
+    with:
+      current_version: ${{ needs.release.outputs.current_version }}
