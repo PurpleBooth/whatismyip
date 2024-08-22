@@ -44,7 +44,7 @@ use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
 mod cli;
 mod myip;
 
-type MyIps = Vec<myip::MyIp>;
+type MyIps = Vec<MyIp>;
 
 const GOOGLE_NS1: &str = "ns1.google.com";
 const GOOGLE_NS2: &str = "ns2.google.com";
@@ -176,15 +176,16 @@ fn find_local_ip(strategy: Option<IpVersion>) -> MyIps {
 }
 
 async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
-    Ok(resolver
-        .txt_lookup(MYADDR_RECORD)
-        .await
-        .into_diagnostic()?
-        .iter()
-        .map(std::string::ToString::to_string)
-        .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
-        .map(myip::MyIp::new_plain)
-        .collect())
+    Ok(
+        resolver
+            .txt_lookup(MYADDR_RECORD)
+            .await
+            .into_diagnostic()?
+            .iter()
+            .map(ToString::to_string)
+            .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
+            .map(MyIp::new_plain)
+            .collect())
 }
 
 fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioAsyncResolver {
@@ -220,7 +221,7 @@ async fn reverse_ip(ip: &MyIp) -> Option<ReversedIp> {
         .await
         .ok()?
         .iter()
-        .map(std::string::ToString::to_string)
+        .map(ToString::to_string)
         .map(ReversedIp::from)
         .next()
 }
