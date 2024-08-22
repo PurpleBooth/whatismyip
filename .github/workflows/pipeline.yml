@@ -75,7 +75,7 @@ jobs:
   docker-push:
     if: needs.release.outputs.current_version != needs.release.outputs.previous_version
     needs:
-      - release
+    - release
     uses: PurpleBooth/common-pipelines/.github/workflows/docker-push.yml@main
     with:
       current_version: ${{ needs.release.outputs.current_version }}

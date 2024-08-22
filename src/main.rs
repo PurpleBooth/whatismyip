@@ -176,16 +176,15 @@ fn find_local_ip(strategy: Option<IpVersion>) -> MyIps {
 }
 
 async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
-    Ok(
-        resolver
-            .txt_lookup(MYADDR_RECORD)
-            .await
-            .into_diagnostic()?
-            .iter()
-            .map(ToString::to_string)
-            .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
-            .map(MyIp::new_plain)
-            .collect())
+    Ok(resolver
+        .txt_lookup(MYADDR_RECORD)
+        .await
+        .into_diagnostic()?
+        .iter()
+        .map(ToString::to_string)
+        .flat_map(|possible_ip| IpAddr::from_str(&possible_ip))
+        .map(MyIp::new_plain)
+        .collect())
 }
 
 fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioAsyncResolver {
