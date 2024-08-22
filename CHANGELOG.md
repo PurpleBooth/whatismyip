@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.12.0 - 2024-08-22
+#### Build system
+- Correctly set each target - (3c73202) - Billie Thompson
+#### Features
+- Add docker distribution - (0c4b8b2) - Billie Thompson
+#### Miscellaneous Chores
+- Unused file - (b0da6c0) - Billie Thompson
+#### Refactoring
+- Correct formatting - (37d3e7a) - Billie Thompson
+- use shorter namespace - (db3e421) - Billie Thompson
+- Deduplicate the strategy logic - (2916998) - Billie Thompson
+
+- - -
+
 ## v0.11.7 - 2024-08-21
 #### Bug Fixes
 - Move to new name of trust - (c79c003) - Billie Thompson
