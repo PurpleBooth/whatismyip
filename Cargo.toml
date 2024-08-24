@@ -13,6 +13,6 @@ description = "Work out what your IP Address is"
 clap = { version = "4.5.16", features = ["derive", "cargo", "wrap_help", "env", "unicode" ] }
 hickory-resolver = "0.24.1"
 futures = "0.3.30"
-tokio = { version = "1.39.2", features = ["full"] }
+tokio = { version = "1.39.3", features = ["full"] }
 miette = { version = "7.2.0", features = ["fancy"] }
 local-ip-address = "0.6.1"
