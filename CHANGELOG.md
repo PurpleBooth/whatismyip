@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.12.1 - 2024-08-24
+#### Bug Fixes
+- **(deps)** update rust crate clap to 4.5.16 - (eb3ef8d) - renovate[bot]
+#### Build system
+- Ensure we are copying the correct binary for docker container - (1bf56e8) - Billie Thompson
+- Ensure we don't cache the "Hello world" app - (d75d96a) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** pin rust docker tag to 29fe437 - (eb0f6cf) - renovate[bot]
+
+- - -
+
 ## v0.12.0 - 2024-08-22
 #### Build system
 - Correctly set each target - (3c73202) - Billie Thompson
