@@ -73,6 +73,11 @@ jobs:
       gpg_passphrase: ${{ secrets.GPG_PASSPHRASE }}
 
   docker-push:
+    permissions:
+      attestations: write
+      packages: write
+      id-token: write
+      contents: read
     if: needs.release.outputs.current_version != needs.release.outputs.previous_version
     needs:
     - release
