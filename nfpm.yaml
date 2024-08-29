@@ -1,0 +1,18 @@
+# nfpm example configuration file
+#
+# check https://nfpm.goreleaser.com/configuration for detailed usage
+#
+name: "whatismyip"
+arch: "${GOARCH}"
+platform: "linux"
+version: "${VER}"
+section: "default"
+priority: "extra"
+maintainer: "Billie Thompson <billie@billiecodes.com>"
+description: Work out what your IP is
+vendor: "PurpleBooth"
+homepage: "https://github.com/PurpleBooth/whatismyip"
+license: "CC0"
+contents:
+  - src: ./whatismyip
+    dst: /usr/bin/whatismyip
