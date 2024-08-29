@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.0 - 2024-08-29
+#### Continuous Integration
+- Add contents read permission to docker - (6e2d7f4) - Billie Thompson
+#### Features
+- Enable packages - (5f67cce) - Billie Thompson
+
+- - -
+
 ## v0.12.2 - 2024-08-25
 #### Bug Fixes
 - **(deps)** update rust crate tokio to 1.39.3 - (aeb27d5) - renovate[bot]
