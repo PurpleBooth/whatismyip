@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.1 - 2024-08-29
+#### Bug Fixes
+- test deploy - (19e55c7) - Billie Thompson
+
+- - -
+
 ## v0.13.0 - 2024-08-29
 #### Continuous Integration
 - Add contents read permission to docker - (6e2d7f4) - Billie Thompson
