@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.2 - 2024-08-29
+#### Bug Fixes
+- test deploy - (1607011) - Billie Thompson
+
+- - -
+
 ## v0.13.1 - 2024-08-29
 #### Bug Fixes
 - test deploy - (19e55c7) - Billie Thompson
