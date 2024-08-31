@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.3 - 2024-08-31
+#### Bug Fixes
+- **(deps)** update rust crate tokio to 1.40.0 - (d36ddbf) - renovate[bot]
+#### Miscellaneous Chores
+- **(deps)** pin dependencies - (b36f9db) - renovate[bot]
+#### Refactoring
+- Cross compile from docker - (5d3c855) - Billie Thompson
+
+- - -
+
 ## v0.13.2 - 2024-08-29
 #### Bug Fixes
 - test deploy - (1607011) - Billie Thompson
