@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.4 - 2024-10-31
+#### Bug Fixes
+- try a release with packages - (71f0320) - Billie Thompson
+#### Continuous Integration
+- try docker bake - (294f484) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** update rust:alpine docker digest to 466dc99 - (6c604a8) - renovate[bot]
+- **(deps)** update rust:alpine docker digest to d6e876c - (dd8fa5f) - renovate[bot]
+
+- - -
+
 ## v0.13.3 - 2024-08-31
 #### Bug Fixes
 - **(deps)** update rust crate tokio to 1.40.0 - (d36ddbf) - renovate[bot]
