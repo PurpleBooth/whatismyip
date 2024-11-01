@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.5 - 2024-11-01
+#### Bug Fixes
+- Switch to full docker bake pipeline - (58bb492) - Billie Thompson
+#### Continuous Integration
+- Kake the directory correct for bins - (e5e1a41) - Billie Thompson
+
+- - -
+
 ## v0.13.4 - 2024-10-31
 #### Bug Fixes
 - try a release with packages - (71f0320) - Billie Thompson
