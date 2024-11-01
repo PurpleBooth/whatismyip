@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.6 - 2024-11-01
+#### Bug Fixes
+- release with packages - (d63ed9f) - Billie Thompson
+
+- - -
+
 ## v0.13.5 - 2024-11-01
 #### Bug Fixes
 - Switch to full docker bake pipeline - (58bb492) - Billie Thompson
