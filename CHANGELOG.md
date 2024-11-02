@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.7 - 2024-11-02
+#### Bug Fixes
+- Add secrets for packaging - (093a051) - Billie Thompson
+
+- - -
+
 ## v0.13.6 - 2024-11-01
 #### Bug Fixes
 - release with packages - (d63ed9f) - Billie Thompson
