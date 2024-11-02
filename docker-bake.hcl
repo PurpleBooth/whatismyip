@@ -7,6 +7,11 @@ target "bins" {
   }
   output = ["type=local,dest=target/bins/${item.TARGETPLAFORM}"]
 
+  secret = [
+    "type=env,id=GPG_PRIVATE_KEY",
+    "type=env,id=GPG_PASSPHRASE",
+  ]
+
   matrix = {
     item = [
       {
