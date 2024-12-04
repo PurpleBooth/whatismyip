@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.8 - 2024-12-04
+#### Bug Fixes
+- **(deps)** update rust crate clap to v4.5.22 (#230) - (1ecb127) - renovate[bot]
+#### Miscellaneous Chores
+- **(deps)** update rust:alpine docker digest to 838d384 - (74d8d68) - renovate[bot]
+- **(deps)** update goreleaser/nfpm docker digest to ae35b40 - (85c6198) - renovate[bot]
+- **(deps)** update rust:alpine docker digest to 2f42ce0 - (30595b0) - renovate[bot]
+- **(deps)** update rust:alpine docker digest to 00c2107 - (d30a773) - renovate[bot]
+
+- - -
+
 ## v0.13.7 - 2024-11-02
 #### Bug Fixes
 - Add secrets for packaging - (093a051) - Billie Thompson
