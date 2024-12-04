@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.10 - 2024-12-04
+#### Bug Fixes
+- **(deps)** update rust crate miette to v7.4.0 - (a57e95f) - renovate[bot]
+- **(deps)** update rust crate tokio to v1.42.0 - (fed28e9) - renovate[bot]
+- **(deps)** update rust crate local-ip-address to v0.6.3 - (e9ad1cc) - renovate[bot]
+
+- - -
+
 ## v0.13.9 - 2024-12-04
 #### Bug Fixes
 - **(deps)** update rust crate futures to v0.3.31 (#231) - (63408e5) - renovate[bot]
