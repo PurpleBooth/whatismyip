@@ -129,7 +129,7 @@ whatismyip -r
 ## Installing
 
 See the [releases
-page](https://github.com/PurpleBooth/whatismyip/releases/latest) we
+page](https://codeberg.org/PurpleBooth/whatismyip/releases/latest) we
 build for linux and mac (all x86_64), alternatively use brew
 
 ``` shell,skip()

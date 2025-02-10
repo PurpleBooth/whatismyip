@@ -11,7 +11,7 @@ priority: "extra"
 maintainer: "Billie Thompson <billie@billiecodes.com>"
 description: Work out what your IP is
 vendor: "PurpleBooth"
-homepage: "https://github.com/PurpleBooth/whatismyip"
+homepage: "https://codeberg.org/PurpleBooth/whatismyip"
 license: "CC0"
 contents:
   - src: ./whatismyip
