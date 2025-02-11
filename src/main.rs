@@ -1,28 +1,7 @@
 //! A little utility to work out the IP address of a machine
-#![warn(
-    rust_2018_idioms,
-    unused,
-    rust_2021_compatibility,
-    nonstandard_style,
-    future_incompatible,
-    missing_copy_implementations,
-    missing_debug_implementations,
-    missing_docs,
-    clippy::all,
-    clippy::pedantic,
-    clippy::nursery,
-    clippy::cargo,
-    clippy::unwrap_used,
-    clippy::missing_assert_message,
-    clippy::todo,
-    clippy::allow_attributes_without_reason,
-    clippy::panic,
-    clippy::panicking_unwrap,
-    clippy::panic_in_result_fn
-)]
-#![deny(warnings)]
-#![allow(clippy::allow_attributes_without_reason)]
+#![deny(clippy::all, clippy::pedantic, clippy::cargo, unused, missing_docs)]
 #![allow(clippy::multiple_crate_versions)]
+#![warn(clippy::nursery)]
 
 use clap::Parser;
 use local_ip_address::list_afinet_netifas;
