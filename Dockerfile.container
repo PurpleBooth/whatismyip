@@ -12,20 +12,20 @@ ARG TARGETPLATFORM
 RUN xx-apk add --no-cache musl-dev zlib-dev zlib-static openssl-dev openssl-libs-static pkgconfig alpine-sdk
 
 WORKDIR /app
-RUN cargo new --lib readable-name-generator
-WORKDIR /app/readable-name-generator
+RUN cargo new --lib whatismyip
+WORKDIR /app/whatismyip
 COPY Cargo.toml ./Cargo.toml
 COPY Cargo.lock ./Cargo.lock
 RUN xx-cargo build --release --target-dir ./build
 COPY . ./
 RUN xx-cargo build --release --target-dir ./build && \
-    xx-verify --static "./build/$(xx-cargo --print-target-triple)/release/readable-name-generator" && \
-    cp -v  "./build/$(xx-cargo --print-target-triple)/release/readable-name-generator" "./build/readable-name-generator"
+    xx-verify --static "./build/$(xx-cargo --print-target-triple)/release/whatismyip" && \
+    cp -v  "./build/$(xx-cargo --print-target-triple)/release/whatismyip" "./build/whatismyip"
 RUN addgroup -g 568 nonroot
 RUN adduser -u 568 -G nonroot -D nonroot
 FROM scratch
-COPY --from=builder "/app/readable-name-generator/build/readable-name-generator" /
+COPY --from=builder "/app/whatismyip/build/whatismyip" /
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/passwd /etc/passwd
-RUN ["/readable-name-generator", "--version"]
-ENTRYPOINT ["/readable-name-generator"]
+RUN ["/whatismyip", "--version"]
+ENTRYPOINT ["/whatismyip"]
