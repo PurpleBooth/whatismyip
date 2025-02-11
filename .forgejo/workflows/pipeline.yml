@@ -662,26 +662,3 @@ jobs:
         CHANGELOG: ${{ needs.release.outputs.changelog }}
     runs-on: docker
 
-  cargo-publish:
-    if: needs.release.outputs.current_version != needs.release.outputs.previous_version
-    name: Publish crate to crates.io
-    runs-on: docker
-    needs:
-    - release
-    steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683   # v4.2.2
-      name: Checkout the repository
-      with:
-        ref: v${{ needs.release.outputs.current_version }}
-    - uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
-      name: Install Rust
-      with:
-        GH_TOKEN: ${{ secrets.GH_TOKEN }}
-    - name: Generate release
-      run: |
-        if [ -n "$CARGO_TOKEN" ] ; then
-          cargo login "$CARGO_TOKEN"
-          cargo publish
-        fi
-      env:
-        CARGO_TOKEN: ${{ secrets.CARGO_TOKEN }}
