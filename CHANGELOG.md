@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.12 - 2025-02-11
+#### Bug Fixes
+- rename project to "whatismyip" in Dockerfile - (7a79532) - Billie Thompson
+- Update dependencies to latest versions - (98e8750) - Billie Thompson
+- migrate to codeberg - (4b1b612) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** update rust:alpine docker digest to 9ab8f4e (#236) - (a74f819) - renovate[bot]
+- remove yamlfmt command from Justfile - (74acb4e) - Billie Thompson
+#### Refactoring
+- simplify and adjust linting configuration - (0d099e3) - Billie Thompson
+
+- - -
+
 ## v0.13.11 - 2024-12-06
 #### Bug Fixes
 - **(deps)** update rust crate clap to v4.5.23 (#235) - (7178d9f) - renovate[bot]
