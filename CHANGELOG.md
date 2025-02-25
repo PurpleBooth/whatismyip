@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.13.13 - 2025-02-25
+#### Bug Fixes
+- **(ci)** update workflow runners to runner-latest - (d23404a) - Billie Thompson
+#### Continuous Integration
+- add sudo to apt commands in pipeline - (96b0dfb) - Billie Thompson
+- unify YAML indentation in pipelines - (dbb9142) - Billie Thompson
+- remove crates publish - (bd7a5e0) - PurpleBooth
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/bake-action digest to 4f08b22 - (9d24a12) - Solace System Renovate Fox
+- **(deps)** update https://code.forgejo.org/actions/cache digest to 0c907a7 - (f5fc87e) - Solace System Renovate Fox
+
+- - -
+
 ## v0.13.12 - 2025-02-11
 #### Bug Fixes
 - rename project to "whatismyip" in Dockerfile - (7a79532) - Billie Thompson
