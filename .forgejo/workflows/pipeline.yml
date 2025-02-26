@@ -581,8 +581,8 @@ jobs:
         env:
           VERSION: ${{ needs.release.outputs.current_version }}
         run: |
-          DEBIAN_FRONTEND=noninteractive apt-get update
-          DEBIAN_FRONTEND=noninteractive apt-get install -y gettext
+          DEBIAN_FRONTEND=noninteractive sudo apt-get update
+          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y gettext
           TEMP_DIR="$(mktemp -d)"
           export TEMP_DIR
           curl --silent \
