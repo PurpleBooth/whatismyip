@@ -11,7 +11,7 @@ description = "Work out what your IP Address is"
 
 [dependencies]
 clap = { version = "4.5.28", features = ["derive", "cargo", "wrap_help", "env", "unicode"] }
-hickory-resolver = "0.24.3"
+hickory-resolver = "0.25.0"
 futures = "0.3.31"
 tokio = { version = "1.43.0", features = ["full"] }
 miette = { version = "7.5.0", features = ["fancy"] }
