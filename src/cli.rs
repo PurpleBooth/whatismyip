@@ -1,5 +1,25 @@
+//! Work out what your IP Address is
+
 use clap::Parser;
 
+/// Command-line arguments for the whatismyip utility
+///
+/// This struct defines all the possible command-line arguments that can be
+/// passed to the application. It uses the clap crate for parsing and validation.
+///
+/// # Examples
+///
+/// ```
+/// use cli::Args;
+///
+/// Parse arguments from the command line
+/// let args = Args::parse();
+///
+/// // Check if only local IPs should be displayed
+/// if args.only_local {
+///     // Handle local-only mode
+/// }
+/// ```
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Parser, Debug, Copy, Clone)]
 #[clap(author, version, about)]
