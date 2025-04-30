@@ -32,16 +32,16 @@ use std::collections::HashSet;
 use std::net::IpAddr;
 use std::str::FromStr;
 
+use crate::IpVersion::{Ipv4, Ipv6};
 use crate::cli::Args;
 use crate::myip::{MyIp, ReversedIp};
-use crate::IpVersion::{Ipv4, Ipv6};
 use futures::future::join_all;
-use futures::{stream, StreamExt};
+use futures::{StreamExt, stream};
 use hickory_resolver::config::{
     LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
 };
 use hickory_resolver::{AsyncResolver, TokioAsyncResolver};
-use miette::{bail, miette, set_panic_hook, IntoDiagnostic, Result};
+use miette::{IntoDiagnostic, Result, bail, miette, set_panic_hook};
 
 mod cli;
 mod myip;

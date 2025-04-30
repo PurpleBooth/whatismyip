@@ -8,13 +8,12 @@ fn run_with_args(args: &[&str]) -> String {
         .args(["run", "--"])
         .args(args)
         .output()
-        .unwrap_or_else(|_| panic!("Failed to execute cargo run with args: {:?}", args));
+        .unwrap_or_else(|_| panic!("Failed to execute cargo run with args: {args:?}"));
 
     // Check that the program executed successfully
     assert!(
         output.status.success(),
-        "Program execution failed with args: {:?}",
-        args
+        "Program execution failed with args: {args:?}"
     );
 
     // Convert the output to a string
@@ -23,8 +22,7 @@ fn run_with_args(args: &[&str]) -> String {
     // Check that the output is not empty
     assert!(
         !stdout.trim().is_empty(),
-        "Program output is empty with args: {:?}",
-        args
+        "Program output is empty with args: {args:?}"
     );
 
     // Check that the output contains at least one IP address
@@ -33,9 +31,7 @@ fn run_with_args(args: &[&str]) -> String {
 
     assert!(
         contains_ipv4 || contains_ipv6,
-        "Output does not contain an IP address with args: {:?}\nOutput: {}",
-        args,
-        stdout
+        "Output does not contain an IP address with args: {args:?}\nOutput: {stdout}"
     );
 
     stdout.to_string()
