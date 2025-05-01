@@ -26,22 +26,20 @@
 )]
 #![allow(clippy::multiple_crate_versions)]
 
-use clap::Parser;
-use local_ip_address::list_afinet_netifas;
-use std::collections::HashSet;
-use std::net::IpAddr;
-use std::str::FromStr;
-
 use crate::IpVersion::{Ipv4, Ipv6};
 use crate::cli::Args;
 use crate::myip::{MyIp, ReversedIp};
+use clap::Parser;
 use futures::future::join_all;
 use futures::{StreamExt, stream};
-use hickory_resolver::config::{
-    LookupIpStrategy, NameServerConfigGroup, ResolverConfig, ResolverOpts,
-};
-use hickory_resolver::{AsyncResolver, TokioAsyncResolver};
+use hickory_resolver::config::{LookupIpStrategy, NameServerConfigGroup, ResolverConfig};
+use hickory_resolver::name_server::TokioConnectionProvider;
+use hickory_resolver::{Resolver, TokioResolver};
+use local_ip_address::list_afinet_netifas;
 use miette::{IntoDiagnostic, Result, bail, miette, set_panic_hook};
+use std::collections::HashSet;
+use std::net::IpAddr;
+use std::str::FromStr;
 
 mod cli;
 mod myip;
@@ -272,7 +270,7 @@ fn find_local_ip(strategy: Option<IpVersion>) -> MyIps {
 /// # Returns
 ///
 /// A result containing a vector of IP addresses if successful
-async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
+async fn user_ips(resolver: &Resolver<TokioConnectionProvider>) -> Result<MyIps> {
     Ok(resolver
         .txt_lookup(MYADDR_RECORD)
         .await
@@ -294,30 +292,17 @@ async fn user_ips(resolver: &TokioAsyncResolver) -> Result<MyIps> {
 /// # Returns
 ///
 /// A configured DNS resolver
-fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioAsyncResolver {
-    AsyncResolver::tokio(
+fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioResolver {
+    let mut builder = Resolver::builder_with_config(
         ResolverConfig::from_parts(
             None,
             vec![],
             NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
         ),
-        resolver_opts(ip_strategy),
-    )
-}
-
-/// Create resolver options with a specific IP strategy
-///
-/// # Arguments
-///
-/// * `ip_strategy` - The IP version strategy to use for lookups
-///
-/// # Returns
-///
-/// Configured resolver options
-fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
-    let mut opts = ResolverOpts::default();
-    opts.ip_strategy = ip_strategy;
-    opts
+        TokioConnectionProvider::default(),
+    );
+    builder.options_mut().ip_strategy = ip_strategy;
+    builder.build()
 }
 
 /// Resolve a nameserver hostname to an IP address
@@ -331,7 +316,11 @@ fn resolver_opts(ip_strategy: LookupIpStrategy) -> ResolverOpts {
 ///
 /// A result containing the IP address of the nameserver if successful
 async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpAddr> {
-    AsyncResolver::tokio(ResolverConfig::default(), resolver_opts(ip_strategy))
+    let mut resolver_builder = Resolver::builder_tokio().into_diagnostic()?;
+    resolver_builder.options_mut().ip_strategy = ip_strategy;
+    let resolver = resolver_builder.build();
+
+    resolver
         .lookup_ip(ns_host)
         .await
         .into_diagnostic()?
@@ -350,7 +339,9 @@ async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result<IpA
 ///
 /// An option containing the reverse DNS entry if successful
 async fn reverse_ip(ip: &MyIp) -> Option<ReversedIp> {
-    AsyncResolver::tokio(ResolverConfig::default(), ResolverOpts::default())
+    Resolver::builder_tokio()
+        .ok()?
+        .build()
         .reverse_lookup(ip.ip())
         .await
         .ok()?
@@ -422,15 +413,6 @@ mod tests {
 
         // Check that we got at least one IP
         assert!(!ips.is_empty(), "No IP addresses found");
-    }
-
-    #[test]
-    fn test_resolver_opts() {
-        let opts = resolver_opts(LookupIpStrategy::Ipv4Only);
-        assert_eq!(opts.ip_strategy, LookupIpStrategy::Ipv4Only);
-
-        let opts = resolver_opts(LookupIpStrategy::Ipv6Only);
-        assert_eq!(opts.ip_strategy, LookupIpStrategy::Ipv6Only);
     }
 
     #[test]
@@ -606,26 +588,6 @@ mod tests {
         // Check that the result contains the IP
         let reversed_str = reversed.unwrap().0;
         assert!(reversed_str.contains("192.168.1.1"));
-    }
-
-    #[test]
-    fn test_resolver_creation() {
-        use std::net::Ipv4Addr;
-
-        // Create a test IP
-        let ip = IpAddr::V4(Ipv4Addr::new(8, 8, 8, 8));
-
-        // Create resolvers with different strategies
-        let _resolver_v4 = resolver(ip, LookupIpStrategy::Ipv4Only);
-        let _resolver_v6 = resolver(ip, LookupIpStrategy::Ipv6Only);
-
-        // We can't directly test the resolver's options, but we can verify that
-        // the resolver_opts function returns the correct options
-        let opts_v4 = resolver_opts(LookupIpStrategy::Ipv4Only);
-        let opts_v6 = resolver_opts(LookupIpStrategy::Ipv6Only);
-
-        assert_eq!(opts_v4.ip_strategy, LookupIpStrategy::Ipv4Only);
-        assert_eq!(opts_v6.ip_strategy, LookupIpStrategy::Ipv6Only);
     }
 
     #[test]
