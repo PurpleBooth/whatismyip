@@ -17,9 +17,17 @@ use std::net::IpAddr;
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MyIp {
     /// An IP address with an associated reverse DNS entry
-    Reversed { ip: IpAddr, reversed: ReversedIp },
+    Reversed {
+        /// The IP address
+        ip: IpAddr,
+        /// The reverse DNS entry for the IP address
+        reversed: ReversedIp,
+    },
     /// A plain IP address without a reverse DNS entry
-    Plain { ip: IpAddr },
+    Plain {
+        /// The IP address
+        ip: IpAddr,
+    },
 }
 
 impl MyIp {
@@ -33,6 +41,7 @@ impl MyIp {
     /// # Returns
     ///
     /// A new `MyIp` instance with the IP and reverse DNS entry
+    #[must_use]
     pub const fn new_reversed(ip: IpAddr, reversed: ReversedIp) -> Self {
         Self::Reversed { ip, reversed }
     }
@@ -46,6 +55,7 @@ impl MyIp {
     /// # Returns
     ///
     /// A new `MyIp` instance with just the IP address
+    #[must_use]
     pub const fn new_plain(ip: IpAddr) -> Self {
         Self::Plain { ip }
     }
@@ -55,6 +65,7 @@ impl MyIp {
     /// # Returns
     ///
     /// The IP address, regardless of whether it has a reverse DNS entry
+    #[must_use]
     pub const fn ip(&self) -> IpAddr {
         match self {
             Self::Reversed { ip, .. } | Self::Plain { ip } => *ip,

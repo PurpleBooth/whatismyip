@@ -9,6 +9,14 @@ categories = [ "development-tools", "command-line-utilities" ]
 keywords = [ "dns", "ip", "resolve" ]
 description = "Work out what your IP Address is"
 
+[lib]
+name = "whatismyip"
+path = "src/lib.rs"
+
+[[bin]]
+name = "whatismyip"
+path = "src/main.rs"
+
 [dependencies]
 clap = { version = "4.5.37", features = ["derive", "cargo", "wrap_help", "env", "unicode"] }
 hickory-resolver = { version = "0.25.1", features = ["tokio"] }
@@ -16,3 +24,10 @@ futures = "0.3.31"
 tokio = { version = "1.44.2", features = ["full"] }
 miette = { version = "7.6.0", features = ["fancy"] }
 local-ip-address = "0.6.4"
+
+[dev-dependencies]
+criterion = { version = "0.5", features = ["html_reports", "async_tokio"] }
+
+[[bench]]
+name = "ip_benchmarks"
+harness = false
