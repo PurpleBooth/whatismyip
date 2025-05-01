@@ -1,19 +1,36 @@
-//! IP address representation and formatting
+//! IP address representation, formatting, and DNS resolution
 //!
-//! This module provides types for representing IP addresses and their
-//! associated reverse DNS entries. It includes functionality for:
-//! - Creating IP address representations
-//! - Formatting IP addresses for display
-//! - Handling reverse DNS lookups
+//! This module provides data structures and functionality for working with IP addresses
+//! in the context of the whatismyip tool. It includes:
+//!
+//! ## Core Types
+//!
+//! - `MyIp`: An enum representing either a plain IP address or an IP with reverse DNS information
+//! - `ReversedIp`: A wrapper around a hostname string obtained from reverse DNS lookup
+//!
+//! ## Features
+//!
+//! - Type-safe representation of IP addresses with or without DNS information
+//! - Methods for creating and manipulating IP address objects
+//! - Formatting functionality for displaying IP addresses with optional hostname information
+//! - Conversion utilities for working with standard Rust IP address types
 
 use core::fmt;
 use core::fmt::{Display, Formatter};
 use std::net::IpAddr;
 
-/// Represents an IP address, optionally with a reverse DNS entry
+/// Represents an IP address with optional reverse DNS information
 ///
-/// This enum can represent either a plain IP address or an IP address
-/// with an associated reverse DNS entry.
+/// This enum provides a unified way to handle IP addresses throughout the application,
+/// whether they have associated reverse DNS information or not. It encapsulates both
+/// the IP address itself and any hostname information obtained through reverse DNS lookup.
+///
+/// The enum has two variants:
+/// - `Plain`: Just the IP address without any DNS information
+/// - `Reversed`: The IP address along with its associated hostname from reverse DNS
+///
+/// This design allows for efficient representation and consistent handling of IP addresses
+/// regardless of whether reverse DNS lookups have been performed.
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum MyIp {
     /// An IP address with an associated reverse DNS entry
@@ -73,10 +90,18 @@ impl MyIp {
     }
 }
 
-/// Represents a reverse DNS entry for an IP address
+/// Represents a hostname obtained from reverse DNS lookup
 ///
-/// This is a wrapper around a String that contains the hostname
-/// associated with an IP address.
+/// This struct is a wrapper around a String that contains the hostname
+/// associated with an IP address. It encapsulates the result of a reverse DNS
+/// lookup operation and provides type safety when working with hostnames.
+///
+/// The struct is intentionally kept simple (a newtype pattern around String)
+/// to minimize overhead while still providing type safety and clear semantics
+/// in function signatures and data structures.
+///
+/// The contained hostname is publicly accessible via the tuple struct field
+/// to allow for easy access and formatting.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct ReversedIp(pub String);
 

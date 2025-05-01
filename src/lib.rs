@@ -1,13 +1,17 @@
-//! A library for determining IP addresses of a machine
+//! A library for determining machine IP addresses
 //!
-//! This library provides functionality to determine both local and WAN IP addresses
-//! of a machine. It supports both IPv4 and IPv6 addresses and can perform reverse
-//! DNS lookups to get the hostname associated with an IP address.
+//! This library provides functionality to identify both local network interface
+//! IP addresses and external (WAN) IP addresses of a machine. It supports both
+//! IPv4 and IPv6 addresses and can perform reverse DNS lookups to resolve
+//! hostnames associated with IP addresses.
 //!
-//! The library uses various strategies to determine IP addresses, including:
-//! - Local network interface enumeration
-//! - DNS queries to Google's nameservers
-//! - Special DNS records that return the client's IP address
+//! ## Features
+//!
+//! - Local IP discovery through network interface enumeration
+//! - External IP discovery using DNS queries to Google's nameservers
+//! - Reverse DNS resolution for IP addresses
+//! - Filtering by IP version (IPv4/IPv6)
+//! - Concurrent processing for efficient lookups
 
 #![warn(clippy::nursery)]
 #![deny(
@@ -65,28 +69,30 @@ pub enum IpVersion {
     Ipv6,
 }
 
-/// Find WAN IP addresses using DNS queries
+/// Discovers external (WAN) IP addresses using DNS queries
 ///
-/// This function attempts to find the WAN IP address of the machine by:
-/// 1. Resolving one of Google's nameservers
-/// 2. Using that nameserver to query a special DNS record that returns the client's IP
+/// This function determines the machine's external IP address by querying
+/// a special DNS record that returns the client's IP address as seen by
+/// the DNS server. The process works as follows:
 ///
-/// The function will try multiple nameservers in parallel and use the first one that responds.
+/// 1. Resolves one of Google's nameservers (tries multiple in parallel)
+/// 2. Creates a DNS resolver using the first nameserver that responds
+/// 3. Queries the special DNS record to get the client's IP address
+///
+/// For performance, the function caches DNS resolvers for subsequent calls.
 ///
 /// # Arguments
 ///
-/// * `strategy` - The IP version strategy to use (IPv4 or IPv6)
+/// * `strategy` - The IP version filter to apply (IPv4 or IPv6)
 ///
 /// # Returns
 ///
-/// A result containing a vector of IP addresses if successful
+/// A result containing a vector of external IP addresses
 ///
 /// # Errors
 ///
-/// This function will return an error if:
-/// - DNS resolution fails for all Google nameservers
-/// - The resolver cannot be created
-/// - The special DNS record cannot be queried
+/// Returns an error if DNS resolution fails for all nameservers or if
+/// the special DNS record cannot be queried successfully.
 pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
     // Use static resolvers for better performance across multiple calls
     static IPV4_DNS_RESOLVER: tokio::sync::OnceCell<TokioResolver> =
@@ -147,24 +153,29 @@ pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
     user_ips(dns_resolver).await
 }
 
-/// Find local IP addresses on the machine
+/// Discovers IP addresses from local network interfaces
 ///
-/// This function enumerates all network interfaces on the machine and returns
-/// their IP addresses, filtered by the specified IP version strategy.
+/// This function enumerates all network interfaces on the machine and collects
+/// their IP addresses. The results can be filtered by IP version (IPv4 or IPv6).
+/// The function is optimized for common use cases and includes special handling
+/// for different filtering scenarios.
 ///
 /// # Arguments
 ///
-/// * `strategy` - Optional IP version filter (IPv4, IPv6, or both if None)
+/// * `strategy` - Optional IP version filter:
+///   * `None` - Return both IPv4 and IPv6 addresses
+///   * `Some(Ipv4)` - Return only IPv4 addresses
+///   * `Some(Ipv6)` - Return only IPv6 addresses
 ///
 /// # Returns
 ///
-/// A vector of IP addresses
+/// A vector of IP addresses matching the specified filter
 ///
 /// # Errors
 ///
-/// This function may return an error if it fails to enumerate network interfaces,
-/// though the function is designed to return an empty vector rather than an error
-/// in most failure cases.
+/// While this function returns a `Result`, it's designed to handle most errors
+/// gracefully by returning an empty vector rather than propagating the error.
+/// It will only return an error in exceptional circumstances.
 pub fn find_local_ip(strategy: Option<IpVersion>) -> Result<MyIps> {
     // Pre-allocate with a reasonable capacity to avoid reallocations
     let mut result = Vec::with_capacity(8);
@@ -205,22 +216,29 @@ pub fn find_local_ip(strategy: Option<IpVersion>) -> Result<MyIps> {
     Ok(result)
 }
 
-/// Query a DNS resolver to get the user's IP addresses
+/// Queries a DNS resolver to retrieve the client's external IP addresses
 ///
-/// This function queries a special DNS record that returns the client's IP address
-/// as seen by the DNS server. This is used to determine the WAN IP address.
+/// This function performs a DNS TXT record lookup for a special domain
+/// (`o-o.myaddr.l.google.com`) that returns the client's IP address as seen
+/// by the DNS server. This technique is used to determine external (WAN) IP
+/// addresses without relying on third-party web services.
+///
+/// The function parses the TXT record responses and converts them to IP addresses.
 ///
 /// # Arguments
 ///
-/// * `resolver` - The DNS resolver to use for the query
+/// * `resolver` - A configured DNS resolver to use for the query
 ///
 /// # Returns
 ///
-/// A result containing a vector of IP addresses if successful
+/// A result containing a vector of IP addresses obtained from the DNS response
 ///
 /// # Errors
 ///
-/// Returns an error if the DNS lookup fails or if there's an issue with the resolver.
+/// Returns an error if:
+/// - The DNS lookup fails to complete
+/// - The resolver encounters network issues
+/// - The TXT records cannot be retrieved
 pub async fn user_ips(resolver: &Resolver<TokioConnectionProvider>) -> Result<MyIps> {
     // Perform the DNS lookup
     let txt_records = resolver.txt_lookup(MYADDR_RECORD).await.into_diagnostic()?;
@@ -378,19 +396,26 @@ pub async fn reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
         .next()
 }
 
-/// Process IP addresses with optional reverse DNS lookup
+/// Processes IP addresses with optional reverse DNS resolution
 ///
-/// This function takes a collection of IP addresses and performs reverse DNS lookups
-/// if requested. It returns a set of processed IP addresses as strings.
+/// This function takes a collection of IP addresses and:
+/// 1. Optionally performs reverse DNS lookups for each IP
+/// 2. Formats the results as strings (with hostname information if reverse lookup was performed)
+/// 3. Returns a deduplicated set of formatted IP addresses
+///
+/// The function is optimized for performance with different code paths for the reverse
+/// and non-reverse cases. When reverse lookups are requested, it uses concurrent
+/// processing to improve performance.
 ///
 /// # Arguments
 ///
-/// * `ips` - A collection of results containing IP addresses
-/// * `do_reverse` - Whether to perform reverse DNS lookups
+/// * `ips` - A collection of results containing IP addresses to process
+/// * `do_reverse` - Boolean flag indicating whether to perform reverse DNS lookups
 ///
 /// # Returns
 ///
-/// A future that resolves to a `HashSet` of IP address strings
+/// A future that resolves to a `HashSet` of formatted IP address strings.
+/// When `do_reverse` is true, the strings will be in the format "ip_address (hostname)"
 pub async fn process_ips(ips: &[Result<MyIps>], do_reverse: bool) -> HashSet<String> {
     // If we don't need to do reverse lookups, we can optimize by avoiding the async processing
     if !do_reverse {
