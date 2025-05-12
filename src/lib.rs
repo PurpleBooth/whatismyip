@@ -106,51 +106,63 @@ pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
         Ipv6 => &IPV6_DNS_RESOLVER,
     };
 
-    // If we already have a resolver, use it directly
-    if let Some(resolver) = resolver_cell.get() {
-        return user_ips(resolver).await;
+    // Add retry logic with 3 attempts
+    let mut retries = 3;
+    loop {
+        // If we already have a resolver, use it directly
+        if let Some(resolver) = resolver_cell.get() {
+            return user_ips(resolver).await;
+        }
+
+        // Otherwise, we need to create a new resolver
+        let lookup_ip_strategy = match strategy {
+            Ipv4 => LookupIpStrategy::Ipv4Only,
+            Ipv6 => LookupIpStrategy::Ipv6Only,
+        };
+
+        // Try all nameservers in parallel and use the first one that responds
+        let ns_ip = tokio::select! {
+            ns_ip = async {
+                resolver_ip(
+                    GOOGLE_NS1,
+                    lookup_ip_strategy
+                ).await
+            } => ns_ip,
+            ns_ip = async {
+                resolver_ip(
+                    GOOGLE_NS2,
+                    lookup_ip_strategy
+                ).await
+            } => ns_ip,
+            ns_ip = async {
+                resolver_ip(
+                    GOOGLE_NS3,
+                    lookup_ip_strategy
+                ).await
+            } => ns_ip,
+            ns_ip = async {
+                resolver_ip(
+                    GOOGLE_NS4,
+                    lookup_ip_strategy
+                ).await
+            } => ns_ip,
+        };
+
+        match ns_ip {
+            Ok(ip) => {
+                // Create and cache the resolver
+                let dns_resolver = resolver_cell
+                    .get_or_init(|| async { resolver(ip, lookup_ip_strategy) })
+                    .await;
+                return user_ips(dns_resolver).await;
+            }
+            Err(e) if retries > 0 => {
+                retries -= 1;
+                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
+            }
+            Err(e) => return Err(e),
+        }
     }
-
-    // Otherwise, we need to create a new resolver
-    let lookup_ip_strategy = match strategy {
-        Ipv4 => LookupIpStrategy::Ipv4Only,
-        Ipv6 => LookupIpStrategy::Ipv6Only,
-    };
-
-    // Try all nameservers in parallel and use the first one that responds
-    let ns_ip = tokio::select! {
-        ns_ip = async {
-            resolver_ip(
-                GOOGLE_NS1,
-                lookup_ip_strategy
-            ).await
-        } => ns_ip,
-        ns_ip = async {
-            resolver_ip(
-                GOOGLE_NS2,
-                lookup_ip_strategy
-            ).await
-        } => ns_ip,
-        ns_ip = async {
-            resolver_ip(
-                GOOGLE_NS3,
-                lookup_ip_strategy
-            ).await
-        } => ns_ip,
-        ns_ip = async {
-            resolver_ip(
-                GOOGLE_NS4,
-                lookup_ip_strategy
-            ).await
-        } => ns_ip,
-    }?;
-
-    // Create and cache the resolver
-    let dns_resolver = resolver_cell
-        .get_or_init(|| async { resolver(ns_ip, lookup_ip_strategy) })
-        .await;
-
-    user_ips(dns_resolver).await
 }
 
 /// Discovers IP addresses from local network interfaces

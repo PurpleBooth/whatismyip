@@ -35,4 +35,5 @@ criterion = { version = "=0.5.1", features = ["html_reports", "async_tokio"] }
 
 [[bench]]
 name = "ip_benchmarks"
+path = "benches/ip_benchmarks.rs"
 harness = false

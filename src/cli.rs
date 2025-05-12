@@ -8,10 +8,10 @@ use clap::Parser;
 #[clap(author, version, about, long_about = None)]
 pub struct Args {
     /// Only print IP addresses local to this machine
-    #[clap(short = 'l', long = "only-local", conflicts_with = "only_wan")]
+    #[clap(short = 'l', long = "only-local")]
     pub only_local: bool,
     /// Only print IP addresses as seen by a remote service
-    #[clap(short = 'w', long = "only-wan", conflicts_with = "only_local")]
+    #[clap(short = 'w', long = "only-wan")]
     pub only_wan: bool,
     /// Only print IPv4 addresses
     #[clap(short = '4', long = "only-4", conflicts_with = "only_6")]
