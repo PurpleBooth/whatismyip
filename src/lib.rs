@@ -38,11 +38,11 @@ use hickory_resolver::config::{LookupIpStrategy, NameServerConfigGroup, Resolver
 use hickory_resolver::name_server::TokioConnectionProvider;
 use hickory_resolver::{Resolver, TokioResolver};
 use local_ip_address::list_afinet_netifas;
-use tokio::sync::OnceCell;
 use miette::{IntoDiagnostic, Result, miette};
 use std::collections::HashSet;
 use std::net::IpAddr;
 use std::str::FromStr;
+use tokio::sync::OnceCell;
 
 pub mod cli;
 pub mod myip;
@@ -96,8 +96,7 @@ pub enum IpVersion {
 /// the special DNS record cannot be queried successfully.
 pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
     // Use tokio's OnceCell for async initialization
-    static IPV4_DNS_RESOLVER: OnceCell<TokioResolver> =
-        OnceCell::const_new();
+    static IPV4_DNS_RESOLVER: OnceCell<TokioResolver> = OnceCell::const_new();
     static IPV6_DNS_RESOLVER: tokio::sync::OnceCell<TokioResolver> =
         tokio::sync::OnceCell::const_new();
 
