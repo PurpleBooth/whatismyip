@@ -17,24 +17,24 @@ pub struct Args {
     pub only_local: bool,
     /// Only print IP addresses as seen by a remote service
     #[clap(
-        short = 'w', 
-        long = "only-wan", 
+        short = 'w',
+        long = "only-wan",
         conflicts_with = "only_local",
         env("IP_ADDRESS_ONLY_WAN")
     )]
     pub only_wan: bool,
     /// Only print IPv4 addresses
     #[clap(
-        short = '4', 
-        long = "only-4", 
+        short = '4',
+        long = "only-4",
         conflicts_with = "only_6",
         env("IP_ADDRESS_ONLY_4")
     )]
     pub only_4: bool,
     /// Only print IPv6 addresses
     #[clap(
-        short = '6', 
-        long = "only-6", 
+        short = '6',
+        long = "only-6",
         conflicts_with = "only_4",
         env("IP_ADDRESS_ONLY_6")
     )]
