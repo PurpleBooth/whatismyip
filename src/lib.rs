@@ -549,7 +549,8 @@ pub fn format_ips<S: ::std::hash::BuildHasher>(ips: HashSet<String, S>) -> Strin
 /// # Returns
 ///
 /// An option containing the mock reverse DNS entry
-pub async fn mock_reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
+#[must_use]
+pub fn mock_reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
     // For testing, return a predictable reverse DNS entry based on the IP
     match ip.ip() {
         IpAddr::V4(ipv4) => {

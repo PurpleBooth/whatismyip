@@ -20,16 +20,16 @@ build:
 
 # Lint it
 lint:
-        cargo +nightly fmt --all -- --check
-        cargo +nightly clippy --all-features
-        cargo +nightly check
-        cargo +nightly audit
+        cargo fmt --all -- --check
+        cargo clippy --all-features
+        cargo check
+        cargo audit
 
 # Format what can be formatted
 fmt:
-        cargo +nightly fix --allow-dirty
-        cargo +nightly clippy --allow-dirty --fix -Z unstable-options --all-features
-        cargo +nightly fmt --all
+        cargo fix --allow-dirty
+        cargo clippy --allow-dirty --fix --all-features
+        cargo fmt --all
 
 # Clean the build directory
 clean:

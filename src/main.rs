@@ -18,7 +18,6 @@
     clippy::pedantic,
     clippy::complexity,
     clippy::correctness,
-    clippy::pedantic,
     clippy::perf,
     clippy::style,
     clippy::suspicious,
@@ -343,26 +342,22 @@ mod tests {
     /// This function returns a predictable reverse DNS entry based on the IP address.
     /// It's used in tests to avoid making actual network calls.
     #[cfg(test)]
-    async fn mock_reverse_ip(ip: &MyIp) -> Option<whatismyip::myip::ReversedIp> {
+    fn mock_reverse_ip(ip: &MyIp) -> whatismyip::myip::ReversedIp {
         use std::net::IpAddr;
         // For testing, return a predictable reverse DNS entry based on the IP
         match ip.ip() {
             IpAddr::V4(ipv4) => {
                 if ipv4.is_loopback() {
-                    Some(whatismyip::myip::ReversedIp("localhost".to_string()))
+                    whatismyip::myip::ReversedIp("localhost".to_string())
                 } else {
-                    Some(whatismyip::myip::ReversedIp(format!(
-                        "host-{ipv4}.example.com"
-                    )))
+                    whatismyip::myip::ReversedIp(format!("host-{ipv4}.example.com"))
                 }
             }
             IpAddr::V6(ipv6) => {
                 if ipv6.is_loopback() {
-                    Some(whatismyip::myip::ReversedIp("localhost".to_string()))
+                    whatismyip::myip::ReversedIp("localhost".to_string())
                 } else {
-                    Some(whatismyip::myip::ReversedIp(format!(
-                        "host-{ipv6}.example.com"
-                    )))
+                    whatismyip::myip::ReversedIp(format!("host-{ipv6}.example.com"))
                 }
             }
         }
@@ -376,26 +371,20 @@ mod tests {
         let test_ip = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
 
         // Use the mock function to get a reverse DNS entry
-        let reversed = mock_reverse_ip(&test_ip).await;
-
-        // Check that we got a result
-        assert!(reversed.is_some());
+        let reversed = mock_reverse_ip(&test_ip);
 
         // Check that the result is what we expect
         assert_eq!(
-            reversed.unwrap(),
+            reversed,
             whatismyip::myip::ReversedIp("localhost".to_string())
         );
 
         // Test with a non-loopback IP
         let test_ip = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)));
-        let reversed = mock_reverse_ip(&test_ip).await;
-
-        // Check that we got a result
-        assert!(reversed.is_some());
+        let reversed = mock_reverse_ip(&test_ip);
 
         // Check that the result contains the IP
-        let reversed_str = reversed.unwrap().0;
+        let reversed_str = reversed.0;
         assert!(reversed_str.contains("192.168.1.1"));
     }
 }
