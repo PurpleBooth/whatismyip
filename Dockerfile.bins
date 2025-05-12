@@ -16,16 +16,22 @@ ENV VER=$VER
 COPY --from=nfpm "/usr/bin/nfpm" "/usr/bin/nfpm"
 RUN xx-apk add --no-cache musl-dev zlib-dev zlib-static openssl-dev openssl-libs-static pkgconfig alpine-sdk
 
-WORKDIR /app
-RUN cargo new --lib whatismyip
 WORKDIR /app/whatismyip
-COPY Cargo.toml ./Cargo.toml
-COPY Cargo.lock ./Cargo.lock
-RUN xx-cargo build --release --target-dir ./build
+
+# Install cargo-chef for dependency caching
+RUN cargo install cargo-chef --locked
+
+# Prepare recipe with host cargo (no cross-compilation needed)
+COPY Cargo.toml Cargo.lock ./
+COPY src src/
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Build dependencies and application with cross-compilation
 COPY . ./
-RUN xx-cargo build --release --target-dir ./build && \
+RUN xx-cargo chef cook --release --recipe-path recipe.json && \
+    xx-cargo build --release --target-dir ./build && \
     xx-verify --static "./build/$(xx-cargo --print-target-triple)/release/whatismyip" && \
-    cp -v  "./build/$(xx-cargo --print-target-triple)/release/whatismyip" "./whatismyip"
+    cp -v "./build/$(xx-cargo --print-target-triple)/release/whatismyip" ./whatismyip
 
 COPY nfpm.yaml nfpm.yaml
 RUN mkdir /PACKS && \
