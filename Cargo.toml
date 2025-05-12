@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [dependencies]
 clap = { version = "4.5.37", features = ["derive", "wrap_help"] }
-hickory-resolver = { version = "0.25.1", features = ["tokio-runtime"] }
+hickory-resolver = { version = "0.25.1", features = ["tokio"] }
 futures = "0.3.31"
 tokio = { version = "1.44.2", features = ["rt", "rt-multi-thread", "net"] }
 miette = { version = "7.6.0", features = ["fancy"] }
