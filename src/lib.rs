@@ -156,7 +156,7 @@ pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
                     .await;
                 return user_ips(dns_resolver).await;
             }
-            Err(e) if retries > 0 => {
+            Err(_e) if retries > 0 => {
                 retries -= 1;
                 tokio::time::sleep(std::time::Duration::from_millis(100)).await;
             }
