@@ -29,14 +29,10 @@ deb:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
   compression: "zstd"
-  depends:
-    - libc6
 
 apk:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
-  depends:
-    - libc6-compat
 
 overrides:
   debian:
