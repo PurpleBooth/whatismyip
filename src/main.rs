@@ -96,13 +96,15 @@ async fn main() -> Result<()> {
 fn process_args(args: Args) -> Vec<impl std::future::Future<Output = Result<MyIps>>> {
     let mut strategies = vec![];
 
-    if !args.only_local {
-        if !args.only_6 {
-            strategies.push(find_wan_ip(Ipv4));
-        }
-        if !args.only_4 {
-            strategies.push(find_wan_ip(Ipv6));
-        }
+    if args.only_local {
+        return strategies;
+    }
+
+    if !args.only_6 {
+        strategies.push(find_wan_ip(Ipv4));
+    }
+    if !args.only_4 {
+        strategies.push(find_wan_ip(Ipv6));
     }
 
     strategies
