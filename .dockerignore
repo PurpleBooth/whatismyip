@@ -3,3 +3,11 @@
 !Cargo.lock
 !Cargo.toml
 !nfpm.yaml
+!docker-bake.hcl
+!Dockerfile.*
+!build.rs
+!benches/
+!tests/
+!rust-toolchain.toml
+!rust-toolchain
+target/
