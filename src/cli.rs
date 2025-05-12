@@ -1,16 +1,16 @@
 //! Command line interface for ip-address
 
-use clap::{Parser, ArgEnum};
+use clap::{ArgEnum, Parser};
 
 /// Work out what your IP Address is
 #[allow(clippy::struct_excessive_bools)]
 #[derive(Parser, Debug, Copy, Clone)]
-#[clap(author, version, about)]
+#[clap(author, version, about, long_about = None)]
 pub struct Args {
     /// Only print IP addresses local to this machine
     #[clap(
-        short = 'l', 
-        long = "only-local", 
+        short = 'l',
+        long = "only-local",
         conflicts_with = "only_wan",
         env("IP_ADDRESS_ONLY_LOCAL")
     )]
@@ -40,10 +40,6 @@ pub struct Args {
     )]
     pub only_6: bool,
     /// Print the reverse DNS entries for the IP addresses
-    #[clap(
-        short = 'r', 
-        long = "reverse",
-        env("IP_ADDRESS_REVERSE")
-    )]
+    #[clap(short = 'r', long = "reverse", env("IP_ADDRESS_REVERSE"))]
     pub reverse: bool,
 }
