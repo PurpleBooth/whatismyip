@@ -97,10 +97,10 @@ fn process_args(args: Args) -> Vec<impl std::future::Future<Output = Result<MyIp
     let mut strategies = vec![];
 
     if !args.only_local {
-        if !args.only_6 && !args.only_local {
+        if !args.only_6 {
             strategies.push(find_wan_ip(Ipv4));
         }
-        if !args.only_4 && !args.only_local {
+        if !args.only_4 {
             strategies.push(find_wan_ip(Ipv6));
         }
     }
