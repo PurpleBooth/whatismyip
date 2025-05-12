@@ -1,7 +1,3 @@
-# nfpm example configuration file
-#
-# check https://nfpm.goreleaser.com/configuration for detailed usage
-#
 name: "whatismyip"
 arch: "${GOARCH}"
 platform: "linux"
@@ -9,23 +5,44 @@ version: "${VER}"
 section: "default"
 priority: "extra"
 maintainer: "Billie Thompson <billie@billiecodes.com>"
-description: Work out what your IP is
+description: |
+  A lightweight utility to determine your public and local IP addresses.
+  Supports multiple network interfaces and DNS resolution.
 vendor: "PurpleBooth"
 homepage: "https://codeberg.org/PurpleBooth/whatismyip"
 license: "CC0"
 contents:
   - src: ./whatismyip
     dst: /usr/bin/whatismyip
+    file_info:
+      mode: 0755
+      owner: root
+      group: root
 
 rpm:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
+  compression: "zstd"
+  packager: "rpmbuild <noreply@purplebooth.com>"
 
 deb:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
+  compression: "zstd"
+  depends:
+    - libc6
 
 apk:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
+  depends:
+    - libc6-compat
+
+overrides:
+  debian:
+    depends:
+      - libc6
+  alpine:
+    depends:
+      - libc6-compat
 
