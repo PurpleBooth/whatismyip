@@ -1,6 +1,6 @@
 //! Command line interface for ip-address
 
-use clap::{Parser, ValueEnum};
+use clap::Parser;
 
 /// Work out what your IP Address is
 #[allow(clippy::struct_excessive_bools)]
