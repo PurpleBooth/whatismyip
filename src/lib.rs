@@ -38,6 +38,7 @@ use hickory_resolver::config::{LookupIpStrategy, NameServerConfigGroup, Resolver
 use hickory_resolver::name_server::TokioConnectionProvider;
 use hickory_resolver::{Resolver, TokioResolver};
 use local_ip_address::list_afinet_netifas;
+use tokio::sync::OnceCell;
 use miette::{IntoDiagnostic, Result, miette};
 use std::collections::HashSet;
 use std::net::IpAddr;
@@ -94,9 +95,9 @@ pub enum IpVersion {
 /// Returns an error if DNS resolution fails for all nameservers or if
 /// the special DNS record cannot be queried successfully.
 pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
-    // Use static resolvers for better performance across multiple calls
-    static IPV4_DNS_RESOLVER: tokio::sync::OnceCell<TokioResolver> =
-        tokio::sync::OnceCell::const_new();
+    // Use tokio's OnceCell for async initialization
+    static IPV4_DNS_RESOLVER: OnceCell<TokioResolver> =
+        OnceCell::const_new();
     static IPV6_DNS_RESOLVER: tokio::sync::OnceCell<TokioResolver> =
         tokio::sync::OnceCell::const_new();
 
@@ -309,8 +310,8 @@ pub async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result
     static IPV6_CACHE: LazyLock<Mutex<HashMap<String, IpAddr>>> =
         LazyLock::new(|| Mutex::new(HashMap::new()));
 
-    // Static resolvers to avoid creating new ones each time
-    static IPV4_RESOLVER: tokio::sync::OnceCell<TokioResolver> = tokio::sync::OnceCell::const_new();
+    // Use tokio's OnceCell for async initialization
+    static IPV4_RESOLVER: OnceCell<TokioResolver> = OnceCell::const_new();
     static IPV6_RESOLVER: tokio::sync::OnceCell<TokioResolver> = tokio::sync::OnceCell::const_new();
 
     // Select the appropriate cache based on IP strategy
@@ -377,7 +378,7 @@ pub async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result
 /// An option containing the reverse DNS entry if successful
 pub async fn reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
     // Create a resolver only once
-    static RESOLVER: tokio::sync::OnceCell<TokioResolver> = tokio::sync::OnceCell::const_new();
+    static RESOLVER: OnceCell<TokioResolver> = OnceCell::const_new();
 
     let resolver = RESOLVER
         .get_or_try_init::<miette::Error, _, _>(|| async {
