@@ -415,7 +415,7 @@ pub async fn reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
 /// # Returns
 ///
 /// A future that resolves to a `HashSet` of formatted IP address strings.
-/// When `do_reverse` is true, the strings will be in the format "ip_address (hostname)"
+/// When `do_reverse` is true, the strings will be in the format "`ip_address` (hostname)"
 pub async fn process_ips(ips: &[Result<MyIps>], do_reverse: bool) -> HashSet<String> {
     // If we don't need to do reverse lookups, we can optimize by avoiding the async processing
     if !do_reverse {
