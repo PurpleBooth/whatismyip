@@ -127,7 +127,8 @@ fn test_local_and_wan_outputs_are_different() {
     let wan_ipv4_lines: std::collections::HashSet<&str> = wan_ipv4.lines().collect();
 
     // Find the intersection between local and WAN IPv4 addresses
-    let intersection: std::collections::HashSet<_> = local_ipv4_lines.intersection(&wan_ipv4_lines).collect();
+    let intersection: std::collections::HashSet<_> =
+        local_ipv4_lines.intersection(&wan_ipv4_lines).collect();
     assert!(
         intersection.is_empty(),
         "Local and WAN IPv4 outputs should have no IPs in common: {:?}",
@@ -143,7 +144,8 @@ fn test_local_and_wan_outputs_are_different() {
     let wan_ipv6_lines: std::collections::HashSet<&str> = wan_ipv6.lines().collect();
 
     // Find the intersection between local and WAN IPv6 addresses
-    let intersection: std::collections::HashSet<_> = local_ipv6_lines.intersection(&wan_ipv6_lines).collect();
+    let intersection: std::collections::HashSet<_> =
+        local_ipv6_lines.intersection(&wan_ipv6_lines).collect();
     assert!(
         intersection.is_empty(),
         "Local and WAN IPv6 outputs should have no IPs in common: {:?}",
