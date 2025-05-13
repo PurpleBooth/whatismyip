@@ -149,7 +149,10 @@ fn test_local_and_wan_outputs_are_different() {
     let intersection: std::collections::HashSet<_> =
         local_ipv6_lines.intersection(&wan_ipv6_lines).collect();
     if !intersection.is_empty() {
-        println!("Note: Found IPv6 addresses in both local and WAN outputs: {:?}", intersection);
+        println!(
+            "Note: Found IPv6 addresses in both local and WAN outputs: {:?}",
+            intersection
+        );
         // This is acceptable for IPv6, so we don't fail the test
     }
 }
