@@ -125,20 +125,20 @@ fn test_local_and_wan_outputs_are_different() {
     // Convert outputs to sets of lines to handle different ordering
     let local_ipv4_lines: std::collections::HashSet<&str> = local_ipv4.lines().collect();
     let wan_ipv4_lines: std::collections::HashSet<&str> = wan_ipv4.lines().collect();
-    
+
     assert_ne!(
         local_ipv4_lines, wan_ipv4_lines,
         "Local and WAN IPv4 outputs should contain different IPs"
     );
-    
+
     // Test that local and WAN outputs are different for IPv6
     let local_ipv6 = run_with_args(&["--only-6", "--only-local"]);
     let wan_ipv6 = run_with_args(&["--only-6", "--only-wan"]);
-    
+
     // Convert outputs to sets of lines to handle different ordering
     let local_ipv6_lines: std::collections::HashSet<&str> = local_ipv6.lines().collect();
     let wan_ipv6_lines: std::collections::HashSet<&str> = wan_ipv6.lines().collect();
-    
+
     assert_ne!(
         local_ipv6_lines, wan_ipv6_lines,
         "Local and WAN IPv6 outputs should contain different IPs"
