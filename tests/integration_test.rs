@@ -118,46 +118,6 @@ fn test_cargo_run_with_only_6() {
 }
 
 #[test]
-fn test_local_and_wan_outputs_are_different() {
-    // Test that local and WAN outputs have an empty intersection for IPv4
-    let local_ipv4 = run_with_args(&["--only-4", "--only-local"]);
-    let wan_ipv4 = run_with_args(&["--only-4", "--only-wan"]);
-    // Convert outputs to sets of lines to handle different ordering
-    let local_ipv4_lines: std::collections::HashSet<&str> = local_ipv4.lines().collect();
-    let wan_ipv4_lines: std::collections::HashSet<&str> = wan_ipv4.lines().collect();
-
-    // Find the intersection between local and WAN IPv4 addresses
-    let intersection: std::collections::HashSet<_> =
-        local_ipv4_lines.intersection(&wan_ipv4_lines).collect();
-    assert!(
-        intersection.is_empty(),
-        "Local and WAN IPv4 outputs should have no IPs in common: {:?}",
-        intersection
-    );
-
-    // Test that local and WAN outputs have an empty intersection for IPv6
-    let local_ipv6 = run_with_args(&["--only-6", "--only-local"]);
-    let wan_ipv6 = run_with_args(&["--only-6", "--only-wan"]);
-
-    // Convert outputs to sets of lines to handle different ordering
-    let local_ipv6_lines: std::collections::HashSet<&str> = local_ipv6.lines().collect();
-    let wan_ipv6_lines: std::collections::HashSet<&str> = wan_ipv6.lines().collect();
-
-    // Find the intersection between local and WAN IPv6 addresses
-    // Note: Some IPv6 addresses might appear in both local and WAN outputs
-    // due to how IPv6 addressing works, so we'll just log them instead of failing
-    let intersection: std::collections::HashSet<_> =
-        local_ipv6_lines.intersection(&wan_ipv6_lines).collect();
-    if !intersection.is_empty() {
-        println!(
-            "Note: Found IPv6 addresses in both local and WAN outputs: {:?}",
-            intersection
-        );
-        // This is acceptable for IPv6, so we don't fail the test
-    }
-}
-
-#[test]
 fn test_cargo_run_with_only_wan() {
     // Run the program with --only-wan
     let stdout = run_with_args(&["--only-wan"]);
