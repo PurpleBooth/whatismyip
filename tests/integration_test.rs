@@ -115,7 +115,6 @@ fn test_cargo_run_with_only_6() {
         !local_stdout.contains('.'),
         "Output contains IPv4 addresses with --only-local when it shouldn't"
     );
-
 }
 
 #[test]
@@ -123,7 +122,6 @@ fn test_local_and_wan_outputs_are_different() {
     // Test that local and WAN outputs are different for IPv4
     let local_ipv4 = run_with_args(&["--only-4", "--only-local"]);
     let wan_ipv4 = run_with_args(&["--only-4", "--only-wan"]);
-    
     // Convert outputs to sets of lines to handle different ordering
     let local_ipv4_lines: std::collections::HashSet<&str> = local_ipv4.lines().collect();
     let wan_ipv4_lines: std::collections::HashSet<&str> = wan_ipv4.lines().collect();
