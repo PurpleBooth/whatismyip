@@ -141,8 +141,8 @@ impl Display for MyIp {
 
 #[cfg(test)]
 mod tests {
-    use std::net::{IpAddr, Ipv4Addr};
     use miette::{Result, miette};
+    use std::net::{IpAddr, Ipv4Addr};
 
     use super::MyIp;
     use super::ReversedIp;
@@ -158,11 +158,13 @@ mod tests {
                 "www.example.com".to_string().into(),
             )
         );
-        
+
         if actual != String::from("127.0.0.1 (www.example.com)") {
-            return Err(miette!("Expected '127.0.0.1 (www.example.com)', got '{}'", actual));
+            return Err(miette!(
+                "Expected '127.0.0.1 (www.example.com)', got '{}'",
+                actual
+            ));
         }
-        
         Ok(())
     }
 
@@ -170,11 +172,14 @@ mod tests {
     fn can_create_a_reversed_ip_from_a_string() -> TestResult {
         let input = "Testing".to_string();
         let actual: ReversedIp = input.clone().into();
-        
+
         if actual != ReversedIp(input.clone()) {
-            return Err(miette!("Expected ReversedIp('{}'), got '{:?}'", input, actual));
+            return Err(miette!(
+                "Expected ReversedIp('{}'), got '{:?}'",
+                input,
+                actual
+            ));
         }
-        
         Ok(())
     }
 
@@ -184,26 +189,22 @@ mod tests {
             "{}",
             MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)))
         );
-        
+
         if actual != "127.0.0.1".to_string() {
             return Err(miette!("Expected '127.0.0.1', got '{}'", actual));
         }
-        
         Ok(())
     }
-    
     #[test]
     fn can_get_the_ip_v4() -> TestResult {
         let actual = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
         let expected = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-        
+
         if actual.ip() != expected {
             return Err(miette!("Expected IP '{}', got '{}'", expected, actual.ip()));
         }
-        
         Ok(())
     }
-    
     #[test]
     fn can_get_the_ip_v6() -> TestResult {
         let actual = MyIp::new_reversed(
@@ -211,11 +212,10 @@ mod tests {
             "www.example.com".to_string().into(),
         );
         let expected = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
-        
+
         if actual.ip() != expected {
             return Err(miette!("Expected IP '{}', got '{}'", expected, actual.ip()));
         }
-        
         Ok(())
     }
 }
