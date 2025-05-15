@@ -587,59 +587,79 @@ mod tests {
     use super::*;
     use std::net::IpAddr;
 
+    type TestResult = Result<()>;
+
     #[test]
-    fn test_find_local_ip_ipv4_only() {
-        let ips = find_local_ip(Some(Ipv4)).unwrap();
+    fn test_find_local_ip_ipv4_only() -> TestResult {
+        let ips = find_local_ip(Some(Ipv4))?;
 
         // Check that we got at least one IP
-        assert!(!ips.is_empty(), "No IPv4 addresses found");
+        if ips.is_empty() {
+            return Err(miette!("No IPv4 addresses found"));
+        }
 
         // Check that all IPs are IPv4
         for ip in ips {
-            assert!(
-                matches!(ip.ip(), IpAddr::V4(_)),
-                "Found IPv6 address when only IPv4 was requested"
-            );
+            if !matches!(ip.ip(), IpAddr::V4(_)) {
+                return Err(miette!("Found IPv6 address when only IPv4 was requested"));
+            }
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_find_local_ip_ipv6_only() {
-        let ips = find_local_ip(Some(Ipv6)).unwrap();
+    fn test_find_local_ip_ipv6_only() -> TestResult {
+        let ips = find_local_ip(Some(Ipv6))?;
 
         // Not all systems have IPv6, so we can't assert that we got IPs
         // But if we did get IPs, they should all be IPv6
         for ip in ips {
-            assert!(
-                matches!(ip.ip(), IpAddr::V6(_)),
-                "Found IPv4 address when only IPv6 was requested"
-            );
+            if !matches!(ip.ip(), IpAddr::V6(_)) {
+                return Err(miette!("Found IPv4 address when only IPv6 was requested"));
+            }
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_find_local_ip_both() {
-        let ips = find_local_ip(None).unwrap();
+    fn test_find_local_ip_both() -> TestResult {
+        let ips = find_local_ip(None)?;
 
         // Check that we got at least one IP
-        assert!(!ips.is_empty(), "No IP addresses found");
+        if ips.is_empty() {
+            return Err(miette!("No IP addresses found"));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_user_ips_parsing() {
+    fn test_user_ips_parsing() -> TestResult {
         // This test verifies the parsing logic in user_ips without making network calls
         use std::str::FromStr;
 
         // Test IPv4 parsing
         let ipv4_str = "192.168.1.1";
-        let ipv4 = IpAddr::from_str(ipv4_str).unwrap();
+        let ipv4 = IpAddr::from_str(ipv4_str)
+            .map_err(|e| miette!("Failed to parse IPv4 address: {}", e))?;
         let my_ip = myip::MyIp::new_plain(ipv4);
-        assert_eq!(my_ip.ip(), ipv4);
+        
+        if my_ip.ip() != ipv4 {
+            return Err(miette!("IPv4 address mismatch"));
+        }
 
         // Test IPv6 parsing
         let ipv6_str = "2001:db8::1";
-        let ipv6 = IpAddr::from_str(ipv6_str).unwrap();
+        let ipv6 = IpAddr::from_str(ipv6_str)
+            .map_err(|e| miette!("Failed to parse IPv6 address: {}", e))?;
         let my_ip = myip::MyIp::new_plain(ipv6);
-        assert_eq!(my_ip.ip(), ipv6);
+        
+        if my_ip.ip() != ipv6 {
+            return Err(miette!("IPv6 address mismatch"));
+        }
+
+        Ok(())
     }
 }
