@@ -151,6 +151,7 @@ fn get_local_ips(args: Args) -> Vec<Result<MyIps>> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use miette::miette;
     use std::net::IpAddr;
     use whatismyip::myip::MyIp;
 
