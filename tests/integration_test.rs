@@ -175,6 +175,18 @@ fn test_condition_not_only_6_and_not_only_local() {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_4() {
+    // Check if we can connect to an IPv4 service
+    let ipv4_available = std::process::Command::new("ping")
+        .args(["-c", "1", "8.8.8.8"])
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false);
+
+    if !ipv4_available {
+        println!("Skipping test_cargo_run_with_only_wan_and_only_4: No IPv4 connectivity");
+        return;
+    }
+
     // Run the program with --only-wan and --only-4
     let stdout = run_with_args(&["--only-wan", "--only-4"]);
     println!("Program output with --only-wan and --only-4: {stdout}");
@@ -192,6 +204,18 @@ fn test_cargo_run_with_only_wan_and_only_4() {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_6() {
+    // Check if we can connect to an IPv6 service
+    let ipv6_available = std::process::Command::new("ping")
+        .args(["-6", "-c", "1", "2001:4860:4860::8888"])
+        .output()
+        .map(|output| output.status.success())
+        .unwrap_or(false);
+
+    if !ipv6_available {
+        println!("Skipping test_cargo_run_with_only_wan_and_only_6: No IPv6 connectivity");
+        return;
+    }
+
     // Run the program with --only-wan and --only-6
     let stdout = run_with_args(&["--only-wan", "--only-6"]);
     println!("Program output with --only-wan and --only-6: {stdout}");
