@@ -106,7 +106,7 @@ fn test_cargo_run_with_only_4() -> TestResult {
         local_stdout, wan_stdout,
         "Local and WAN outputs should be different for IPv4"
     );
-    
+
     Ok(())
 }
 
@@ -135,7 +135,7 @@ fn test_cargo_run_with_only_6() -> TestResult {
         !local_stdout.contains('.'),
         "Output contains IPv4 addresses with --only-local when it shouldn't"
     );
-    
+
     Ok(())
 }
 
@@ -154,7 +154,7 @@ fn test_cargo_run_with_only_wan() -> TestResult {
         has_ipv4 || has_ipv6,
         "Output does not contain any IP addresses"
     );
-    
+
     Ok(())
 }
 
@@ -195,7 +195,7 @@ fn test_condition_not_only_6_and_not_only_local() -> TestResult {
         default_stdout, only_local_stdout,
         "Default and --only-local outputs should be different"
     );
-    
+
     Ok(())
 }
 
@@ -222,7 +222,7 @@ fn test_cargo_run_with_only_wan_and_only_4() -> TestResult {
         !stdout.contains(':'),
         "Output contains IPv6 addresses when it shouldn't"
     );
-    
+
     Ok(())
 }
 
@@ -245,7 +245,7 @@ fn test_cargo_run_with_only_wan_and_only_6() -> TestResult {
         stdout.contains(':'),
         "Output does not contain IPv6 addresses"
     );
-    
+
     Ok(())
 }
 
@@ -260,6 +260,6 @@ fn test_cargo_run_with_reverse() -> TestResult {
         stdout.contains('('),
         "Output does not contain reverse DNS entries"
     );
-    
+
     Ok(())
 }
