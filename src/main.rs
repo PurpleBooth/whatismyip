@@ -154,46 +154,56 @@ mod tests {
     use std::net::IpAddr;
     use whatismyip::myip::MyIp;
 
+    type TestResult = Result<()>;
+
     #[test]
-    fn test_find_local_ip_ipv4_only() {
-        let ips = find_local_ip(Some(Ipv4)).unwrap();
+    fn test_find_local_ip_ipv4_only() -> TestResult {
+        let ips = find_local_ip(Some(Ipv4))?;
 
         // Check that we got at least one IP
-        assert!(!ips.is_empty(), "No IPv4 addresses found");
+        if ips.is_empty() {
+            return Err(miette!("No IPv4 addresses found"));
+        }
 
         // Check that all IPs are IPv4
         for ip in ips {
-            assert!(
-                matches!(ip.ip(), IpAddr::V4(_)),
-                "Found IPv6 address when only IPv4 was requested"
-            );
+            if !matches!(ip.ip(), IpAddr::V4(_)) {
+                return Err(miette!("Found IPv6 address when only IPv4 was requested"));
+            }
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_find_local_ip_ipv6_only() {
-        let ips = find_local_ip(Some(Ipv6)).unwrap();
+    fn test_find_local_ip_ipv6_only() -> TestResult {
+        let ips = find_local_ip(Some(Ipv6))?;
 
         // Not all systems have IPv6, so we can't assert that we got IPs
         // But if we did get IPs, they should all be IPv6
         for ip in ips {
-            assert!(
-                matches!(ip.ip(), IpAddr::V6(_)),
-                "Found IPv4 address when only IPv6 was requested"
-            );
+            if !matches!(ip.ip(), IpAddr::V6(_)) {
+                return Err(miette!("Found IPv4 address when only IPv6 was requested"));
+            }
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_find_local_ip_both() {
-        let ips = find_local_ip(None).unwrap();
+    fn test_find_local_ip_both() -> TestResult {
+        let ips = find_local_ip(None)?;
 
         // Check that we got at least one IP
-        assert!(!ips.is_empty(), "No IP addresses found");
+        if ips.is_empty() {
+            return Err(miette!("No IP addresses found"));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_process_args_default() {
+    fn test_process_args_default() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -205,11 +215,15 @@ mod tests {
         let strategies = process_args(args);
 
         // Should have 2 strategies (IPv4 and IPv6 WAN)
-        assert_eq!(strategies.len(), 2);
+        if strategies.len() != 2 {
+            return Err(miette!("Expected 2 strategies, got {}", strategies.len()));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_process_args_only_local() {
+    fn test_process_args_only_local() -> TestResult {
         let args = Args {
             only_local: true,
             only_wan: false,
@@ -221,11 +235,15 @@ mod tests {
         let strategies = process_args(args);
 
         // Should have 0 strategies (no WAN lookups)
-        assert_eq!(strategies.len(), 0);
+        if strategies.len() != 0 {
+            return Err(miette!("Expected 0 strategies, got {}", strategies.len()));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_process_args_only_ipv4() {
+    fn test_process_args_only_ipv4() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -237,11 +255,15 @@ mod tests {
         let strategies = process_args(args);
 
         // Should have 1 strategy (IPv4 WAN only)
-        assert_eq!(strategies.len(), 1);
+        if strategies.len() != 1 {
+            return Err(miette!("Expected 1 strategy, got {}", strategies.len()));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_process_args_only_ipv6() {
+    fn test_process_args_only_ipv6() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -253,11 +275,15 @@ mod tests {
         let strategies = process_args(args);
 
         // Should have 1 strategy (IPv6 WAN only)
-        assert_eq!(strategies.len(), 1);
+        if strategies.len() != 1 {
+            return Err(miette!("Expected 1 strategy, got {}", strategies.len()));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_get_local_ips_default() {
+    fn test_get_local_ips_default() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -269,14 +295,20 @@ mod tests {
         let local_ips = get_local_ips(args);
 
         // Should have 1 result (all local IPs)
-        assert_eq!(local_ips.len(), 1);
+        if local_ips.len() != 1 {
+            return Err(miette!("Expected 1 result, got {}", local_ips.len()));
+        }
 
         // The result should be Ok
-        assert!(local_ips[0].is_ok());
+        if !local_ips[0].is_ok() {
+            return Err(miette!("Expected Ok result, got Err"));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_get_local_ips_only_wan() {
+    fn test_get_local_ips_only_wan() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: true,
@@ -288,11 +320,15 @@ mod tests {
         let local_ips = get_local_ips(args);
 
         // Should have 0 results (no local IPs)
-        assert_eq!(local_ips.len(), 0);
+        if local_ips.len() != 0 {
+            return Err(miette!("Expected 0 results, got {}", local_ips.len()));
+        }
+
+        Ok(())
     }
 
     #[test]
-    fn test_get_local_ips_only_ipv4() {
+    fn test_get_local_ips_only_ipv4() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -304,19 +340,27 @@ mod tests {
         let local_ips = get_local_ips(args);
 
         // Should have 1 result (IPv4 local IPs)
-        assert_eq!(local_ips.len(), 1);
+        if local_ips.len() != 1 {
+            return Err(miette!("Expected 1 result, got {}", local_ips.len()));
+        }
 
         // The result should be Ok
-        assert!(local_ips[0].is_ok());
+        if !local_ips[0].is_ok() {
+            return Err(miette!("Expected Ok result, got Err"));
+        }
 
         // All IPs should be IPv4
         for ip in local_ips[0].as_ref().unwrap() {
-            assert!(matches!(ip.ip(), IpAddr::V4(_)));
+            if !matches!(ip.ip(), IpAddr::V4(_)) {
+                return Err(miette!("Expected IPv4 address, got IPv6"));
+            }
         }
+
+        Ok(())
     }
 
     #[test]
-    fn test_get_local_ips_only_ipv6() {
+    fn test_get_local_ips_only_ipv6() -> TestResult {
         let args = Args {
             only_local: false,
             only_wan: false,
@@ -328,15 +372,23 @@ mod tests {
         let local_ips = get_local_ips(args);
 
         // Should have 1 result (IPv6 local IPs)
-        assert_eq!(local_ips.len(), 1);
+        if local_ips.len() != 1 {
+            return Err(miette!("Expected 1 result, got {}", local_ips.len()));
+        }
 
         // The result should be Ok
-        assert!(local_ips[0].is_ok());
+        if !local_ips[0].is_ok() {
+            return Err(miette!("Expected Ok result, got Err"));
+        }
 
         // All IPs should be IPv6 (if any)
         for ip in local_ips[0].as_ref().unwrap() {
-            assert!(matches!(ip.ip(), IpAddr::V6(_)));
+            if !matches!(ip.ip(), IpAddr::V6(_)) {
+                return Err(miette!("Expected IPv6 address, got IPv4"));
+            }
         }
+
+        Ok(())
     }
 
     /// Mock implementation of reverse DNS lookup for testing
@@ -366,7 +418,7 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn test_reverse_ip() {
+    async fn test_reverse_ip() -> TestResult {
         use std::net::{IpAddr, Ipv4Addr};
 
         // Create a test IP
@@ -376,10 +428,12 @@ mod tests {
         let reversed = mock_reverse_ip(&test_ip);
 
         // Check that the result is what we expect
-        assert_eq!(
-            reversed,
-            whatismyip::myip::ReversedIp("localhost".to_string())
-        );
+        if reversed != whatismyip::myip::ReversedIp("localhost".to_string()) {
+            return Err(miette!(
+                "Expected 'localhost', got '{}'",
+                reversed.0
+            ));
+        }
 
         // Test with a non-loopback IP
         let test_ip = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(192, 168, 1, 1)));
@@ -387,6 +441,13 @@ mod tests {
 
         // Check that the result contains the IP
         let reversed_str = reversed.0;
-        assert!(reversed_str.contains("192.168.1.1"));
+        if !reversed_str.contains("192.168.1.1") {
+            return Err(miette!(
+                "Expected string containing '192.168.1.1', got '{}'",
+                reversed_str
+            ));
+        }
+
+        Ok(())
     }
 }
