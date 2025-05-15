@@ -175,12 +175,8 @@ fn test_condition_not_only_6_and_not_only_local() {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_4() {
-    // Check if we can connect to an IPv4 service
-    let ipv4_available = std::process::Command::new("ping")
-        .args(["-c", "1", "8.8.8.8"])
-        .output()
-        .map(|output| output.status.success())
-        .unwrap_or(false);
+    // Check if we can connect to an IPv4 service using TCP
+    let ipv4_available = std::net::TcpStream::connect("8.8.8.8:53").is_ok();
 
     if !ipv4_available {
         println!("Skipping test_cargo_run_with_only_wan_and_only_4: No IPv4 connectivity");
@@ -204,12 +200,8 @@ fn test_cargo_run_with_only_wan_and_only_4() {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_6() {
-    // Check if we can connect to an IPv6 service
-    let ipv6_available = std::process::Command::new("ping")
-        .args(["-6", "-c", "1", "2001:4860:4860::8888"])
-        .output()
-        .map(|output| output.status.success())
-        .unwrap_or(false);
+    // Check if we can connect to an IPv6 service using TCP
+    let ipv6_available = std::net::TcpStream::connect("[2001:4860:4860::8888]:53").is_ok();
 
     if !ipv6_available {
         println!("Skipping test_cargo_run_with_only_wan_and_only_6: No IPv6 connectivity");
