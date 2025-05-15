@@ -159,7 +159,7 @@ mod tests {
             )
         );
 
-        if actual != String::from("127.0.0.1 (www.example.com)") {
+        if actual != *"127.0.0.1 (www.example.com)" {
             return Err(miette!(
                 "Expected '127.0.0.1 (www.example.com)', got '{}'",
                 actual
@@ -190,7 +190,7 @@ mod tests {
             MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)))
         );
 
-        if actual != "127.0.0.1".to_string() {
+        if actual != *"127.0.0.1" {
             return Err(miette!("Expected '127.0.0.1', got '{}'", actual));
         }
         Ok(())
