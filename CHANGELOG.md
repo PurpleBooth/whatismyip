@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.1 - 2025-05-15
+#### Bug Fixes
+- add sudo to GitHub CLI installation commands in pipeline workflow - (a877fa0) - Billie Thompson
+
+- - -
+
 ## v0.14.0 - 2025-05-15
 #### Bug Fixes
 - **(deps)** update rust crate local-ip-address to v0.6.5 - (242da48) - Solace System Renovate Fox
