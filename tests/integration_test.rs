@@ -1,42 +1,30 @@
-use std::io::{self, ErrorKind};
+use miette::{miette, Result};
 use std::process::Command;
 use std::str;
 
-type TestResult = Result<(), Box<dyn std::error::Error>>;
+type TestResult = Result<()>;
 
 // Helper function to run the program with given arguments and check the output
-fn run_with_args(args: &[&str]) -> Result<String, Box<dyn std::error::Error>> {
+fn run_with_args(args: &[&str]) -> Result<String> {
     // Run the program with cargo run and the given arguments
     let output = Command::new("cargo")
         .args(["run", "--"])
         .args(args)
         .output()
-        .map_err(|e| {
-            io::Error::new(
-                ErrorKind::Other,
-                format!("Failed to execute cargo run with args {args:?}: {e}"),
-            )
-        })?;
+        .map_err(|e| miette!("Failed to execute cargo run with args {args:?}: {e}"))?;
 
     // Check that the program executed successfully
     if !output.status.success() {
-        return Err(Box::new(io::Error::new(
-            ErrorKind::Other,
-            format!("Program execution failed with args: {args:?}"),
-        )));
+        return Err(miette!("Program execution failed with args: {args:?}"));
     }
 
     // Convert the output to a string
-    let stdout = str::from_utf8(&output.stdout).map_err(|e| {
-        io::Error::new(ErrorKind::InvalidData, format!("Invalid UTF-8 output: {e}"))
-    })?;
+    let stdout = str::from_utf8(&output.stdout)
+        .map_err(|e| miette!("Invalid UTF-8 output: {e}"))?;
 
     // Check that the output is not empty
     if stdout.trim().is_empty() {
-        return Err(Box::new(io::Error::new(
-            ErrorKind::Other,
-            format!("Program output is empty with args: {args:?}"),
-        )));
+        return Err(miette!("Program output is empty with args: {args:?}"));
     }
 
     // Check that the output contains at least one IP address
@@ -44,10 +32,7 @@ fn run_with_args(args: &[&str]) -> Result<String, Box<dyn std::error::Error>> {
     let contains_ipv6 = stdout.contains(':');
 
     if !contains_ipv4 && !contains_ipv6 {
-        return Err(Box::new(io::Error::new(
-            ErrorKind::Other,
-            format!("Output does not contain an IP address with args: {args:?}\nOutput: {stdout}"),
-        )));
+        return Err(miette!("Output does not contain an IP address with args: {args:?}\nOutput: {stdout}"));
     }
 
     Ok(stdout.to_string())
