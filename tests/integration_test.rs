@@ -1,4 +1,4 @@
-use miette::{miette, Result};
+use miette::{Result, miette};
 use std::process::Command;
 use std::str;
 
@@ -19,8 +19,8 @@ fn run_with_args(args: &[&str]) -> Result<String> {
     }
 
     // Convert the output to a string
-    let stdout = str::from_utf8(&output.stdout)
-        .map_err(|e| miette!("Invalid UTF-8 output: {e}"))?;
+    let stdout =
+        str::from_utf8(&output.stdout).map_err(|e| miette!("Invalid UTF-8 output: {e}"))?;
 
     // Check that the output is not empty
     if stdout.trim().is_empty() {
@@ -32,7 +32,9 @@ fn run_with_args(args: &[&str]) -> Result<String> {
     let contains_ipv6 = stdout.contains(':');
 
     if !contains_ipv4 && !contains_ipv6 {
-        return Err(miette!("Output does not contain an IP address with args: {args:?}\nOutput: {stdout}"));
+        return Err(miette!(
+            "Output does not contain an IP address with args: {args:?}\nOutput: {stdout}"
+        ));
     }
 
     Ok(stdout.to_string())
