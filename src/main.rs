@@ -430,10 +430,7 @@ mod tests {
 
         // Check that the result is what we expect
         if reversed != whatismyip::myip::ReversedIp("localhost".to_string()) {
-            return Err(miette!(
-                "Expected 'localhost', got '{}'",
-                reversed.0
-            ));
+            return Err(miette!("Expected 'localhost', got '{}'", reversed.0));
         }
 
         // Test with a non-loopback IP
@@ -443,10 +440,7 @@ mod tests {
         // Check that the result contains the IP
         let reversed_str = reversed.0;
         if !reversed_str.contains("192.168.1.1") {
-            return Err(miette!(
-                "Expected string containing '192.168.1.1', got '{}'",
-                reversed_str
-            ));
+            return Err(miette!("Expected string containing '192.168.1.1', got '{}'", reversed_str));
         }
 
         Ok(())
