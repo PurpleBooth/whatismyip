@@ -645,7 +645,7 @@ mod tests {
         let ipv4 = IpAddr::from_str(ipv4_str)
             .map_err(|e| miette!("Failed to parse IPv4 address: {}", e))?;
         let my_ip = myip::MyIp::new_plain(ipv4);
-        
+
         if my_ip.ip() != ipv4 {
             return Err(miette!("IPv4 address mismatch"));
         }
@@ -655,7 +655,7 @@ mod tests {
         let ipv6 = IpAddr::from_str(ipv6_str)
             .map_err(|e| miette!("Failed to parse IPv6 address: {}", e))?;
         let my_ip = myip::MyIp::new_plain(ipv6);
-        
+
         if my_ip.ip() != ipv6 {
             return Err(miette!("IPv6 address mismatch"));
         }
