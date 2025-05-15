@@ -440,7 +440,10 @@ mod tests {
         // Check that the result contains the IP
         let reversed_str = reversed.0;
         if !reversed_str.contains("192.168.1.1") {
-            return Err(miette!("Expected string containing '192.168.1.1', got '{}'", reversed_str));
+            return Err(miette!(
+                "Expected string containing '192.168.1.1', got '{}'",
+                reversed_str
+            ));
         }
 
         Ok(())
