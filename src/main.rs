@@ -236,7 +236,7 @@ mod tests {
         let strategies = process_args(args);
 
         // Should have 0 strategies (no WAN lookups)
-        if strategies.len() != 0 {
+        if !strategies.is_empty() {
             return Err(miette!("Expected 0 strategies, got {}", strategies.len()));
         }
 
@@ -301,7 +301,7 @@ mod tests {
         }
 
         // The result should be Ok
-        if !local_ips[0].is_ok() {
+        if local_ips[0].is_err() {
             return Err(miette!("Expected Ok result, got Err"));
         }
 
@@ -321,7 +321,7 @@ mod tests {
         let local_ips = get_local_ips(args);
 
         // Should have 0 results (no local IPs)
-        if local_ips.len() != 0 {
+        if !local_ips.is_empty() {
             return Err(miette!("Expected 0 results, got {}", local_ips.len()));
         }
 
@@ -346,7 +346,7 @@ mod tests {
         }
 
         // The result should be Ok
-        if !local_ips[0].is_ok() {
+        if local_ips[0].is_err() {
             return Err(miette!("Expected Ok result, got Err"));
         }
 
@@ -378,7 +378,7 @@ mod tests {
         }
 
         // The result should be Ok
-        if !local_ips[0].is_ok() {
+        if local_ips[0].is_err() {
             return Err(miette!("Expected Ok result, got Err"));
         }
 
