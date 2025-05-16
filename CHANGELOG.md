@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.2 - 2025-05-16
+#### Bug Fixes
+- add sudo to chmod command in GitHub CLI installation script - (970644e) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/bake-action digest to 212c367 - (7ce234a) - Solace System Renovate Fox
+- update Renovate config to use specific config preset - (b51e0c0) - Billie Thompson
+
+- - -
+
 ## v0.14.1 - 2025-05-15
 #### Bug Fixes
 - add sudo to GitHub CLI installation commands in pipeline workflow - (a877fa0) - Billie Thompson
