@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.3 - 2025-06-13
+#### Bug Fixes
+- **(deps)** update rust crate tokio to v1.45.1 - (6ce91e3) - Solace System Renovate Fox
+- **(deps)** update rust crate clap to v4.5.40 - (daadf19) - Solace System Renovate Fox
+- **(deps)** update rust:alpine docker digest to 126df0f - (fbc2535) - Solace System Renovate Fox
+- **(deps)** update goreleaser/nfpm docker digest to 929e105 - (f19e675) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/bake-action digest to 37816e7 - (23417ca) - Solace System Renovate Fox
+- **(deps)** update rust crate criterion to v0.6.0 - (8ca8552) - Solace System Renovate Fox
+
+- - -
+
 ## v0.14.2 - 2025-05-16
 #### Bug Fixes
 - add sudo to chmod command in GitHub CLI installation script - (970644e) - Billie Thompson
