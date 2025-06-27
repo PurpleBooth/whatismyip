@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.4 - 2025-06-27
+#### Bug Fixes
+- **(deps)** update rust:alpine docker digest to ec0413a - (8852f69) - Solace System Renovate Fox
+#### Continuous Integration
+- run less often - (497b873) - PurpleBooth
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/setup-buildx-action digest to e468171 - (c452bc0) - Solace System Renovate Fox
+- **(deps)** update https://code.forgejo.org/docker/setup-buildx-action digest to 18ce135 - (ef148aa) - Solace System Renovate Fox
+
+- - -
+
 ## v0.14.3 - 2025-06-13
 #### Bug Fixes
 - **(deps)** update rust crate tokio to v1.45.1 - (6ce91e3) - Solace System Renovate Fox
