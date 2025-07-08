@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.5 - 2025-07-08
+#### Bug Fixes
+- **(deps)** update rust crate tokio to v1.46.1 - (e28f3ce) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- update dockerignore and dockerfile, remove build.rs - (a7c3d61) - Billie Thompson
+
+- - -
+
 ## v0.14.4 - 2025-06-27
 #### Bug Fixes
 - **(deps)** update rust:alpine docker digest to ec0413a - (8852f69) - Solace System Renovate Fox
