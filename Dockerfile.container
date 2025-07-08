@@ -30,7 +30,7 @@ RUN xx-cargo chef cook --release --recipe-path recipe.json && \
 RUN addgroup -g 568 nonroot
 RUN adduser -u 568 -G nonroot -D nonroot
 FROM scratch
-COPY --from=builder "/app/whatismyip/build/whatismyip" /
+COPY --from=builder "/app/whatismyip/build/whatismyip" /whatismyip
 COPY --from=builder /etc/group /etc/group
 COPY --from=builder /etc/passwd /etc/passwd
 RUN ["/whatismyip", "--version"]
