@@ -12,7 +12,7 @@ vendor: "PurpleBooth"
 homepage: "https://codeberg.org/PurpleBooth/whatismyip"
 license: "CC0"
 contents:
-  - src: ./whatismyip
+  - src: ./build/whatismyip
     dst: /usr/bin/whatismyip
     file_info:
       mode: 0755
@@ -22,13 +22,13 @@ contents:
 rpm:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
-  compression: "zstd"
+  compression: "gzip"
   packager: "rpmbuild <noreply@purplebooth.com>"
 
 deb:
   signature:
     key_file: ${NFPM_SIGNING_KEY_FILE}
-  compression: "zstd"
+  compression: "gzip"
 
 apk:
   signature:
