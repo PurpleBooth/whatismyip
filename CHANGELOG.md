@@ -2,6 +2,19 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.14.6 - 2025-07-10
+#### Bug Fixes
+- **(deps)** update rust crate clap to v4.5.41 - (ca3524e) - Solace System Renovate Fox
+#### Build system
+- update Dockerfile and build configuration for cross-platform support - (8b2a707) - Billie Thompson
+#### Miscellaneous Chores
+- remove Dockerfile.bins and Dockerfile.container - (cf82233) - Billie Thompson
+#### Refactoring
+- optimize Dockerfile cross-compilation platform handling - (4fe0ef3) - Billie Thompson
+- Optimize Dockerfile with multi-stage build and cargo-chef - (377822e) - Billie Thompson
+
+- - -
+
 ## v0.14.5 - 2025-07-08
 #### Bug Fixes
 - **(deps)** update rust crate tokio to v1.46.1 - (e28f3ce) - Solace System Renovate Fox
