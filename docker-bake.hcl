@@ -5,6 +5,7 @@ target "bins" {
 
     args = {
         TARGETPLAFORM = "${item.TARGETPLAFORM}"
+        SPECDOWN_VERSION = "1.2.112"
     }
     output = ["type=local,dest=target/bins/${item.TARGETPLAFORM}"]
 
@@ -47,7 +48,9 @@ target "docker" {
     dockerfile = "Dockerfile"
     target = "container"
 
-    args = {}
+    args = {
+        SPECDOWN_VERSION = "1.2.112"
+    }
 
     attest = [
         "type=provenance,mode=max",
@@ -57,6 +60,25 @@ target "docker" {
     platform = ["alpine/amd64", "alpine/arm64"]
 }
 
+target "lint" {
+    dockerfile = "Dockerfile"
+    target = "lint"
+}
+
+target "test" {
+    dockerfile = "Dockerfile"
+    target = "test"
+}
+
+target "specdown" {
+    dockerfile = "Dockerfile"
+    target = "specdown"
+}
+
 group "default" {
     targets = ["bins", "docker"]
+}
+
+group "ci" {
+    targets = ["lint", "test", "specdown"]
 }

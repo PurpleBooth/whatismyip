@@ -1,6 +1,6 @@
 ARG BUILDKIT_SBOM_SCAN_CONTEXT=true
 
-# Base stages
+# Setup build environment
 FROM goreleaser/nfpm@sha256:929e1056ba69bf1da57791e851d210e9d6d4f528fede53a55bd43cf85674450c AS nfpm
 
 FROM --platform=$BUILDPLATFORM tonistiigi/xx@sha256:923441d7c25f1e2eb5789f82d987693c47b8ed987c4ab3b075d6ed2b5d6779a3 AS xx
@@ -9,16 +9,31 @@ ARG TARGETPLATFORM
 FROM --platform=$BUILDPLATFORM rust:alpine@sha256:ec0413a092f4cc01b32e08f991485abe4467ef95c7416a6643a063a141c2e0ec AS chef
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 ARG TARGETPLATFORM
-RUN apk add clang lld openssl-dev curl bash
+
+RUN apk add clang lld openssl-dev curl bash wget
 # copy xx scripts to your build stage
 COPY --from=xx / /
 RUN xx-apk add --no-cache musl-dev zlib-dev zlib-static openssl-dev openssl-libs-static pkgconfig alpine-sdk
 
-WORKDIR /app
+
+# renovate: datasource=github-releases depName=specdown/specdown
+ARG SPECDOWN_VERSION=1.2.112
+RUN TEMP_SRC="$(mktemp -d)" && \
+    git clone https://github.com/specdown/specdown.git "$TEMP_SRC" && \
+    cd "$TEMP_SRC" && \
+    git switch --detach "v${SPECDOWN_VERSION}" && \
+    cargo build --release && \
+    cp -v target/release/specdown /usr/local/bin/specdown && \
+    cd / && \
+    rm -rf "$TEMP_SRC" && \
+    /usr/local/bin/specdown --version \
 
 # Install cargo-chef for dependency caching
 RUN cargo install cargo-chef --locked
+# Install cargo-audit for security auditing
+RUN cargo install cargo-audit --locked
 
+WORKDIR /app
 # Planner stage
 FROM chef AS planner
 ARG TARGETPLATFORM
@@ -49,6 +64,26 @@ RUN mkdir -p /PACKS && \
     GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager rpm --config="nfpm.yaml" --target="/PACKS" && \
     GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager apk --config="nfpm.yaml" --target="/PACKS" && \
     GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager deb --config="nfpm.yaml" --target="/PACKS"
+
+# Lint stage
+FROM chef AS lint
+COPY . .
+RUN cargo fmt --all -- --check && \
+    cargo clippy --all-features && \
+    cargo check && \
+    cargo audit
+
+# Test stage
+FROM chef AS test
+COPY . .
+ENV RUST_BACKTRACE=1
+RUN cargo test
+
+# Specdown stage
+FROM chef AS specdown
+COPY . .
+RUN cargo build --release && \
+    specdown run --temporary-workspace-dir --add-path "/app/target/release" ./README.md
 
 # Users stage for container build
 FROM --platform=$BUILDPLATFORM alpine@sha256:8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715 AS users
