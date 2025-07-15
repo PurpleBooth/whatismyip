@@ -131,7 +131,6 @@ jobs:
         with:
           set: |
             *.attest=type=provenance,mode=max
-            *.args.VER=${{ needs.semver.outputs.next_version }}
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:${{ needs.semver.outputs.current_version }}
             *.cache-to=type=inline,mode=max
@@ -286,7 +285,6 @@ jobs:
         with:
           set: |
             *.attest=type=provenance,mode=max
-            *.args.VER=${{ needs.release.outputs.current_version }}
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
             *.cache-to=type=inline,mode=max
           push: true
@@ -295,7 +293,7 @@ jobs:
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
-          targets: docker,bins
+          targets: docker,bins,packages
 
       - name: Move Binaries to Release Path
         shell: bash
@@ -304,6 +302,14 @@ jobs:
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/bins/ -type d -empty -delete
+
+      - name: Move Packages to Release Directory
+        shell: bash
+        run: |
+          for I in target/packages/*/*/* ; do
+            mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
+          done
+          find target/packages/ -type d -empty -delete
 
       - name: Upload Binaries
         uses: https://code.forgejo.org/forgejo/upload-artifact@16871d9e8cfcf27ff31822cac382bbb5450f1e1e       # v4
@@ -370,7 +376,6 @@ jobs:
         with:
           set: |
             *.attest=type=provenance,mode=max
-            *.args.VER=${{ needs.release.outputs.current_version }}
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
             *.cache-to=type=inline,mode=max
           push: true
@@ -379,7 +384,7 @@ jobs:
             cwd://${{ steps.meta-with-version.outputs.bake-file-tags }}
             cwd://${{ steps.meta-with-version.outputs.bake-file-annotations }}
             cwd://${{ steps.meta-with-version.outputs.bake-file-labels }}
-          targets: docker,bins
+          targets: docker,bins,packages
 
       - name: Move Binaries to Release Directory
         shell: bash
@@ -388,6 +393,14 @@ jobs:
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/bins/ -type d -empty -delete
+
+      - name: Move Packages to Release Directory
+        shell: bash
+        run: |
+          for I in target/packages/*/*/* ; do
+            mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
+          done
+          find target/packages/ -type d -empty -delete
 
       - name: Upload Release Artifacts
         uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/forgejo-release@main

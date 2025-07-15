@@ -3,3 +3,5 @@
 /mutants.out/
 /mutants.out.old/
 .aider*
+docker-bake.hcl
+Dockerfile

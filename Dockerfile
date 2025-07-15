@@ -1,21 +1,53 @@
 ARG BUILDKIT_SBOM_SCAN_CONTEXT=true
 
-# Setup build environment
+# Download NFPM
 FROM goreleaser/nfpm@sha256:929e1056ba69bf1da57791e851d210e9d6d4f528fede53a55bd43cf85674450c AS nfpm
 
-FROM --platform=$BUILDPLATFORM tonistiigi/xx@sha256:923441d7c25f1e2eb5789f82d987693c47b8ed987c4ab3b075d6ed2b5d6779a3 AS xx
-ARG TARGETPLATFORM
-
-FROM --platform=$BUILDPLATFORM rust:alpine@sha256:ec0413a092f4cc01b32e08f991485abe4467ef95c7416a6643a063a141c2e0ec AS chef
+FROM --platform=$BUILDPLATFORM rust AS base
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 ARG TARGETPLATFORM
 
-RUN apk add clang lld openssl-dev curl bash wget
-# copy xx scripts to your build stage
-COPY --from=xx / /
-RUN xx-apk add --no-cache musl-dev zlib-dev zlib-static openssl-dev openssl-libs-static pkgconfig alpine-sdk
+RUN apt-get update && \
+    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
+    apt-get clean && \
+    rm -vrf /var/lib/apt/lists/*
 
+# Install Zig for cross-compilation
+# renovate: datasource=github-tags depName=ziglang/zig versioning=loose
+ARG ZIG_VERSION=0.15.0-dev.936+fc2c1883b
+RUN wget "https://ziglang.org/builds/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" -O /tmp/zig.tar.xz && \
+    mkdir -p /var/opt/zig && \
+    tar -xvf /tmp/zig.tar.xz -C /var/opt/zig && \
+    rm -vf /tmp/zig.tar.xz && \
+    ls /var/opt/zig/
+ENV PATH="/var/opt/zig/zig-x86_64-linux-${ZIG_VERSION}:${PATH}"
 
+# Install nfpm for packaging
+COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
+
+# Install yq for YAML processing
+# renovate: datasource=github-releases depName=mikefarah/yq
+ARG YQ_VERSION=4.40.5
+ARG YQ_BINARY=yq_linux_amd64
+RUN wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - | \
+    tar -xvz && mv ${YQ_BINARY} /usr/local/bin/yq
+
+# Drop to an unprivilaged user
+ENV HOME=/home/nonroot
+ENV PATH=/home/nonroot/.cargo/bin:$PATH
+RUN addgroup nonroot && \
+    adduser --disabled-password --ingroup nonroot nonroot && \
+    mkdir -p /app /home/nonroot/.cargo/bin/ && \
+    chown -vR nonroot:nonroot /app /home/nonroot
+USER nonroot
+WORKDIR /app
+
+# Install cargo binstall
+# renovate: datasource=crate depName=cargo-binstall
+ARG CARGO_BINSTALL_VERSION=1.14.1
+RUN cargo install cargo-binstall --version ${CARGO_BINSTALL_VERSION} --locked
+
+# Install specdown
 # renovate: datasource=github-releases depName=specdown/specdown
 ARG SPECDOWN_VERSION=1.2.112
 RUN TEMP_SRC="$(mktemp -d)" && \
@@ -23,81 +55,51 @@ RUN TEMP_SRC="$(mktemp -d)" && \
     cd "$TEMP_SRC" && \
     git switch --detach "v${SPECDOWN_VERSION}" && \
     cargo build --release && \
-    cp -v target/release/specdown /usr/local/bin/specdown && \
+    mkdir -p '/home/nonroot/.cargo/bin/' && \
+    cp -v target/release/specdown /home/nonroot/.cargo/bin/specdown && \
     cd / && \
-    rm -rf "$TEMP_SRC" && \
-    /usr/local/bin/specdown --version \
+    rm -vrf "$TEMP_SRC" && \
+    specdown --version
 
 # Install cargo-chef for dependency caching
-RUN cargo install cargo-chef --locked
-# Install cargo-audit for security auditing
-RUN cargo install cargo-audit --locked
+# renovate: datasource=crate depName=cargo-chef
+ARG CARGO_CHEF_VERSION=0.1.72
+RUN cargo binstall cargo-chef --version ${CARGO_CHEF_VERSION} --locked
 
-WORKDIR /app
-# Planner stage
-FROM chef AS planner
+# Install cargo-audit for security auditing
+# renovate: datasource=crate depName=cargo-audit
+ARG CARGO_AUDIT_VERSION=0.21.2
+RUN cargo binstall cargo-audit --version ${CARGO_AUDIT_VERSION} --locked
+
+# Install cargo-zigbuild for security auditing
+# renovate: datasource=crate depName=cargo-zigbuild
+ARG CARGO_ZIGBUILD_VERSION=0.20.0
+RUN cargo binstall cargo-zigbuild --version ${CARGO_ZIGBUILD_VERSION} --locked
+
+# Generate build dep list
+FROM --platform=$BUILDPLATFORM base AS planner
 ARG TARGETPLATFORM
 COPY . .
 RUN cargo chef prepare --recipe-path recipe.json
 
 # Builder stage
-FROM chef AS builder
+FROM --platform=$BUILDPLATFORM base AS builder
 ARG TARGETPLATFORM
-ARG VER
-ENV VER=$VER
 
-# Copy nfpm for packaging
-COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
-
-COPY --from=planner /app/recipe.json recipe.json
 # Build dependencies with cross-compilation
-RUN xx-cargo chef cook --release --recipe-path recipe.json
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
 
+# Add targets
+RUN rustup target add \
+      aarch64-apple-darwin \
+      aarch64-pc-windows-gnullvm \
+      aarch64-unknown-linux-gnu \
+      aarch64-unknown-linux-musl \
+      x86_64-apple-darwin \
+      x86_64-pc-windows-gnu \
+      x86_64-unknown-linux-gnu \
+      x86_64-unknown-linux-musl
+
+# Build application
 COPY . .
-RUN xx-cargo build --release --target-dir ./build && \
-    xx-verify --static "./build/$(xx-cargo --print-target-triple)/release/whatismyip" && \
-    cp -v "./build/$(xx-cargo --print-target-triple)/release/whatismyip" ./build/whatismyip
-
-# Always build packages (but only copy them in bins stage)
-RUN mkdir -p /PACKS && \
-    GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager archlinux --config="nfpm.yaml" --target="/PACKS" && \
-    GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager rpm --config="nfpm.yaml" --target="/PACKS" && \
-    GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager apk --config="nfpm.yaml" --target="/PACKS" && \
-    GOARCH="$(xx-info arch)" GOOS="$(xx-info os)" nfpm pkg --packager deb --config="nfpm.yaml" --target="/PACKS"
-
-# Lint stage
-FROM chef AS lint
-COPY . .
-RUN cargo fmt --all -- --check && \
-    cargo clippy --all-features && \
-    cargo check && \
-    cargo audit
-
-# Test stage
-FROM chef AS test
-COPY . .
-ENV RUST_BACKTRACE=1
-RUN cargo test
-
-# Specdown stage
-FROM chef AS specdown
-COPY . .
-RUN cargo build --release && \
-    specdown run --temporary-workspace-dir --add-path "/app/target/release" ./README.md
-
-# Users stage for container build
-FROM --platform=$BUILDPLATFORM alpine@sha256:8a1f59ffb675680d47db6337b49d22281a139e9d709335b492be023728e11715 AS users
-RUN addgroup -S nonroot && adduser -S nonroot -G nonroot
-
-# Bins output stage (includes packages)
-FROM scratch AS bins
-USER nonroot
-COPY --from=builder /PACKS .
-COPY --from=builder /app/build/whatismyip .
-
-# Container runtime stage (only binary, no packages)
-FROM scratch AS container
-COPY --from=users /etc/passwd /etc/passwd
-COPY --from=builder /app/build/whatismyip /usr/local/bin/
-USER nonroot
-ENTRYPOINT ["/usr/local/bin/whatismyip"]

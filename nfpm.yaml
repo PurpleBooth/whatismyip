@@ -12,7 +12,7 @@ vendor: "PurpleBooth"
 homepage: "https://codeberg.org/PurpleBooth/whatismyip"
 license: "CC0"
 contents:
-  - src: ./build/whatismyip
+  - src: ./target/release/whatismyip
     dst: /usr/bin/whatismyip
     file_info:
       mode: 0755
