@@ -8,7 +8,9 @@ jobs:
   lint:
     name: Lint
     continue-on-error: true
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - name: Checkout code
         uses: https://code.forgejo.org/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4
@@ -22,7 +24,9 @@ jobs:
     name: Fix Formatting
     needs:
       - lint
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     if: always() && contains(needs.lint.result, 'failure') && github.ref == 'refs/heads/main'
     steps:
       - name: Checkout Repository
@@ -69,7 +73,9 @@ jobs:
 
   unit-test:
     name: Unit Test
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - name: Checkout Repository
         uses: https://code.forgejo.org/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4
@@ -81,7 +87,9 @@ jobs:
 
   integration-test:
     name: Integration Test
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - uses: https://code.forgejo.org/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4
         name: Checkout Code
@@ -92,7 +100,9 @@ jobs:
           targets: specdown
 
   bake-edge-test:
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     needs:
       - semver
     name: Test Release Build
@@ -194,8 +204,9 @@ jobs:
 
           # Remove the test tap after completion
           brew untap homebrew-releaser/test
-
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
 
   all-tests-passed:
     name: All tests passed
@@ -205,7 +216,9 @@ jobs:
       - lint
       - bake-edge-test
       - lint-homebrew-formula
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - run: echo "Looks good"
         shell: bash
@@ -219,7 +232,9 @@ jobs:
       current_version: ${{ steps.release.outputs.current_version }}
       previous_version: ${{ steps.release.outputs.previous_version }}
       changelog: ${{ steps.release.outputs.changelog }}
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - name: Checkout Repository
         uses: https://code.forgejo.org/actions/checkout@main
@@ -241,7 +256,9 @@ jobs:
   bake-edge-build:
     name: Create Pre-release Assets
     if: needs.release.outputs.current_version == needs.release.outputs.previous_version
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     needs:
       - release
     steps:
@@ -322,7 +339,9 @@ jobs:
     if: needs.release.outputs.current_version != needs.release.outputs.previous_version
     needs:
       - release
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
     steps:
       - name: Checkout Code
         uses: https://code.forgejo.org/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4
@@ -477,4 +496,6 @@ jobs:
           FORMULA_PATH: ${{ steps.generate-formula.outputs.path }}
           VERSION: ${{ needs.release.outputs.current_version }}
           CHANGELOG: ${{ needs.release.outputs.changelog }}
-    runs-on: runner-latest
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest
