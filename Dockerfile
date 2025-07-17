@@ -17,7 +17,7 @@ RUN apt-get update && \
 ARG ZIG_VERSION=0.15.0-dev.936+fc2c1883b
 RUN wget "https://ziglang.org/builds/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" -O /tmp/zig.tar.xz && \
     mkdir -p /var/opt/zig && \
-    tar -xvf /tmp/zig.tar.xz -C /var/opt/zig && \
+    tar -xf /tmp/zig.tar.xz -C /var/opt/zig && \
     rm -vf /tmp/zig.tar.xz && \
     ls /var/opt/zig/
 ENV PATH="/var/opt/zig/zig-x86_64-linux-${ZIG_VERSION}:${PATH}"
