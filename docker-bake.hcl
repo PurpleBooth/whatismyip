@@ -57,6 +57,7 @@ ENV RUSTFLAGS="-C target-feature=+crt-static"
 RUN case "$TARGETPLATFORM" in \
       "linux/amd64") cargo zigbuild --release --target "x86_64-unknown-linux-musl" ;; \
       "linux/arm64") cargo zigbuild --release --target "aarch64-unknown-linux-musl" ;; \
+      *) echo "$TARGETPLATFORM not supported" && exit 1 ;; \
     esac
 FROM scratch AS final
 COPY --from=docker /etc/passwd /etc/passwd
@@ -89,7 +90,7 @@ RUN case "$TARGETPLATFORM" in \
       "windows/amd64") cargo zigbuild --release --target "aarch64-pc-windows-gnu" ;; \
       "windows/arm64") cargo zigbuild --release --target "x86_64-pc-windows-gnu" ;; \
       "darwin") cargo zigbuild --release --target "universal2-apple-darwin" ;; \
-      *) exit 1 ;; \
+      *) echo "$TARGETPLATFORM not supported" && exit 1 ;; \
     esac
 FROM scratch AS final
 COPY --from=bins "/app/target/release/whatismyip" /whatismyip
@@ -129,7 +130,7 @@ ENV GOOS=$TARGETOS
 RUN case "$TARGETPLATFORM" in \
       "linux/amd64") cargo zigbuild --release --target "aarch64-unknown-linux-gnu" ;; \
       "linux/arm64") cargo zigbuild --release --target "x86_64-unknown-linux-gnu" ;; \
-      *) exit 1 ;; \
+      *) echo "$TARGETPLATFORM not supported" && exit 1 ;; \
     esac && \
     VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager archlinux --config="nfpm.yaml" && \
     VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager rpm --config="nfpm.yaml" && \
