@@ -27,7 +27,7 @@ COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
 
 # Install yq for YAML processing
 # renovate: datasource=github-releases depName=mikefarah/yq
-ARG YQ_VERSION=4.40.5
+ARG YQ_VERSION=4.46.1
 ARG YQ_BINARY=yq_linux_amd64
 RUN wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - | \
     tar -xvz && mv ${YQ_BINARY} /usr/local/bin/yq
