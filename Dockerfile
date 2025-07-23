@@ -3,51 +3,49 @@ ARG BUILDKIT_SBOM_SCAN_CONTEXT=true
 # Download NFPM
 FROM goreleaser/nfpm@sha256:929e1056ba69bf1da57791e851d210e9d6d4f528fede53a55bd43cf85674450c AS nfpm
 
-FROM --platform=$BUILDPLATFORM rust@sha256:5771a3cc2081935c59ac52b92d49c9e164d4fed92c9f6420aa8cc50364aead6e AS base
+FROM --platform=$BUILDPLATFORM rust:alpine AS base
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
-ARG TARGETPLATFORM
 
-RUN apt-get update && \
-    DEBIAN_FRONTEND=noninteractive apt-get upgrade -y && \
-    apt-get clean && \
-    rm -vrf /var/lib/apt/lists/*
+RUN apk update && \
+    apk upgrade && \
+    rm -rf /var/cache/apk/*
 
-# Install Zig for cross-compilation
-# renovate: datasource=github-tags depName=ziglang/zig versioning=loose
-ARG ZIG_VERSION=0.15.0-dev.936+fc2c1883b
-RUN wget "https://ziglang.org/builds/zig-x86_64-linux-${ZIG_VERSION}.tar.xz" -O /tmp/zig.tar.xz && \
-    mkdir -p /var/opt/zig && \
-    tar -xf /tmp/zig.tar.xz -C /var/opt/zig && \
-    rm -vf /tmp/zig.tar.xz && \
-    ls /var/opt/zig/
-ENV PATH="/var/opt/zig/zig-x86_64-linux-${ZIG_VERSION}:${PATH}"
+# Use bash rather than sh
+RUN apk add --no-cache bash
+SHELL ["/usr/bin/env", "bash", "-c"]
 
-# Install nfpm for packaging
-COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
+# Install tools required for cross-compilation and building
+RUN apk add --no-cache \
+    alpine-sdk \
+    bash \
+    curl \
+    git \
+    bzip2 \
+    xz \
+    unzip \
+    ca-certificates \
+    libc-dev \
+    libc++-dev \
+    zig \
+    openssl-dev  \
+    binutils \
+    mingw-w64-binutils \
+    musl-dev \
+    musl-utils
 
-# Install yq for YAML processing
+# renovate: datasource=crate depName=cargo-binstall
+ARG CARGO_BINSTALL_VERSION=1.14.1
+RUN wget https://github.com/cargo-bins/cargo-binstall/releases/download/v${CARGO_BINSTALL_VERSION}/cargo-binstall-x86_64-unknown-linux-musl.full.tgz -O - | \
+    tar -xz && \
+    mv cargo-binstall /usr/local/bin/
+ENV PATH=/root/.cargo/bin:$PATH
+
 # renovate: datasource=github-releases depName=mikefarah/yq
 ARG YQ_VERSION=4.40.5
 ARG YQ_BINARY=yq_linux_amd64
 RUN wget https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/${YQ_BINARY}.tar.gz -O - | \
-    tar -xvz && mv ${YQ_BINARY} /usr/local/bin/yq
+    tar -xz && mv ${YQ_BINARY} /usr/local/bin/yq
 
-# Drop to an unprivilaged user
-ENV HOME=/home/nonroot
-ENV PATH=/home/nonroot/.cargo/bin:$PATH
-RUN addgroup nonroot && \
-    adduser --disabled-password --ingroup nonroot nonroot && \
-    mkdir -p /app /home/nonroot/.cargo/bin/ && \
-    chown -vR nonroot:nonroot /app /home/nonroot
-USER nonroot
-WORKDIR /app
-
-# Install cargo binstall
-# renovate: datasource=crate depName=cargo-binstall
-ARG CARGO_BINSTALL_VERSION=1.14.1
-RUN cargo install cargo-binstall --version ${CARGO_BINSTALL_VERSION} --locked
-
-# Install specdown
 # renovate: datasource=github-releases depName=specdown/specdown
 ARG SPECDOWN_VERSION=1.2.112
 RUN TEMP_SRC="$(mktemp -d)" && \
@@ -55,51 +53,62 @@ RUN TEMP_SRC="$(mktemp -d)" && \
     cd "$TEMP_SRC" && \
     git switch --detach "v${SPECDOWN_VERSION}" && \
     cargo build --release && \
-    mkdir -p '/home/nonroot/.cargo/bin/' && \
-    cp -v target/release/specdown /home/nonroot/.cargo/bin/specdown && \
+    cp -v target/release/specdown /usr/local/bin/specdown && \
     cd / && \
-    rm -vrf "$TEMP_SRC" && \
+    rm -rf "$TEMP_SRC" && \
     specdown --version
 
-# Install cargo-chef for dependency caching
-# renovate: datasource=crate depName=cargo-chef
-ARG CARGO_CHEF_VERSION=0.1.72
-RUN cargo binstall cargo-chef --version ${CARGO_CHEF_VERSION} --locked
-
-# Install cargo-audit for security auditing
 # renovate: datasource=crate depName=cargo-audit
 ARG CARGO_AUDIT_VERSION=0.21.2
 RUN cargo binstall cargo-audit --version ${CARGO_AUDIT_VERSION} --locked
 
-# Install cargo-zigbuild for security auditing
 # renovate: datasource=crate depName=cargo-zigbuild
-ARG CARGO_ZIGBUILD_VERSION=0.20.0
+ARG CARGO_ZIGBUILD_VERSION=0.20.1
 RUN cargo binstall cargo-zigbuild --version ${CARGO_ZIGBUILD_VERSION} --locked
 
-# Generate build dep list
-FROM --platform=$BUILDPLATFORM base AS planner
-ARG TARGETPLATFORM
+# renovate: datasource=github-releases depName=konoui/lipo
+ARG LIPO_VERSION=0.10.0
+RUN curl -L -o /tmp/lipo https://github.com/konoui/lipo/releases/download/v${LIPO_VERSION}/lipo_Linux_amd64 && \
+    chmod +x /tmp/lipo && \
+    mv /tmp/lipo /usr/local/bin/
+#
+## renovate: datasource=github-releases depName=joseluisq/macosx-sdks
+#ARG MACOS_SDK_VERSION=15.5
+#ENV MACOS_SDK_VERSION=${MACOS_SDK_VERSION}
+#RUN git clone https://github.com/tpoechtrager/osxcross.git /tmp/osxcross && \
+#   cd /tmp/osxcross && \
+#   mkdir -p /tmp/osxcross/tarballs && \
+#   curl -L -o /tmp/osxcross/tarballs/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz && \
+#   UNATTENDED=1 ./build.sh && \
+#   mv /tmp/osxcross/target /usr/local/osxcross && \
+#   rm -rf /tmp/osxcross
+#ENV PATH=$PATH:/usr/local/osxcross/bin
+
+RUN addgroup -S nonroot && \
+    adduser -S -G nonroot nonroot && \
+    mkdir -p /app /home/nonroot/.cargo/bin/ && \
+    chown -R nonroot:nonroot /app /home/nonroot
+WORKDIR /app
+
+COPY Cargo.* .
+RUN cargo fetch
+
+COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
 COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
 
-# Builder stage
-FROM --platform=$BUILDPLATFORM base AS builder
 ARG TARGETPLATFORM
+ENV TARGETPLATFORM=$TARGETPLATFORM
 
-# Build dependencies with cross-compilation
-COPY --from=planner /app/recipe.json recipe.json
-RUN cargo chef cook --release --recipe-path recipe.json
-
-# Add targets
-RUN rustup target add \
+RUN rustup update && \
+    rustup target add \
       aarch64-apple-darwin \
       aarch64-pc-windows-gnullvm \
       aarch64-unknown-linux-gnu \
       aarch64-unknown-linux-musl \
       x86_64-apple-darwin \
       x86_64-pc-windows-gnu \
+      x86_64-pc-windows-msvc \
       x86_64-unknown-linux-gnu \
       x86_64-unknown-linux-musl
 
-# Build application
-COPY . .
+COPY build/cross-platform-build /usr/local/bin/cross-platform-build
