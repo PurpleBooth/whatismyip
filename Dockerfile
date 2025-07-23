@@ -71,18 +71,6 @@ ARG LIPO_VERSION=0.10.0
 RUN curl -L -o /tmp/lipo https://github.com/konoui/lipo/releases/download/v${LIPO_VERSION}/lipo_Linux_amd64 && \
     chmod +x /tmp/lipo && \
     mv /tmp/lipo /usr/local/bin/
-#
-## renovate: datasource=github-releases depName=joseluisq/macosx-sdks
-#ARG MACOS_SDK_VERSION=15.5
-#ENV MACOS_SDK_VERSION=${MACOS_SDK_VERSION}
-#RUN git clone https://github.com/tpoechtrager/osxcross.git /tmp/osxcross && \
-#   cd /tmp/osxcross && \
-#   mkdir -p /tmp/osxcross/tarballs && \
-#   curl -L -o /tmp/osxcross/tarballs/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz https://github.com/joseluisq/macosx-sdks/releases/download/${MACOS_SDK_VERSION}/MacOSX${MACOS_SDK_VERSION}.sdk.tar.xz && \
-#   UNATTENDED=1 ./build.sh && \
-#   mv /tmp/osxcross/target /usr/local/osxcross && \
-#   rm -rf /tmp/osxcross
-#ENV PATH=$PATH:/usr/local/osxcross/bin
 
 RUN addgroup -S nonroot && \
     adduser -S -G nonroot nonroot && \
