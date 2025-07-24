@@ -2,6 +2,34 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.0 - 2025-07-24
+#### Bug Fixes
+- **(deps)** pin dependencies - (86c1e5d) - Solace System Renovate Fox
+- **(deps)** pin dependencies - (11942ec) - Solace System Renovate Fox
+- Ersetze wlinuxbrewget durch wget in Dockerfile - (315d6e2) - Billie Thompson
+- Dockerfile-Formatierung und Berechtigungskorrektur bereinigen - (d78f0d4) - Billie Thompson
+- Dockerfile-Schritte für korrekte Cargo-Abhängigkeiten und Kopiervorgang anpassen - (9080db5) - Billie Thompson
+#### Build system
+- Rust-Ziele vor Cross-Plattform-Build explizit hinzufügen - (f5c956e) - Billie Thompson
+- improve error handling for unsupported target platforms in docker-bake.hcl - (03c6adb) - Billie Thompson
+#### Continuous Integration
+- Homebrew-Formel-Generierung und -Prüfung mit Docker Buildx aktualisieren - (10a707e) - Billie Thompson
+- Erweitere Pipeline um Bake-Schritt für Paketerstellung - (c5a61e2) - Billie Thompson
+- reduce the concurrency of docker bake - (7c3fe52) - Billie Thompson
+- update workflow to use docker runners with ubuntu image - (9241a99) - Billie Thompson
+#### Features
+- Homebrew-Formel für whatismyip-Projekt hinzufügen - (f05e545) - Billie Thompson
+- change how we do cross platform builds - (5495714) - Billie Thompson
+#### Miscellaneous Chores
+- update Zig installation to use less verbose tar extraction - (4f3ae55) - Billie Thompson
+- update Docker and CI configuration for cross-platform builds - (f1e9912) - Billie Thompson
+#### Refactoring
+- Dockerfile verbessern und Rust-Ziele dynamisch basierend auf Plattform hinzufügen - (09f5a51) - Billie Thompson
+- Entferne auskommentierte macOS SDK-Konfiguration aus Dockerfile und Build-Skript - (3c9b57c) - Billie Thompson
+- simplify CI pipeline and Dockerfile with Docker Bake targets - (fa63d60) - Billie Thompson
+
+- - -
+
 ## v0.14.6 - 2025-07-10
 #### Bug Fixes
 - **(deps)** update rust crate clap to v4.5.41 - (ca3524e) - Solace System Renovate Fox
