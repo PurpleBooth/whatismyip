@@ -3,7 +3,7 @@ ARG BUILDKIT_SBOM_SCAN_CONTEXT=true
 # Download NFPM
 FROM goreleaser/nfpm@sha256:929e1056ba69bf1da57791e851d210e9d6d4f528fede53a55bd43cf85674450c AS nfpm
 
-FROM --platform=$BUILDPLATFORM rust:alpine AS base
+FROM --platform=$BUILDPLATFORM rust:alpine@sha256:9dfaae478ecd298b6b5a039e1f2cc4fc040fc818a2de9aa78fa714dea036574d AS base
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 
 RUN apk update && \
