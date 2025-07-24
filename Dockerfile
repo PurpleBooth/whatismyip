@@ -75,7 +75,7 @@ RUN curl -L -o /tmp/lipo https://github.com/konoui/lipo/releases/download/v${LIP
 RUN addgroup -S nonroot && \
     adduser -S -G nonroot nonroot && \
     mkdir -p /app /home/nonroot/.cargo/bin/ && \
-    chown -R nonroot:nonroot /app /home/nonroot \
+    chown -R nonroot:nonroot /app /home/nonroot
 COPY build/cross-platform-build /usr/local/bin/cross-platform-build
 
 WORKDIR /app
