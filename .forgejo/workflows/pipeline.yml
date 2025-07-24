@@ -133,7 +133,7 @@ jobs:
             type=ref,event=pr
             type=sha
 
-      - name: Build (Bake)
+      - name: Build (Bake) - docker
         uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
         env:
           GPG_PRIVATE_KEY: ''
@@ -150,7 +150,22 @@ jobs:
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
-          targets: docker,bins
+          targets: docker
+      - name: Build (Bake) - bins
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        env:
+          GPG_PRIVATE_KEY: ''
+          GPG_PASSPHRASE: ''
+        with:
+          set: |
+            *.attest=type=provenance,mode=max
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:${{ needs.semver.outputs.current_version }}
+            *.cache-to=type=inline,mode=max
+          push: false
+          files: |
+            ./docker-bake.hcl
+          targets: bins
 
   lint-homebrew-formula:
     name: Lint Homebrew Formula
