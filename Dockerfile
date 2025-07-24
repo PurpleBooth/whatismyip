@@ -78,12 +78,6 @@ RUN addgroup -S nonroot && \
     chown -R nonroot:nonroot /app /home/nonroot
 WORKDIR /app
 
-COPY Cargo.* .
-RUN cargo fetch
-
-COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
-COPY . .
-
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=$TARGETPLATFORM
 
@@ -100,3 +94,9 @@ RUN rustup update && \
       x86_64-unknown-linux-musl
 
 COPY build/cross-platform-build /usr/local/bin/cross-platform-build
+COPY Cargo.* .
+RUN cargo fetch
+
+COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
+COPY . .
+
