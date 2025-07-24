@@ -75,28 +75,54 @@ RUN curl -L -o /tmp/lipo https://github.com/konoui/lipo/releases/download/v${LIP
 RUN addgroup -S nonroot && \
     adduser -S -G nonroot nonroot && \
     mkdir -p /app /home/nonroot/.cargo/bin/ && \
-    chown -R nonroot:nonroot /app /home/nonroot
+    chown -R nonroot:nonroot /app /home/nonroot \
+COPY build/cross-platform-build /usr/local/bin/cross-platform-build
+
 WORKDIR /app
 
 ARG TARGETPLATFORM
 ENV TARGETPLATFORM=$TARGETPLATFORM
 
-RUN rustup update && \
-    rustup target add \
-      aarch64-apple-darwin \
-      aarch64-pc-windows-gnullvm \
-      aarch64-unknown-linux-gnu \
-      aarch64-unknown-linux-musl \
-      x86_64-apple-darwin \
-      x86_64-pc-windows-gnu \
-      x86_64-pc-windows-msvc \
-      x86_64-unknown-linux-gnu \
-      x86_64-unknown-linux-musl
+ARG TARGETOS
+ENV TARGETOS=$TARGETOS
 
-COPY build/cross-platform-build /usr/local/bin/cross-platform-build
+ARG TARGETARCH
+ENV TARGETARCH=$TARGETARCH
+
 COPY Cargo.* .
 RUN cargo fetch
 
 COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
 COPY . .
 
+# Add macOS (darwin) targets
+RUN if [[ "$TARGETOS" == *"darwin"* ]]; then \
+    rustup target add aarch64-apple-darwin x86_64-apple-darwin; \
+    fi
+
+# Add Windows targets based on architecture
+RUN if [[ "$TARGETOS" == *"windows"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
+    rustup target add aarch64-pc-windows-gnullvm; \
+    fi
+
+RUN if [[ "$TARGETOS" == *"windows"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
+    rustup target add x86_64-pc-windows-gnu x86_64-pc-windows-msvc; \
+    fi
+
+# Add Linux GNU targets based on architecture
+RUN if [[ "$TARGETOS" == *"linux"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
+    rustup target add aarch64-unknown-linux-gnu; \
+    fi
+
+RUN if [[ "$TARGETOS" == *"linux"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
+    rustup target add x86_64-unknown-linux-gnu; \
+    fi
+
+# Add Alpine Linux (musl) targets based on architecture
+RUN if [[ "$TARGETOS" == *"alpine"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
+    rustup target add aarch64-unknown-linux-musl; \
+    fi
+
+RUN if [[ "$TARGETOS" == *"alpine"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
+    rustup target add x86_64-unknown-linux-musl; \
+    fi
