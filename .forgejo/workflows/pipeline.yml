@@ -187,57 +187,20 @@ jobs:
     name: Lint Homebrew Formula
     needs:
       - semver
+    runs-on: docker
+    container:
+      image: ghcr.io/catthehacker/ubuntu:runner-latest@sha256:efb099ce4ec3408ab2cc6875808087436d099ac73e2124bc1322a9d279fb0fbd
     steps:
       - uses: https://code.forgejo.org/actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683       # v4
         name: Checkout Repository
 
-      - uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-cocogitto@main
-        name: Install Cocogitto
+      - name: Set Up Docker Buildx
+        uses: https://code.forgejo.org/docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435       # v3
 
-      - name: Generate Homebrew Formula
-        id: generate_formula
-        env:
-          VERSION: ${{ needs.semver.outputs.current_version }}
-        run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y gettext
-          TEMP_DIR="$(mktemp -d)"
-          export TEMP_DIR
-          curl --silent \
-          --fail \
-          --output "$TEMP_DIR/v$VERSION.tar.gz" \
-          "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz"
-          FILE_SHA="$(
-          sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1
-          )" envsubst < homebrew/formula.rb.j2 > "$(echo "$GITHUB_REPOSITORY" | cut -d "/" -f2 ).rb"
-          echo "path=$(echo "$GITHUB_REPOSITORY" | cut -d "/" -f2 ).rb" >> "$GITHUB_OUTPUT"
-
-      - name: Lint Homebrew Formula
-        run: |
-          # Install Homebrew on Linux
-          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-          # Set up Homebrew environment
-          test -d ~/.linuxbrew && eval "$(~/.linuxbrew/bin/brew shellenv)"
-          test -d /home/linuxbrew/.linuxbrew && eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-          echo "eval \"\$($(brew --prefix)/bin/brew shellenv)\"" >> ~/.bashrc
-
-          # Create a new Homebrew tap for testing
-          brew tap-new homebrew-releaser/test --no-git
-
-          # Copy the formula file into the test tap's Formula directory
-          cp -vr *.rb "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
-
-          # Lint each formula file in the test tap
-          for file in "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"*; do
-            brew audit --formula "homebrew-releaser/test/$(basename "${file%.rb}")"
-          done
-
-          # Remove the test tap after completion
-          brew untap homebrew-releaser/test
-    runs-on: docker
-    container:
-      image: ghcr.io/catthehacker/ubuntu:runner-latest@sha256:efb099ce4ec3408ab2cc6875808087436d099ac73e2124bc1322a9d279fb0fbd
+      - name: Run Lint Homebrew Formula
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        with:
+          targets: lint-homebrew-formula
 
   all-tests-passed:
     name: All tests passed
@@ -475,23 +438,23 @@ jobs:
           fetch-depth: 0
       - uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/configure-git-user@main
         name: Configure git user
-      - name: Generate formula
-        id: generate-formula
+      - name: Set Up Docker Buildx
+        uses: https://code.forgejo.org/docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435       # v3
+
+      - name: Generate Homebrew Formula
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
         env:
-          VERSION: ${{ needs.release.outputs.current_version }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        with:
+          targets: build-homebrew-formula
+
+      - name: Set Formula Path
+        id: generate-formula
         run: |
-          DEBIAN_FRONTEND=noninteractive sudo apt-get update
-          DEBIAN_FRONTEND=noninteractive sudo apt-get install -y gettext
-          TEMP_DIR="$(mktemp -d)"
-          export TEMP_DIR
-          curl --silent \
-          --fail \
-          --output "$TEMP_DIR/v$VERSION.tar.gz" \
-          "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz"
-          FILE_SHA="$(
-          sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1
-          )" envsubst < homebrew/formula.rb.j2 > "$(echo "$GITHUB_REPOSITORY" | cut -d "/" -f2 ).rb"
-          echo "path=$(echo "$GITHUB_REPOSITORY" | cut -d "/" -f2 ).rb" >> "$GITHUB_OUTPUT"
+          FORMULA_NAME="$(echo "$GITHUB_REPOSITORY" | cut -d "/" -f2 ).rb"
+          cp -v target/homebrew/whatismyip.rb "$FORMULA_NAME"
+          echo "path=$FORMULA_NAME" >> "$GITHUB_OUTPUT"
+
       - uses: https://code.forgejo.org/forgejo/upload-artifact@16871d9e8cfcf27ff31822cac382bbb5450f1e1e       # v4
         name: Upload built files
         with:
