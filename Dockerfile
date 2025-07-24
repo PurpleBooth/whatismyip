@@ -94,35 +94,3 @@ RUN cargo fetch
 
 COPY --from=nfpm /usr/bin/nfpm /usr/bin/nfpm
 COPY . .
-
-# Add macOS (darwin) targets
-RUN if [[ "$TARGETOS" == *"darwin"* ]]; then \
-    rustup target add aarch64-apple-darwin x86_64-apple-darwin; \
-    fi
-
-# Add Windows targets based on architecture
-RUN if [[ "$TARGETOS" == *"windows"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
-    rustup target add aarch64-pc-windows-gnullvm; \
-    fi
-
-RUN if [[ "$TARGETOS" == *"windows"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
-    rustup target add x86_64-pc-windows-gnu x86_64-pc-windows-msvc; \
-    fi
-
-# Add Linux GNU targets based on architecture
-RUN if [[ "$TARGETOS" == *"linux"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
-    rustup target add aarch64-unknown-linux-gnu; \
-    fi
-
-RUN if [[ "$TARGETOS" == *"linux"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
-    rustup target add x86_64-unknown-linux-gnu; \
-    fi
-
-# Add Alpine Linux (musl) targets based on architecture
-RUN if [[ "$TARGETOS" == *"alpine"* ]] && [[ "$TARGETARCH" == "arm64" ]]; then \
-    rustup target add aarch64-unknown-linux-musl; \
-    fi
-
-RUN if [[ "$TARGETOS" == *"alpine"* ]] && [[ "$TARGETARCH" == "amd64" ]]; then \
-    rustup target add x86_64-unknown-linux-musl; \
-    fi
