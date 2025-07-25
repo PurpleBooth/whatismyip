@@ -31,7 +31,7 @@ codegen-units = 1
 panic = "abort"
 
 [dev-dependencies]
-criterion = { version = "=0.6.0", features = ["html_reports", "async_tokio"] }
+criterion = { version = "=0.7.0", features = ["html_reports", "async_tokio"] }
 
 [[bench]]
 name = "ip_benchmarks"
