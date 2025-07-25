@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.1 - 2025-07-25
+#### Bug Fixes
+- **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to ff07e85 - (0569958) - Solace System Renovate Fox
+- **(deps)** pin rust docker tag to 9dfaae4 - (d0e7030) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- **(deps)** update dependency mikefarah/yq to v4.47.1 - (004a382) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.0 - 2025-07-24
 #### Bug Fixes
 - **(deps)** pin dependencies - (86c1e5d) - Solace System Renovate Fox
