@@ -92,7 +92,7 @@ COPY . .
 
 RUN cross-platform-build
 FROM scratch AS final
-COPY --from=bins "/app/target/release/whatismyip" /whatismyip
+COPY --from=bins "/app/target/release/whatismyip*" /
 EOF
 
     platforms = [

@@ -304,7 +304,43 @@ jobs:
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
             cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
-          targets: docker,bins,packages
+          targets: docker
+
+      - name: Bake Binaries
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        with:
+          set: |
+            *.attest=type=provenance,mode=max
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
+            *.cache-to=type=inline,mode=max
+          push: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
+          targets: bins
+
+      - name: Bake Packages
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        with:
+          set: |
+            *.attest=type=provenance,mode=max
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
+            *.cache-to=type=inline,mode=max
+          push: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
+          targets: packages
 
       - name: Move Binaries to Release Path
         shell: bash
@@ -397,7 +433,43 @@ jobs:
             cwd://${{ steps.meta-with-version.outputs.bake-file-tags }}
             cwd://${{ steps.meta-with-version.outputs.bake-file-annotations }}
             cwd://${{ steps.meta-with-version.outputs.bake-file-labels }}
-          targets: docker,bins,packages
+          targets: docker
+
+      - name: Bake Binaries
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        with:
+          set: |
+            *.attest=type=provenance,mode=max
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
+            *.cache-to=type=inline,mode=max
+          push: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
+          targets: bins
+
+      - name: Bake Packages
+        uses: https://code.forgejo.org/docker/bake-action@37816e747588cb137173af99ab33873600c46ea8       # v6
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        with:
+          set: |
+            *.attest=type=provenance,mode=max
+            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
+            *.cache-to=type=inline,mode=max
+          push: true
+          files: |
+            ./docker-bake.hcl
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
+            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
+          targets: packages
 
       - name: Move Binaries to Release Directory
         shell: bash

@@ -32,12 +32,12 @@ elif [[ $TARGETOS == *"windows"* ]] && [[ $TARGETARCH == *"arm64"* ]]; then
     rustup target add aarch64-pc-windows-gnullvm
 	cargo zigbuild --release --target "aarch64-pc-windows-gnullvm"
 
-	cp "/app/target/aarch64-pc-windows-gnullvm/release/whatismyip.exe" "/app/target/release/whatismyip"
+	cp "/app/target/aarch64-pc-windows-gnullvm/release/whatismyip.exe" "/app/target/release/whatismyip.exe"
 elif [[ $TARGETOS == *"windows"* ]] && [[ $TARGETARCH == *"amd64"* ]]; then
     rustup target add x86_64-pc-windows-gnu
 	cargo zigbuild --release --target "x86_64-pc-windows-gnu"
 
-	cp "/app/target/x86_64-pc-windows-gnu/release/whatismyip.exe" "/app/target/release/whatismyip"
+	cp "/app/target/x86_64-pc-windows-gnu/release/whatismyip.exe" "/app/target/release/whatismyip.exe"
 elif [[ $TARGETOS == *"linux"* ]] && [[ $TARGETARCH == *"amd64"* ]]; then
 	rustup target add "x86_64-unknown-linux-gnu"
 	cargo zigbuild --release --target "x86_64-unknown-linux-gnu"
