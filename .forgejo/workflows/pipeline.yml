@@ -345,7 +345,7 @@ jobs:
       - name: Move Binaries to Release Path
         shell: bash
         run: |
-          for I in target/bins/*/*/* ; do
+          for I in target/bins/*/* ; do
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/bins/ -type d -empty -delete
@@ -353,7 +353,7 @@ jobs:
       - name: Move Packages to Release Directory
         shell: bash
         run: |
-          for I in target/packages/*/*/* ; do
+          for I in target/packages/*/* ; do
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/packages/ -type d -empty -delete
@@ -474,7 +474,7 @@ jobs:
       - name: Move Binaries to Release Directory
         shell: bash
         run: |
-          for I in target/bins/*/*/* ; do
+          for I in target/bins/*/* ; do
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/bins/ -type d -empty -delete
@@ -482,7 +482,7 @@ jobs:
       - name: Move Packages to Release Directory
         shell: bash
         run: |
-          for I in target/packages/*/*/* ; do
+          for I in target/packages/*/* ; do
             mv -v "$I" "target/bins/$(echo "$I" | cut -d '/' -f 3- | tr '/' '-')"
           done
           find target/packages/ -type d -empty -delete
