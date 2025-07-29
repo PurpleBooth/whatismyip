@@ -142,7 +142,6 @@ jobs:
           set: |
             *.attest=type=provenance,mode=max
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
-            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:${{ needs.semver.outputs.current_version }}
             *.cache-to=type=inline,mode=max
           push: false
           files: |
@@ -160,7 +159,6 @@ jobs:
           set: |
             *.attest=type=provenance,mode=max
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
-            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:${{ needs.semver.outputs.current_version }}
             *.cache-to=type=inline,mode=max
           push: false
           files: |
@@ -175,7 +173,6 @@ jobs:
           set: |
             *.attest=type=provenance,mode=max
             *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:edge
-            *.cache-from=type=registry,ref=${{ steps.docker.outputs.repository }}:${{ needs.semver.outputs.current_version }}
             *.cache-to=type=inline,mode=max
           push: false
           files: |
@@ -319,9 +316,6 @@ jobs:
           push: true
           files: |
             ./docker-bake.hcl
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
           targets: bins
 
       - name: Bake Packages
@@ -337,9 +331,6 @@ jobs:
           push: true
           files: |
             ./docker-bake.hcl
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
           targets: packages
 
       - name: Move Binaries to Release Path
@@ -448,9 +439,6 @@ jobs:
           push: true
           files: |
             ./docker-bake.hcl
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
           targets: bins
 
       - name: Bake Packages
@@ -466,9 +454,6 @@ jobs:
           push: true
           files: |
             ./docker-bake.hcl
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-tags }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-annotations }}
-            cwd://${{ steps.extract-docker-metadata.outputs.bake-file-labels }}
           targets: packages
 
       - name: Move Binaries to Release Directory
