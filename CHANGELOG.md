@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.3 - 2025-07-29
+#### Bug Fixes
+- try and reolve release asset problem - (f43eb3a) - Billie Thompson
+
+- - -
+
 ## v0.15.2 - 2025-07-29
 #### Bug Fixes
 - **(deps)** update rust crate tokio to v1.47.0 - (dc23f26) - Solace System Renovate Fox
