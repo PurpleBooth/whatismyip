@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.2 - 2025-07-29
+#### Bug Fixes
+- **(deps)** update rust crate tokio to v1.47.0 - (dc23f26) - Solace System Renovate Fox
+#### Continuous Integration
+- Vereinfache Pfadverarbeitung in Workflow-Skripten - (e61125d) - Billie Thompson
+- Teile Build-Prozess in separate Bake-Schritte auf - (6148052) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** update rust crate criterion to v0.7.0 - (b2012f8) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.1 - 2025-07-25
 #### Bug Fixes
 - **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to ff07e85 - (0569958) - Solace System Renovate Fox
