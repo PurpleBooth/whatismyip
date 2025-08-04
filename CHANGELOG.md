@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.4 - 2025-08-04
+#### Bug Fixes
+- **(deps)** update rust crate clap to v4.5.42 - (8fc5e64) - Solace System Renovate Fox
+- **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to 0202c99 - (907035e) - Solace System Renovate Fox
+#### Build system
+- Rust-Entwicklungstools im Dockerfile hinzufügen - (72ae7eb) - Billie Thompson
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/metadata-action digest to c1e5197 - (f1dfca4) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.3 - 2025-07-29
 #### Bug Fixes
 - try and reolve release asset problem - (f43eb3a) - Billie Thompson
