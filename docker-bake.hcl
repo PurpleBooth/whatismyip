@@ -65,7 +65,7 @@ USER nonroot
 ENTRYPOINT ["/whatismyip"]
 EOF
 
-    platforms = ["alpine/amd64", "alpine/arm64"]
+    platforms = ["alpine/amd64", "alpine/arm64", "linux/amd64", "linux/arm64"]
 
     contexts = {
         buildenv = "target:build-environment"
@@ -121,17 +121,30 @@ target "packages" {
 FROM --platform=$BUILDPLATFORM buildenv AS packages
 ARG TARGETPLATFORM TARGETOS TARGETARCH
 
-# Build application
+# Copy source files for package configuration
 COPY . .
+
+# Copy binaries from bins target
+COPY --from=bins /whatismyip /app/target/release/
 
 ENV GOARCH=$TARGETARCH
 ENV GOOS=$TARGETOS
 
-RUN cross-platform-build && \
-    VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager archlinux --config="nfpm.yaml" && \
-    VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager rpm --config="nfpm.yaml" && \
-    VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager apk --config="nfpm.yaml" && \
-    VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager deb --config="nfpm.yaml"
+# Create packages using the binaries from bins target
+# If GPG_PRIVATE_KEY and GPG_PASSPHRASE are provided, use them to sign packages
+RUN --mount=type=secret,id=gpg_private_key \
+    --mount=type=secret,id=gpg_passphrase,env=NFPM_PASSPHRASE \
+    if [ -n "$GPG_PASSPHRASE" ]; then \
+        NFPM_SIGNING_KEY_FILE="/run/secrets/gpg_private_key" VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager archlinux --config="nfpm.yaml" && \
+        NFPM_SIGNING_KEY_FILE="/run/secrets/gpg_private_key" VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager rpm --config="nfpm.yaml" && \
+        NFPM_SIGNING_KEY_FILE="/run/secrets/gpg_private_key" VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager apk --config="nfpm.yaml" && \
+        NFPM_SIGNING_KEY_FILE="/run/secrets/gpg_private_key" VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager deb --config="nfpm.yaml" \
+    else \
+        VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager archlinux --config="nfpm.yaml" && \
+        VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager rpm --config="nfpm.yaml" && \
+        VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager apk --config="nfpm.yaml" && \
+        VER="$(yq -o tsv -p toml ".package.version" Cargo.toml)" nfpm pkg --packager deb --config="nfpm.yaml"; \
+    fi
 
 FROM scratch AS final
 COPY --from=packages /app/*.rpm /
@@ -143,7 +156,8 @@ EOF
     platforms = ["linux/amd64", "linux/arm64"]
 
     contexts = {
-        buildenv = "target:build-environment"
+        buildenv = "target:build-environment",
+        bins = "target:bins"
     }
 
     output = [{type="local",dest="target/packages"}]
@@ -222,4 +236,3 @@ EOF
         "build-homebrew-formula" = "target:build-homebrew-formula"
     }
 }
-
