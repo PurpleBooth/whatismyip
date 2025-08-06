@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.5 - 2025-08-06
+#### Bug Fixes
+- **(deps)** update rust crate tokio to v1.47.1 - (b75d1fd) - Solace System Renovate Fox
+#### Continuous Integration
+- Update CI pipeline with Docker image signing and platform support - (11e5b5f) - Billie Thompson
+
+- - -
+
 ## v0.15.4 - 2025-08-04
 #### Bug Fixes
 - **(deps)** update rust crate clap to v4.5.42 - (8fc5e64) - Solace System Renovate Fox
