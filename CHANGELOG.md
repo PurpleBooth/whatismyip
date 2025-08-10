@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.6 - 2025-08-10
+#### Bug Fixes
+- **(deps)** pin dependencies - (1fa1d25) - Solace System Renovate Fox
+#### Build system
+- Dockerfile und Build-Skript auf Ubuntu und Debian umstellen - (3a4413a) - Billie Thompson
+- Optimiere Cross-Plattform-Build-Konfiguration und Rust-Compiler-Flags - (d97545e) - Billie Thompson
+- Statische Rust-Binärkompilierung mit RUSTFLAGS hinzufügen - (971b7ee) - Billie Thompson
+#### Miscellaneous Chores
+- Dockerfile-Abhängigkeiten bereinigen und reduzieren - (0ccc2ba) - Billie Thompson
+
+- - -
+
 ## v0.15.5 - 2025-08-06
 #### Bug Fixes
 - **(deps)** update rust crate tokio to v1.47.1 - (b75d1fd) - Solace System Renovate Fox
