@@ -333,10 +333,10 @@ pub async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result
 
     // Try to get from cache first (using std::sync::Mutex instead of tokio::sync::Mutex)
     // This avoids an await point and is more efficient for read-heavy workloads
-    if let Ok(cache_guard) = cache.lock() {
-        if let Some(ip) = cache_guard.get(ns_host) {
-            return Ok(*ip);
-        }
+    if let Ok(cache_guard) = cache.lock()
+        && let Some(ip) = cache_guard.get(ns_host)
+    {
+        return Ok(*ip);
     }
 
     // Get or initialize the appropriate resolver based on the IP strategy
