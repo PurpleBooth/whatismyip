@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.8 - 2025-09-05
+#### Bug Fixes
+- **(deps)** update goreleaser/nfpm docker digest to f1e9f1a - (d3c57d5) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/actions/checkout digest to 08eba0b - (8e3d2fa) - Solace System Renovate Fox
+- Aktualisiere windows-sys Abhängigkeiten auf Version 0.60.2 - (909a585) - Billie Thompson
+- Aktualisiere Abhängigkeiten auf neueste Versionen - (bec1560) - Billie Thompson
+- Aktualisiere Abhängigkeiten und Cargo.lock - (fd9471a) - Billie Thompson
+
+- - -
+
 ## v0.15.7 - 2025-08-11
 #### Bug Fixes
 - **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to 3ac21d9 - (ca0f4f1) - Solace System Renovate Fox
