@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.9 - 2025-09-06
+#### Bug Fixes
+- **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to b6a6f9f - (6118725) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- **(deps)** update dependency ziglang/zig to v0.15.1 - (200f4fa) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.8 - 2025-09-05
 #### Bug Fixes
 - **(deps)** update goreleaser/nfpm docker digest to f1e9f1a - (d3c57d5) - Solace System Renovate Fox
