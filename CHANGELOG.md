@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.10 - 2025-09-08
+#### Bug Fixes
+- **(deps)** update ubuntu docker digest to 9cbed75 - (c8fff12) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- **(deps)** update https://code.forgejo.org/docker/bake-action digest to 3acf805 - (e83f957) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.9 - 2025-09-06
 #### Bug Fixes
 - **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to b6a6f9f - (6118725) - Solace System Renovate Fox
