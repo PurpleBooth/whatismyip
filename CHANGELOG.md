@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.12 - 2025-09-22
+#### Bug Fixes
+- **(deps)** update ubuntu docker digest to 353675e - (ea91d27) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.11 - 2025-09-21
 #### Bug Fixes
 - **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to fce9eca - (3b4f2bb) - Solace System Renovate Fox
