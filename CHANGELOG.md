@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.16 - 2025-10-05
+#### Bug Fixes
+- **(deps)** update goreleaser/nfpm docker digest to 40fb2e6 - (2824165) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.15 - 2025-10-03
 #### Bug Fixes
 - **(deps)** update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to 525d143 - (957af1c) - Solace System Renovate Fox
