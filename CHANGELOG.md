@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.17 - 2025-10-07
+#### Bug Fixes
+- **(deps)** update goreleaser/nfpm docker digest to 90720c4 - (e2a29ba) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.16 - 2025-10-05
 #### Bug Fixes
 - **(deps)** update goreleaser/nfpm docker digest to 40fb2e6 - (2824165) - Solace System Renovate Fox
