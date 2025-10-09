@@ -1,0 +1,449 @@
+---
+# Concourse pipeline for whatismyip validation and auto-formatting
+# - Triggers on any change to main
+# - Validates and auto-fixes Rust code (fmt, clippy, check)
+# - Runs tests and security scans
+# - Validates PRs without auto-fixing
+jobs:
+  - name: set-pipeline
+    serial: true
+    plan:
+      - get: repo-main
+        trigger: true
+      - set_pipeline: self
+        file: repo-main/ci/concourse.yaml
+  - name: verify-runtime-env
+    plan:
+      - get: task
+      - get: ci-runtime-env
+        trigger: true
+      - load_var: tag
+        file: ci-runtime-env/tag
+      - load_var: digest
+        file: ci-runtime-env/digest
+      - task: cosign-verify-registry-image
+        file: task/concourse/tasks/cosign-verify-registry-image/task.yaml
+        input_mapping:
+          task: task
+          image: ci-runtime-env
+        params:
+          DOCKER_REGISTRY: europe-west10-docker.pkg.dev
+          DOCKER_USERNAME: ((vault:gar.username))
+          DOCKER_PASSWORD: ((vault:gar.password))
+          IMAGE: europe-west10-docker.pkg.dev/purplebooth-gke/optimistic-robbie/ci-runtime-env:((.:tag))@((.:digest))
+          COSIGN_PASSWORD: ((vault:cosign.password))
+          COSIGN_PRIVATE_KEY: ((vault:cosign.private_key))
+          COSIGN_PUBLIC_KEY: ((vault:cosign.public_key))
+  - name: verify-rust-env
+    plan:
+      - get: task
+      - get: ci-rust-env
+        trigger: true
+      - load_var: tag
+        file: ci-rust-env/tag
+      - load_var: digest
+        file: ci-rust-env/digest
+      - task: cosign-verify-registry-image
+        file: task/concourse/tasks/cosign-verify-registry-image/task.yaml
+        input_mapping:
+          task: task
+          image: ci-rust-env
+        params:
+          DOCKER_REGISTRY: europe-west10-docker.pkg.dev
+          DOCKER_USERNAME: ((vault:gar.username))
+          DOCKER_PASSWORD: ((vault:gar.password))
+          IMAGE: europe-west10-docker.pkg.dev/purplebooth-gke/optimistic-robbie/ci-runtime-env:((.:tag))@((.:digest))
+          COSIGN_PASSWORD: ((vault:cosign.password))
+          COSIGN_PRIVATE_KEY: ((vault:cosign.private_key))
+          COSIGN_PUBLIC_KEY: ((vault:cosign.public_key))
+  - name: validate-main
+    public: true
+    plan:
+      - get: 1h
+        trigger: true
+      - get: ci-runtime-env
+        passed: [verify-runtime-env]
+      - get: ci-rust-env
+        passed: [verify-rust-env]
+      - get: task
+      - get: repo-main
+        trigger: true
+        version: every
+      - load_var: sha
+        file: repo-main/.git/refs/heads/main
+      - task: set-status-validate-main-pending
+        file: task/concourse/tasks/forgejo-set-commit-status/task.yaml
+        image: ci-runtime-env
+        input_mapping:
+          repo: repo-main
+        params:
+          SHA: ((.:sha))
+          FJ_API_URL: https://codeberg.org/api/v1
+          FJ_OWNER: PurpleBooth
+          FJ_REPO: whatismyip
+          FJ_TOKEN: ((vault:forgejo.token))
+          CONTEXT: validate-main
+          DESCRIPTION: Validating main branch
+          STATUS: pending
+      - task: yamlfix-check
+        file: task/concourse/tasks/yamlfix-check/task.yaml
+        image: ci-runtime-env
+        input_mapping:
+          src: repo-main
+        on_failure:
+          do:
+            - task: prevent-loop-gate
+              file: task/concourse/tasks/git-last-commit-check/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                task: task
+                src: repo-main
+              params:
+                EXPECTED_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                EXPECTED_COMMIT_SUBJECT: 'style(yamlfix): apply auto-fixes'
+            - task: yamlfix-fix
+              file: task/concourse/tasks/yamlfix-fix/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+            - task: git-commit
+              file: task/concourse/tasks/git-commit/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              params:
+                ADD: .
+                MESSAGE: 'style(yamlfix): apply auto-fixes'
+                GIT_COMMITTER_NAME: Solace System Renovate Fox [bot]
+                GIT_COMMITTER_EMAIL: solace-system-renovate-fox@example.com
+                GIT_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                GIT_AUTHOR_EMAIL: solace-system-renovate-fox@example.com
+                GPG_SIGNING_PRIVATE_KEY: ((gpg.signing_private_key))
+                GPG_SIGNING_PRIVATE_PASSWORD: ((gpg.signing_private_password))
+            - put: repo-main
+              params:
+                rebase: true
+                repository: repo-main
+              get_params:
+                skip_download: true
+      - task: renovate-config-lint
+        file: task/concourse/tasks/renovate-config-lint/task.yaml
+        input_mapping:
+          src: repo-main
+      - task: trufflehog
+        file: task/concourse/tasks/trufflehog-git/task.yaml
+        input_mapping:
+          src: repo-main
+      - task: trivy
+        file: task/concourse/tasks/trivy-filesystem/task.yaml
+        input_mapping:
+          src: repo-main
+        vars:
+          fail-on: CRITICAL
+      - task: rust-fmt-check
+        image: ci-rust-env
+        input_mapping:
+          src: repo-main
+        config:
+          platform: linux
+          inputs:
+            - name: src
+          run:
+            path: cargo
+            dir: src
+            args: [fmt, --, --check]
+        on_failure:
+          do:
+            - task: prevent-loop-gate
+              file: task/concourse/tasks/git-last-commit-check/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                task: task
+                src: repo-main
+              params:
+                EXPECTED_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                EXPECTED_COMMIT_SUBJECT: 'style(rust-fmt): apply auto-fixes'
+            - task: rust-fmt-fix
+              image: ci-rust-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              config:
+                platform: linux
+                inputs:
+                  - name: src
+                outputs:
+                  - name: src
+                run:
+                  path: cargo
+                  dir: src
+                  args: [fmt]
+            - task: git-commit
+              file: task/concourse/tasks/git-commit/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              params:
+                ADD: .
+                MESSAGE: 'style(rust-fmt): apply auto-fixes'
+                GIT_COMMITTER_NAME: Solace System Renovate Fox [bot]
+                GIT_COMMITTER_EMAIL: solace-system-renovate-fox@example.com
+                GIT_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                GIT_AUTHOR_EMAIL: solace-system-renovate-fox@example.com
+                GPG_SIGNING_PRIVATE_KEY: ((gpg.signing_private_key))
+                GPG_SIGNING_PRIVATE_PASSWORD: ((gpg.signing_private_password))
+            - put: repo-main
+              params:
+                rebase: true
+                repository: repo-main
+              get_params:
+                skip_download: true
+      - task: rust-clippy
+        image: ci-rust-env
+        input_mapping:
+          src: repo-main
+        config:
+          platform: linux
+          inputs:
+            - name: src
+          run:
+            path: cargo
+            dir: src
+            args: [clippy, --all-features]
+        on_failure:
+          do:
+            - task: prevent-loop-gate
+              file: task/concourse/tasks/git-last-commit-check/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                task: task
+                src: repo-main
+              params:
+                EXPECTED_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                EXPECTED_COMMIT_SUBJECT: 'style(clippy): apply auto-fixes'
+            - task: rust-clippy-fix
+              image: ci-rust-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              config:
+                platform: linux
+                inputs:
+                  - name: src
+                outputs:
+                  - name: src
+                run:
+                  path: cargo
+                  dir: src
+                  args:
+                    - clippy
+                    - --fix
+                    - --allow-dirty
+                    - --allow-staged
+                    - --all-features
+            - task: git-commit
+              file: task/concourse/tasks/git-commit/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              params:
+                ADD: .
+                MESSAGE: 'style(clippy): apply auto-fixes'
+                GIT_COMMITTER_NAME: Solace System Renovate Fox [bot]
+                GIT_COMMITTER_EMAIL: solace-system-renovate-fox@example.com
+                GIT_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                GIT_AUTHOR_EMAIL: solace-system-renovate-fox@example.com
+                GPG_SIGNING_PRIVATE_KEY: ((gpg.signing_private_key))
+                GPG_SIGNING_PRIVATE_PASSWORD: ((gpg.signing_private_password))
+            - put: repo-main
+              params:
+                rebase: true
+                repository: repo-main
+              get_params:
+                skip_download: true
+      - task: rust-check
+        image: ci-rust-env
+        input_mapping:
+          src: repo-main
+        config:
+          platform: linux
+          inputs:
+            - name: src
+          run:
+            path: cargo
+            dir: src
+            args: [check]
+        on_failure:
+          do:
+            - task: prevent-loop-gate
+              file: task/concourse/tasks/git-last-commit-check/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                task: task
+                src: repo-main
+              params:
+                EXPECTED_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                EXPECTED_COMMIT_SUBJECT: 'style(cargo-check): apply auto-fixes'
+            - task: rust-check-fix
+              image: ci-rust-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              config:
+                platform: linux
+                inputs:
+                  - name: src
+                outputs:
+                  - name: src
+                run:
+                  path: cargo
+                  dir: src
+                  args: [fix, --allow-dirty, --allow-staged]
+            - task: git-commit
+              file: task/concourse/tasks/git-commit/task.yaml
+              image: ci-runtime-env
+              input_mapping:
+                src: repo-main
+              output_mapping:
+                src: repo-main
+              params:
+                ADD: .
+                MESSAGE: 'style(cargo-check): apply auto-fixes'
+                GIT_COMMITTER_NAME: Solace System Renovate Fox [bot]
+                GIT_COMMITTER_EMAIL: solace-system-renovate-fox@example.com
+                GIT_AUTHOR_NAME: Solace System Renovate Fox [bot]
+                GIT_AUTHOR_EMAIL: solace-system-renovate-fox@example.com
+                GPG_SIGNING_PRIVATE_KEY: ((gpg.signing_private_key))
+                GPG_SIGNING_PRIVATE_PASSWORD: ((gpg.signing_private_password))
+            - put: repo-main
+              params:
+                rebase: true
+                repository: repo-main
+              get_params:
+                skip_download: true
+      - task: rust-test
+        image: ci-rust-env
+        input_mapping:
+          src: repo-main
+        config:
+          platform: linux
+          inputs:
+            - name: src
+          run:
+            path: cargo
+            dir: src
+            args: [test]
+    on_success:
+      task: set-status-validate-main-success
+      file: task/concourse/tasks/forgejo-set-commit-status/task.yaml
+      image: ci-runtime-env
+      input_mapping:
+        repo: repo-main
+      params:
+        SHA: ((.:sha))
+        FJ_API_URL: https://codeberg.org/api/v1
+        FJ_OWNER: PurpleBooth
+        FJ_REPO: whatismyip
+        FJ_TOKEN: ((vault:forgejo.token))
+        CONTEXT: validate-main
+        DESCRIPTION: Main branch validation complete
+        STATUS: success
+    on_failure:
+      task: set-status-validate-main-failure
+      file: task/concourse/tasks/forgejo-set-commit-status/task.yaml
+      image: ci-runtime-env
+      input_mapping:
+        repo: repo-main
+      params:
+        SHA: ((.:sha))
+        FJ_API_URL: https://codeberg.org/api/v1
+        FJ_OWNER: PurpleBooth
+        FJ_REPO: whatismyip
+        FJ_TOKEN: ((vault:forgejo.token))
+        CONTEXT: validate-main
+        DESCRIPTION: Main branch validation failed
+        STATUS: failure
+# -----------------------------------------------------------------------------
+# Resources
+# -----------------------------------------------------------------------------
+resources:
+  - name: 1h
+    type: time
+    icon: hours-24
+    source: {interval: 1h, location: Europe/Berlin}
+  - name: repo-main
+    type: git
+    icon: git
+    check_every: 1h
+    source:
+      uri: ssh://git@codeberg.org/PurpleBooth/whatismyip.git
+      fetch_tags: true
+      branch: main
+      private_key: ((vault:git.private_key))
+    webhook_token: ((vault:webhook.token))
+  - name: task
+    type: git
+    icon: git
+    check_every: 1h
+    source:
+      uri: ssh://git@codeberg.org/PurpleBooth/common-pipelines.git
+      branch: main
+      private_key: ((vault:git.private_key))
+    webhook_token: ((vault:webhook.token))
+  - name: ci-runtime-env
+    icon: docker
+    check_every: 1h
+    source:
+      repository: europe-west10-docker.pkg.dev/purplebooth-gke/optimistic-robbie/ci-runtime-env
+      tag: latest
+      username: ((vault:gar.username))
+      password: ((vault:gar.password))
+    type: registry-image
+  - name: ci-rust-env
+    icon: docker
+    check_every: 1h
+    source:
+      repository: europe-west10-docker.pkg.dev/purplebooth-gke/optimistic-robbie/ci-runtime-env
+      tag: rust
+      username: ((vault:gar.username))
+      password: ((vault:gar.password))
+    type: registry-image
+#  - name: pr
+#    type: gitea-pr
+#    icon: source-merge
+#    check_every: 1m
+#    webhook_token: ((vault:webhook.token))
+#    source:
+#      access_token: ((vault:forgejo.token))
+#      endpoint: https://codeberg.org
+#      repository: PurpleBooth/whatismyip
+#      state: open
+# -----------------------------------------------------------------------------
+# Resource Types
+# -----------------------------------------------------------------------------
+resource_types:
+  - name: gitea-pr
+    source:
+      repository: europe-west10-docker.pkg.dev/purplebooth-gke/giving-raddeker/atteniemi/gitea-pr-resource
+      tag: latest
+      username: ((vault:gar.username))
+      password: ((vault:gar.password))
+    type: registry-image
+  - name: registry-image
+    type: registry-image
+    source:
+      repository: europe-west10-docker.pkg.dev/purplebooth-gke/giving-raddeker/concourse/registry-image-resource
+      tag: latest
+      username: ((vault:gar.username))
+      password: ((vault:gar.password))
