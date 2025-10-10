@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.18 - 2025-10-10
+#### Bug Fixes
+- **(deps)** update ubuntu docker digest to 59a458b - (2753ba6) - Solace System Renovate Fox
+#### Continuous Integration
+- add Concourse pipeline configuration for whatismyip project - (78ea178) - Billie Thompson
+#### Style
+- **(yamlfix)** apply auto-fixes - (864895f) - Solace System Renovate Fox [bot]
+
+- - -
+
 ## v0.15.17 - 2025-10-07
 #### Bug Fixes
 - **(deps)** update goreleaser/nfpm docker digest to 90720c4 - (e2a29ba) - Solace System Renovate Fox
