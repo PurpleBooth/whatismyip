@@ -2,6 +2,18 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.19 - 2025-10-11
+#### Miscellaneous Chores
+- remove Concourse CI configuration file - (4e72547) - Billie Thompson
+
+- - -
+
+## v0.15.18 - 2025-10-11
+#### Bug Fixes
+- **(deps)** update goreleaser/nfpm docker digest to c3e0280 - (8da3c9c) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.18 - 2025-10-10
 #### Bug Fixes
 - **(deps)** update ubuntu docker digest to 59a458b - (2753ba6) - Solace System Renovate Fox
