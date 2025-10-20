@@ -2,6 +2,16 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.20 - 2025-10-20
+#### Bug Fixes
+- (**deps**) update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to 99fdd53 - (f312abc) - Solace System Renovate Fox
+- (**deps**) update ubuntu docker digest to 66460d5 - (b010e6f) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- (**deps**) update rust crate clap to v4.5.50 - (92ed370) - Solace System Renovate Fox
+- (**deps**) update dependency mikefarah/yq to v4.48.1 - (69bda5f) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.19 - 2025-10-11
 #### Miscellaneous Chores
 - remove Concourse CI configuration file - (4e72547) - Billie Thompson
