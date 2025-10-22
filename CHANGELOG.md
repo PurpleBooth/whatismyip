@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.21 - 2025-10-22
+#### Bug Fixes
+- (**deps**) update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to fbefcd3 - (9a669cb) - Solace System Renovate Fox
+#### Miscellaneous Chores
+- (**deps**) update rust crate tokio to v1.48.0 - (782a200) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.20 - 2025-10-20
 #### Bug Fixes
 - (**deps**) update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to 99fdd53 - (f312abc) - Solace System Renovate Fox
