@@ -17,8 +17,10 @@ steps:
     image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
     environment:
       CARGO_TERM_COLOR: always
+      ZIG_VERSION: 0.15.1
     commands:
       - rustup default $RUST
       - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
       - cargo binstall cargo-zigbuild
+      - curl -L https://ziglang.org/download/${ZIG_VERSION}/zig-x86_64-linux-${ZIG_VERSION}.tar.xz | tar -xJ -C /opt && ln -s /opt/zig-x86_64-linux-${ZIG_VERSION}/zig /usr/local/bin/zig && zig version
       - cargo zigbuild --release --target $TARGET
