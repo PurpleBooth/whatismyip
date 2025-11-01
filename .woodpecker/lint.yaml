@@ -12,6 +12,8 @@ steps:
       - rustup default stable
       - rustup component add rustfmt
       - rustup component add clippy
-      - cargo fmt --all -- --check
-      - cargo clippy
-      - cargo check
+      - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - cargo binstall sccache --locked
+      - CARGO_BUILD_RUSTC_WRAPPER=sccache cargo fmt --all -- --check
+      - CARGO_BUILD_RUSTC_WRAPPER=sccache cargo clippy
+      - CARGO_BUILD_RUSTC_WRAPPER=sccache cargo check
