@@ -22,7 +22,7 @@ steps:
       - rustup default $RUST
       - rustup target add $TARGET
       - apt-get update
-      - DEBIAN_FRONTEND="noninteractive" apt-get install --yes build-essential mingw32 nasm
+      - DEBIAN_FRONTEND="noninteractive" apt-get install --yes build-essential mingw-w64 nasm
       - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
       - cargo binstall cargo-zigbuild
       - curl -L https://ziglang.org/download/$${ZIG_VERSION}/zig-x86_64-linux-$${ZIG_VERSION}.tar.xz | tar -xJ -C /opt && ln -s /opt/zig-x86_64-linux-$${ZIG_VERSION}/zig /usr/local/bin/zig && zig version
