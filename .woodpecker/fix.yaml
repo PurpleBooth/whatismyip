@@ -21,7 +21,7 @@ steps:
       - rustup component add rustfmt
       - rustup component add clippy
       - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-      - cargo binstall specdown
+      - cargo binstall specdown --git https://github.com/specdown/specdown.git
       - cargo binstall cargo-zigbuild
       - cargo fix
       - cargo clippy --fix --all-features

@@ -11,7 +11,7 @@ steps:
     commands:
       - rustup default $RUST
       - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-      - cargo binstall specdown
+      - cargo binstall specdown --git https://github.com/specdown/specdown.git
       - cargo binstall cargo-zigbuild
       - cargo test
       - cargo zigbuild --release
