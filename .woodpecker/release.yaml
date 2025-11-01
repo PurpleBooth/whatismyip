@@ -1,0 +1,67 @@
+---
+clone:
+  git:
+    image: woodpeckerci/plugin-git@sha256:1ce87890a4996596c0f6c28f69afe5e07bf106c294f49fb2cfe5971b4a04f70c
+    settings:
+      partial: false
+      depth: 0
+      git-user-name: &git-user-name Solace System Renovate Fox [bot]
+      git-user-email: &git-user-email solace-system-renovate-fox@example.com
+      tags: true
+runs_on: [success]
+when:
+  event: [push]
+  branch:
+    include: [main]
+steps:
+  release:
+    image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
+    environment:
+      GIT_USER_NAME: *git-user-name
+      GIT_USER_EMAIL: *git-user-email
+      CARGO_TERM_COLOR: always
+      GIT_PRIVATE_KEY:
+        from_secret: GIT_PRIVATE_KEY
+      GPG_PRIVATE_KEY:
+        from_secret: SIGNING_PRIVATE_KEY
+      GPG_PASSWORD:
+        from_secret: SIGNING_PRIVATE_PASSWORD
+    commands:
+      - rustup default stable
+      - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh
+        | bash
+      - cargo binstall --locked cargo-edit
+      - cargo binstall --locked cocogitto
+      - git config user.name "$GIT_USER_NAME"
+      - git config user.email "$GIT_USER_EMAIL"
+
+      # Configure ssh for auth Codeberg
+      - mkdir -p ~/.ssh/
+      - chmod 700 ~/.ssh/
+      - echo "$$GIT_PRIVATE_KEY" > ~/.ssh/id_rsa
+      - ssh-keyscan -t rsa codeberg.org >> ~/.ssh/known_hosts
+      - chmod 600 ~/.ssh/known_hosts ~/.ssh/id_rsa
+      - git config url."git@codeberg.org:".insteadOf "https://codeberg.org/"
+
+      # Import the PGP key
+      - echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+      - gpg --export-ownertrust | sed 's/:.*/:5:/' | gpg --import-ownertrust
+      - echo "$GPG_PASSWORD" > ~/.gpg-passphrase
+      - chmod 600 ~/.gpg-passphrase
+      - |
+        cat > ~/.gpg-wrapper.sh <<'EOF'
+        #!/bin/sh
+        gpg --batch --pinentry-mode loopback --passphrase-file ~/.gpg-passphrase "$@"
+        EOF
+      - chmod +x ~/.gpg-wrapper.sh
+      - git config gpg.program ~/.gpg-wrapper.sh
+      - git config gpg.format openpgp
+      - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG |
+        grep sec | awk '{print $2}' | cut -d'/' -f2)
+      - git config commit.gpgsign true
+#
+#      # Set up git for Codeberg
+#      - cog bump --auto
+#      - git push origin main --follow-tags
+#      - git push origin main --tags
+depends_on: [test, lint, build]

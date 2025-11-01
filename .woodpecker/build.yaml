@@ -1,0 +1,28 @@
+---
+when:
+  event: [push, pull_request]
+matrix:
+  RUST: [stable, beta, nightly]
+  TARGET:
+    - x86_64-apple-darwin
+    - aarch64-apple-darwin
+    - aarch64-pc-windows-gnullvm
+    - x86_64-pc-windows-gnu
+    - x86_64-unknown-linux-gnu
+    - aarch64-unknown-linux-gnu
+    - x86_64-unknown-linux-musl
+    - aarch64-unknown-linux-musl
+steps:
+  test:
+    image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
+    environment:
+      CARGO_TERM_COLOR: always
+    commands:
+      - rustup default $RUST
+      - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - cargo binstall specdown
+      - cargo binstall cargo-zigbuild
+      - cargo zigbuild --release --target $TARGET
+  audit:
+    image: woodpeckerci/plugin-trivy@sha256:612038a5ca2d46fd34bb22510ce84f5ce9b605f36304e58faca8ff3edac59eed
+    commands: [trivy fs .]
