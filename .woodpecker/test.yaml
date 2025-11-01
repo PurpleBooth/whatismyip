@@ -1,8 +1,6 @@
 ---
 when:
   event: [push, pull_request]
-matrix:
-  RUST: [stable, beta, nightly]
 steps:
   test:
     image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
@@ -10,7 +8,7 @@ steps:
       CARGO_TERM_COLOR: always
       ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
     commands:
-      - rustup default $RUST
+      - rustup default stable
       - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
       - cargo binstall specdown --git https://github.com/specdown/specdown.git
       - cargo binstall cargo-zigbuild
