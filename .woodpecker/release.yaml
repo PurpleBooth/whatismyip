@@ -59,9 +59,9 @@ steps:
       - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG |
         grep sec | awk '{print $2}' | cut -d'/' -f2)
       - git config commit.gpgsign true
-#
-#      # Set up git for Codeberg
-#      - cog bump --auto
-#      - git push origin main --follow-tags
-#      - git push origin main --tags
+
+      # release
+      - cog bump --auto
+      - git push origin main --follow-tags
+      - git push origin main --tags
 depends_on: [test, lint, build]
