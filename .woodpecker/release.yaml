@@ -28,8 +28,8 @@ steps:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - rustup default stable
-      - git config user.name "$$GIT_USER_NAME"
-      - git config user.email "$$GIT_USER_EMAIL"
+      - git config user.name "$GIT_USER_NAME"
+      - git config user.email "$GIT_USER_EMAIL"
 
       # Configure ssh for auth Codeberg
       - mkdir -p ~/.ssh/
