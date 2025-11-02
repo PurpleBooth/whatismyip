@@ -13,7 +13,7 @@ when:
     include: [main]
 steps:
   fix:
-    image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
+    image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
       ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
@@ -37,7 +37,7 @@ steps:
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release" ./README.md
   commit:
     depends_on: [fix]
-    image: rust
+    image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       GIT_USER_NAME: *git-user-name
       GIT_USER_EMAIL: *git-user-email

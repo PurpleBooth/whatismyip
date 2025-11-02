@@ -5,7 +5,7 @@ when:
     exclude: [CHANGELOG.md]
 steps:
   rust:
-    image: rust@sha256:c0601cfa53ef38705af64f72b6b1f2b8afcd8f76de9aa621a8b45b4fa124694c
+    image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
     commands:
