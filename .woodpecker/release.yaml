@@ -4,7 +4,7 @@ when:
   event: [push]
   branch:
     include: [main]
-steps:
+
   clone:
     image: woodpeckerci/plugin-git
     settings:
@@ -14,6 +14,7 @@ steps:
       git-user-email: &git-user-email solace-system-renovate-fox@example.com
       tags: true
 
+steps:
   release:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
@@ -28,8 +29,8 @@ steps:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - rustup default stable
-      - git config user.name "$GIT_USER_NAME"
-      - git config user.email "$GIT_USER_EMAIL"
+      - git config user.name "$$GIT_USER_NAME"
+      - git config user.email "$$GIT_USER_EMAIL"
 
       # Configure ssh for auth Codeberg
       - mkdir -p ~/.ssh/
