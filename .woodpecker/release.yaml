@@ -43,7 +43,7 @@ steps:
       # Import the PGP key
       - echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
       - gpg --export-ownertrust | sed 's/:.*/:5:/' | gpg --import-ownertrust
-      - echo "$GPG_PASSWORD" > ~/.gpg-passphrase
+      - echo "$$GPG_PASSWORD" > ~/.gpg-passphrase
       - chmod 600 ~/.gpg-passphrase
       - |
         cat > ~/.gpg-wrapper.sh <<'EOF'
