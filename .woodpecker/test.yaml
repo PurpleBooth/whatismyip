@@ -9,11 +9,6 @@ steps:
       ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
     commands:
       - rustup default stable
-      - curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
-      - cargo binstall sccache --locked
-      - cargo install specdown --git https://github.com/specdown/specdown.git
-      - cargo binstall cargo-zigbuild
-      - curl -L https://ziglang.org/download/$${ZIG_VERSION}/zig-x86_64-linux-$${ZIG_VERSION}.tar.xz | tar -xJ -C /opt && ln -s /opt/zig-x86_64-linux-$${ZIG_VERSION}/zig /usr/local/bin/zig && zig version
       - cargo test
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release" ./README.md
