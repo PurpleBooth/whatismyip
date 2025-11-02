@@ -35,8 +35,4 @@ steps:
       - envsubst < homebrew/formula.rb.envsubstr > "whatismyip.rb"
       - brew tap-new homebrew-releaser/test --no-git
       - cp -vr *.rb "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
-      - for file in "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"*.rb; do
-          filename=$(basename "$file")
-          formula_name=$(echo "$filename" | sed 's/\.rb$//')
-          brew audit --formula "homebrew-releaser/test/$formula_name" || exit 1
-        done
+      - brew audit --formula "homebrew-releaser/test/whatismyip"
