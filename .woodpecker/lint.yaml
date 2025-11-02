@@ -24,7 +24,7 @@ steps:
     commands:
       - |
         # Install yq
-        curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz -o - | tar xz && mv yq_linux_amd64 /usr/local/bin/yq
+        curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz -o - | tar xz && mv yq_linux_amd64 /tmp/yq
       
       - |
         # Install gettext for envsubst
@@ -37,7 +37,7 @@ steps:
         # Switch to linuxbrew user and build formula
         su - linuxbrew << 'EOF'
         # Extract version from Cargo.toml
-        export VERSION=$(yq -o tsv -p toml ".package.version" Cargo.toml)
+        export VERSION=$(/tmp/yq -o tsv -p toml ".package.version" Cargo.toml)
         
         # Download release tarball and calculate SHA256
         TEMP_DIR="$(mktemp -d)"
