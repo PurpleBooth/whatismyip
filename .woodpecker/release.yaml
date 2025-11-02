@@ -29,6 +29,7 @@ steps:
       GPG_PASSWORD:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
+      - ls -lrathF
       - rustup default stable
       - git config user.name "$$GIT_USER_NAME"
       - git config user.email "$$GIT_USER_EMAIL"
