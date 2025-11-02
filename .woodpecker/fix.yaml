@@ -30,7 +30,7 @@ steps:
       --release - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
       ./README.md
   commit:
-    depends_on: [fix, test, lint]
+    depends_on: [test, lint]
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       GIT_USER_NAME: *git-user-name
