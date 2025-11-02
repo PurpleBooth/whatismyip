@@ -22,45 +22,21 @@ steps:
       YQ_VERSION: 4.43.1 # renovate: datasource=github-releases depName=mikefarah/yq
       GITHUB_REPOSITORY: "PurpleBooth/whatismyip"
     commands:
-      - |
-        # Install yq
-        curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz -o - | tar xz && mv yq_linux_amd64 /tmp/yq
-      
-      - |
-        # Install gettext for envsubst
-        apt-get update && \
-        apt-get install -y gettext && \
-        apt-get clean && \
-        rm -rf /var/lib/apt/lists/*
-      
-      - |
-        # Switch to linuxbrew user and build formula
-        su - linuxbrew << 'EOF'
-        # Extract version from Cargo.toml
-        export VERSION=$(/tmp/yq -o tsv -p toml ".package.version" Cargo.toml)
-        
-        # Download release tarball and calculate SHA256
-        TEMP_DIR="$(mktemp -d)"
-        curl --silent --fail --output "$TEMP_DIR/v$VERSION.tar.gz" \
-          "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz" || \
-          touch "$TEMP_DIR/v$VERSION.tar.gz"
-        FILE_SHA="$(sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1)"
-        
-        # Generate formula from template
-        export VERSION FILE_SHA GITHUB_REPOSITORY GITHUB_REF_NAME="v$VERSION"
-        envsubst < homebrew/formula.rb.envsubstr > "whatismyip.rb"
-        
-        # Create test tap and copy formula
-        brew tap-new homebrew-releaser/test --no-git
-        cp -vr *.rb "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
-        
-        # Lint the formula
-        for file in "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"*.rb; do
+      - curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz -o - | tar xz && mv yq_linux_amd64 /tmp/yq
+      - sudo apt-get update
+      - sudo apt-get install -y gettext
+      - sudo apt-get clean
+
+      - export VERSION=$(/tmp/yq -o tsv -p toml ".package.version" Cargo.toml)
+      - export TEMP_DIR="$(mktemp -d)"
+      - curl --silent --fail --output "$TEMP_DIR/v$VERSION.tar.gz" "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz"
+      - export FILE_SHA="$(sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1)"
+      - export GITHUB_REF_NAME="v$VERSION"
+      - envsubst < homebrew/formula.rb.envsubstr > "whatismyip.rb"
+      - brew tap-new homebrew-releaser/test --no-git
+      - cp -vr *.rb "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
+      - for file in "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"*.rb; do
           filename=$(basename "$file")
           formula_name=$(echo "$filename" | sed 's/\.rb$//')
           brew audit --formula "homebrew-releaser/test/$formula_name" || exit 1
         done
-        
-        # Clean up test tap
-        brew untap homebrew-releaser/test
-        EOF
