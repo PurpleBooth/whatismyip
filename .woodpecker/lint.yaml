@@ -20,7 +20,6 @@ steps:
     image: homebrew/brew:latest
     environment:
       YQ_VERSION: 4.43.1 # renovate: datasource=github-releases depName=mikefarah/yq
-      GITHUB_REPOSITORY: "PurpleBooth/whatismyip"
     commands:
       - curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz -o - | tar xz && mv yq_linux_amd64 /tmp/yq
       - sudo apt-get update
@@ -29,10 +28,10 @@ steps:
 
       - export VERSION=$(/tmp/yq -o tsv -p toml ".package.version" Cargo.toml)
       - export TEMP_DIR="$(mktemp -d)"
-      - curl --silent --fail --output "$TEMP_DIR/v$VERSION.tar.gz" "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz"
+      - curl --silent --fail --output "$TEMP_DIR/v$VERSION.tar.gz" "https://codeberg.org/$CI_REPO/archive/v$VERSION.tar.gz"
       - export FILE_SHA="$(sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1)"
       - export GITHUB_REF_NAME="v$VERSION"
-      - envsubst < homebrew/formula.rb.envsubstr > "whatismyip.rb"
+      - envsubst < homebrew/formula.rb.envsubstr > "$CI_REPO_NAME.rb"
       - brew tap-new homebrew-releaser/test --no-git
       - cp -vr *.rb "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
-      - brew audit --formula "homebrew-releaser/test/whatismyip"
+      - brew audit --formula "homebrew-releaser/test/$CI_REPO_NAME"
