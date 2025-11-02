@@ -16,7 +16,7 @@ steps:
       - cargo clippy
       - cargo check
   homebrew:
-    image: homebrew/brew:latest
+    image: homebrew/brew:latest@sha256:3f0bfdb29110ae467ef13ee81a115b0efd0741cb032c6f7529e72e6077aecacd
     environment:
       YQ_VERSION: 4.43.1  # renovate: datasource=github-releases depName=mikefarah/yq
     commands:
