@@ -5,7 +5,8 @@ when:
   branch:
     include: [main]
 
-  clone:
+clone:
+  git:
     image: woodpeckerci/plugin-git
     settings:
       partial: false
