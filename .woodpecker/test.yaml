@@ -2,16 +2,19 @@
 when:
   event: [push, pull_request]
 steps:
-  test:
+  cargo-test:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
-      ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
+    commands: [cargo test]
+  specdown:
+    image: codeberg.org/purplebooth/rust-build-env:latest
+    environment:
+      CARGO_TERM_COLOR: always
     commands:
-      - rustup default stable
-      - cargo test
       - cargo zigbuild --release
-      - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release" ./README.md
+      - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
+        ./README.md
   audit:
     image: woodpeckerci/plugin-trivy@sha256:612038a5ca2d46fd34bb22510ce84f5ce9b605f36304e58faca8ff3edac59eed
     commands: [trivy fs .]

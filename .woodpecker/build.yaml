@@ -16,7 +16,7 @@ steps:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
-      ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
+      ZIG_VERSION: 0.15.1  # renovate: datasource=github-releases depName=ziglang/zig
     commands:
       - rustup default stable
       - rustup target add $TARGET

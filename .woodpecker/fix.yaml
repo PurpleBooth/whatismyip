@@ -16,22 +16,21 @@ steps:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
-      ZIG_VERSION: 0.15.1 # renovate: datasource=github-releases depName=ziglang/zig
     commands:
-      - rustup default $RUST
-      - rustup component add rustfmt
-      - rustup component add clippy
       - cargo fix
       - cargo clippy --fix --all-features
       - cargo fmt --all
-      - cargo fmt --all -- --check
-      - cargo clippy
-      - cargo check
-      - cargo test
-      - cargo zigbuild --release
-      - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release" ./README.md
-  commit:
+  lint:
     depends_on: [fix]
+    image: codeberg.org/purplebooth/rust-build-env:latest - cargo fmt --all -- --check
+      - cargo clippy - cargo check
+  test:
+    depends_on: [fix]
+    image: codeberg.org/purplebooth/rust-build-env:latest - cargo test - cargo zigbuild
+      --release - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
+      ./README.md
+  commit:
+    depends_on: [fix, test, lint]
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       GIT_USER_NAME: *git-user-name
