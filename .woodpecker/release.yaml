@@ -15,7 +15,7 @@ clone:
       tags: true
 steps:
   release:
-    image: codeberg.org/purplebooth/rust-build-env:latest@sha256:a8e10c3237ca7db6e0c7b2962dec547c85ab257ddfd02dca4092c28e9fef3678
+    image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       GIT_USER_NAME: *git-user-name
       GIT_USER_EMAIL: *git-user-email
