@@ -46,7 +46,7 @@ steps:
       - chmod 600 ~/.gpg-passphrase
       - |
         cat > ~/.gpg-wrapper.sh <<'EOF'
-        #!/bin/sh
+        #!/bin/bash
         gpg --batch --pinentry-mode loopback --passphrase-file ~/.gpg-passphrase "$@"
         EOF
       - chmod +x ~/.gpg-wrapper.sh
