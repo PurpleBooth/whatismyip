@@ -54,13 +54,7 @@ steps:
       - git config gpg.format openpgp
       - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
       - git config commit.gpgsign true
-
-      # release
-      - |
-        #!/bin/bash
-        set -eu
-        export PATH=/usr/local/cargo/bin:$PATH
-        cog bump --auto
+      - cog bump --auto
       - git push origin main --follow-tags
       - git push origin main --tags
 depends_on: [test, lint, build]
