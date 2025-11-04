@@ -46,7 +46,7 @@ steps:
       - chmod 600 ~/.gpg-passphrase
       - |
         cat > ~/.gpg-wrapper.sh <<'EOF'
-        #!/bin/bash        
+        #!/bin/bash
         gpg --batch --pinentry-mode loopback --passphrase-file ~/.gpg-passphrase "$@"
         EOF
       - chmod +x ~/.gpg-wrapper.sh
@@ -57,8 +57,8 @@ steps:
 
       # release
       - |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        #!/bin/bash
+        set -eu
         export PATH=/usr/local/cargo/bin:$PATH
         cog bump --auto
       - git push origin main --follow-tags
