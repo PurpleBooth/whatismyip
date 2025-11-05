@@ -2,6 +2,13 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.24 - 2025-11-05
+#### Bug Fixes
+- disable actual cargo publish in Woodpecker deploy step - (feac71a) - Billie
+- add --skip-ci flag to cog bump command in release pipeline - (3bb187f) - Billie
+
+- - -
+
 ## v0.15.23 - 2025-11-05
 #### Bug Fixes
 - (**deps**) update homebrew/brew:latest docker digest to b0072bf - (eff82e9) - Solace System Renovate Fox
