@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.16.1 - 2025-11-05
+#### Bug Fixes
+- use cosign sign-blob for file artifact signing - (e75d3ed) - Billie
+#### Revert
+- disable cron and manual triggers for deploy pipeline - (5afe471) - Billie
+
+- - -
+
 ## v0.16.0 - 2025-11-05
 #### Features
 - enable cron and manual triggers for all Woodpecker pipelines - (ba8d098) - Billie
