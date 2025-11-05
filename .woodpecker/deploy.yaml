@@ -1,6 +1,6 @@
 ---
 when:
-  event: [tag, release, cron, manual]
+  event: [tag, release]
 matrix:
   TARGET:
     - x86_64-apple-darwin
