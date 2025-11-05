@@ -30,7 +30,7 @@ steps:
       - rustup default stable
       - git config user.name "$GIT_USER_NAME"
       - git config user.email "$GIT_USER_EMAIL"
-
+      - git config --type bool push.autoSetupRemote true
       # Configure ssh for auth Codeberg
       - mkdir -p ~/.ssh/
       - chmod 700 ~/.ssh/
