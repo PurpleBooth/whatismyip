@@ -22,13 +22,17 @@ steps:
       - cargo fmt --all
   lint:
     depends_on: [fix]
-    image: codeberg.org/purplebooth/rust-build-env:latest - cargo fmt --all -- --check
+    image: codeberg.org/purplebooth/rust-build-env:latest
+    commands:
+      - cargo fmt --all -- --check
       - cargo clippy - cargo check
   test:
     depends_on: [fix]
-    image: codeberg.org/purplebooth/rust-build-env:latest - cargo test - cargo zigbuild
-      --release - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
-      ./README.md
+    image: codeberg.org/purplebooth/rust-build-env:latest
+    commands:
+      - cargo test
+      - cargo zigbuild --release
+      - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release" ./README.md
   commit:
     depends_on: [test, lint]
     image: codeberg.org/purplebooth/rust-build-env:latest
