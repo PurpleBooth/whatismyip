@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.16.2 - 2025-11-05
+#### Bug Fixes
+- add cosign bundle output and improve shell compatibility - (45a05b7) - Billie
+
+- - -
+
 ## v0.16.1 - 2025-11-05
 #### Bug Fixes
 - use cosign sign-blob for file artifact signing - (e75d3ed) - Billie
