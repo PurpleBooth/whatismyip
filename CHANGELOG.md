@@ -2,6 +2,14 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.16.0 - 2025-11-05
+#### Features
+- enable cron and manual triggers for all Woodpecker pipelines - (ba8d098) - Billie
+- enable manual pipeline triggers for deployment - (9e4e288) - Billie
+- add comprehensive multi-target release pipeline with signing - (3f116e8) - Billie
+
+- - -
+
 ## v0.15.24 - 2025-11-05
 #### Bug Fixes
 - disable actual cargo publish in Woodpecker deploy step - (feac71a) - Billie

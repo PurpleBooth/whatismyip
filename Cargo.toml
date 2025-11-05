@@ -1,6 +1,6 @@
 [package]
 name = "whatismyip"
-version = "0.15.24"
+version = "0.16.0"
 authors = ["Billie Thompson <billie@billiecodes.com>"]
 edition = "2024"
 license = "CC0-1.0"
