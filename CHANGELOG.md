@@ -2,6 +2,66 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.15.23 - 2025-11-05
+#### Bug Fixes
+- (**deps**) update homebrew/brew:latest docker digest to b0072bf - (eff82e9) - Solace System Renovate Fox
+- (**deps**) pin dependencies - (582c974) - Solace System Renovate Fox
+- configure git push autoSetupRemote in Woodpecker CI - (3b4e28b) - Billie
+- remove automatic git push from cog.toml post_bump_hooks - (05ff13b) - Billie
+- remove redundant build step from cog.toml pre_bump_hooks - (66f871c) - Billie
+- improve YAML formatting in Woodpecker CI pipelines - (19a2e6c) - Billie
+- correct CI pipeline command formatting in Woodpecker configuration - (ff0d051) - Billie
+- use cargo command directly in cog.toml pre_bump_hooks - (937ac53) - Billie
+- use absolute path for cargo-set-version in cog.toml - (99adb7f) - Billie Thompson
+- correct cargo-set-version command in cog.toml - (9870dba) - Billie Thompson
+- use cargo-set-version command in pre_bump_hooks - (4437878) - Billie Thompson
+#### Build system
+- remove duplicated lint - (6fc845d) - Billie Thompson
+#### Continuous Integration
+- revert docker image to main tag in release pipeline - (b00219b) - Billie
+- pin docker image to specific sha256 in release pipeline - (1a99a10) - Billie Thompson
+- simplify cog bump command in release pipeline - (b7f37c1) - Billie Thompson
+- clean up shell script formatting in release pipeline - (3281fb4) - Billie Thompson
+- combine GPG key extraction into single line - (8c2628c) - Billie Thompson
+- fix PATH in cog bump command - (9d42447) - Billie Thompson
+- fix GPG wrapper script PATH and shell - (faa3914) - Billie Thompson
+- change GPG wrapper script to use bash - (f1a83c3) - Billie Thompson
+- revert docker image to latest tag - (3a5dd86) - Billie Thompson
+- pin docker image to specific sha256 digest - (1edc90b) - Billie Thompson
+- correct the variable - (41ade86) - Billie Thompson
+- remove fix step dependency from commit step - (9184820) - Billie Thompson
+- restructure pipeline workflows and fix formatting - (f003916) - Billie Thompson
+- add debug listing in release pipeline - (129209f) - Billie Thompson
+- fix clone configuration in release pipeline - (bd5b786) - Billie Thompson
+- fix GPG password variable expansion in release pipeline - (28d1fe2) - Billie Thompson
+- fix variable expansion in release pipeline - (e9c1ca7) - Billie Thompson
+- restructure woodpecker release pipeline - (3444aad) - Billie Thompson
+- use CI_REPO variables in homebrew formula generation - (460878e) - Billie Thompson
+- remove loop - (dec9ee0) - Billie Thompson
+- update woodpecker lint configuration - (1cf3185) - Billie Thompson
+- fix yq path in homebrew lint - (e303428) - Billie Thompson
+- skip install - (6827af7) - Billie Thompson
+- switch image with built in tools - (423984a) - Billie Thompson
+- add homebrew linting again - (a5bfd2e) - Billie Thompson
+- use sccache - (3334d51) - Billie Thompson
+- use cargo install rather than cargo binstall - (6f878aa) - Billie Thompson
+- only build against stable - (0ea8438) - Billie Thompson
+- fix package name for debian - (cbe2978) - Billie Thompson
+- correct package name - (d5f09d7) - Billie Thompson
+- correct apt command - (433709d) - Billie Thompson
+- use apt-get - (d4bbc92) - Billie Thompson
+- add cross platform dependencies - (d3a2316) - Billie Thompson
+- add target before trying to use target - (30d6976) - Billie Thompson
+- correct variable - (e1e52bf) - Billie Thompson
+- install zig for zigbuild - (79c53b1) - Billie Thompson
+- build specdown - (aa84f84) - Billie Thompson
+- remove duplicated audit step - (2765435) - Billie Thompson
+- switch to woodpecker - (ed7c60f) - Billie Thompson
+#### Miscellaneous Chores
+- (**deps**) update rust crate clap to v4.5.51 - (56d7899) - Solace System Renovate Fox
+
+- - -
+
 ## v0.15.22 - 2025-10-30
 #### Bug Fixes
 - (**deps**) update ghcr.io/catthehacker/ubuntu:runner-latest docker digest to fa551c9 - (0b920c1) - Solace System Renovate Fox
