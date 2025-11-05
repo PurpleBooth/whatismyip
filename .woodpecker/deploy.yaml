@@ -54,7 +54,7 @@ steps:
       # Setup cosign and sign the binary
       - echo "$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
       - chmod 600 /tmp/cosign.key
-      - COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key /tmp/cosign.key --output-certificate ${ARCHIVE_NAME}.pem --output-signature ${ARCHIVE_NAME}.sig --output-bundle ${ARCHIVE_NAME}.bundle $ARCHIVE_NAME
+      - COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key /tmp/cosign.key --output-certificate ${ARCHIVE_NAME}.pem --output-signature ${ARCHIVE_NAME}.sig --bundle ${ARCHIVE_NAME}.bundle $ARCHIVE_NAME
       - rm -f /tmp/cosign.key
       
       # Upload to forgejo release
