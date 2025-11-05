@@ -5,8 +5,8 @@ matrix:
   TARGET:
     - x86_64-apple-darwin
     - aarch64-apple-darwin
-    - aarch64-pc-windows-gnullvm
     - x86_64-pc-windows-gnu
+    - aarch64-pc-windows-gnullvm
     - x86_64-unknown-linux-gnu
     - aarch64-unknown-linux-gnu
     - x86_64-unknown-linux-musl
@@ -33,7 +33,7 @@ steps:
       
       # Determine binary name and extension
       - |
-        if [[ "$TARGET" == *"windows"* ]]; then
+        if [ "$TARGET" = *"windows"* ]; then
           BINARY_NAME="whatismyip.exe"
           ARCHIVE_NAME="whatismyip-${TARGET}.exe"
         else
@@ -54,7 +54,7 @@ steps:
       # Setup cosign and sign the binary
       - echo "$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
       - chmod 600 /tmp/cosign.key
-      - COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key /tmp/cosign.key --output-certificate ${ARCHIVE_NAME}.pem --output-signature ${ARCHIVE_NAME}.sig $ARCHIVE_NAME
+      - COSIGN_PASSWORD=$COSIGN_PASSWORD cosign sign-blob --key /tmp/cosign.key --output-certificate ${ARCHIVE_NAME}.pem --output-signature ${ARCHIVE_NAME}.sig --output-bundle ${ARCHIVE_NAME}.bundle $ARCHIVE_NAME
       - rm -f /tmp/cosign.key
       
       # Upload to forgejo release
@@ -89,6 +89,12 @@ steps:
           curl --header "Authorization: token $FORGEJO_TOKEN" \
                --form file=@${ARCHIVE_NAME}.sig \
                --form attachment=$(basename ${ARCHIVE_NAME}.sig) \
+               "${CI_REPO_LINK:-https://codeberg.org/${CI_REPO_OWNER}/${CI_REPO_NAME}}/api/v1/repos/${CI_REPO_OWNER}/${CI_REPO_NAME}/releases/$RELEASE_TAG/assets"
+          
+          # Upload cosign bundle
+          curl --header "Authorization: token $FORGEJO_TOKEN" \
+               --form file=@${ARCHIVE_NAME}.bundle \
+               --form attachment=$(basename ${ARCHIVE_NAME}.bundle) \
                "${CI_REPO_LINK:-https://codeberg.org/${CI_REPO_OWNER}/${CI_REPO_NAME}}/api/v1/repos/${CI_REPO_OWNER}/${CI_REPO_NAME}/releases/$RELEASE_TAG/assets"
         fi
 
