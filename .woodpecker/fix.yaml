@@ -8,7 +8,7 @@ clone:
       git-user-name: &git-user-name Solace System Renovate Fox [bot]
       git-user-email: &git-user-email solace-system-renovate-fox@example.com
 when:
-  event: [push]
+  event: [push, cron, manual]
   branch:
     include: [main]
 steps:
