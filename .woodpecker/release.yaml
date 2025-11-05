@@ -52,7 +52,8 @@ steps:
       - chmod +x ~/.gpg-wrapper.sh
       - git config gpg.program ~/.gpg-wrapper.sh
       - git config gpg.format openpgp
-      - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $2}' | cut -d'/' -f2)
+      - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG |
+        grep sec | awk '{print $2}' | cut -d'/' -f2)
       - git config commit.gpgsign true
       - cog bump --auto
       - git push origin main --follow-tags
