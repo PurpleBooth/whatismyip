@@ -1820,7 +1820,7 @@ dependencies = [
 
 [[package]]
 name = "whatismyip"
-version = "0.16.4"
+version = "0.17.0"
 dependencies = [
  "clap",
  "criterion",
