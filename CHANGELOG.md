@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.3 - 2025-11-06
+#### Bug Fixes
+- properly escape variables in Woodpecker CI deploy step - (bd3ba25) - Billie
+
+- - -
+
 ## v0.17.2 - 2025-11-06
 #### Bug Fixes
 - export binary name variables in CI deploy step - (79e4810) - Billie
