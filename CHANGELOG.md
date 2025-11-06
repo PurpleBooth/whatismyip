@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.16.4 - 2025-11-06
+#### Bug Fixes
+- add --yes flag to cosign sign-blob command - (892a690) - Billie
+
+- - -
+
 ## v0.16.3 - 2025-11-05
 #### Bug Fixes
 - correct cosign bundle flag name - (3e30cda) - Billie
