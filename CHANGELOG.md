@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.2 - 2025-11-06
+#### Bug Fixes
+- export binary name variables in CI deploy step - (79e4810) - Billie
+
+- - -
+
 ## v0.17.1 - 2025-11-06
 #### Bug Fixes
 - simplify Forgejo release asset uploads in CI pipeline - (e47a559) - Billie
