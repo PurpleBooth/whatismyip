@@ -26,6 +26,8 @@ steps:
         from_secret: SIGNING_PRIVATE_KEY
       GPG_PASSWORD:
         from_secret: SIGNING_PRIVATE_PASSWORD
+      FORGEJO_TOKEN:
+        from_secret: FORGEJO_TOKEN
     commands:
       - rustup default stable
       - git config user.name "$GIT_USER_NAME"
@@ -58,4 +60,15 @@ steps:
       - cog bump --auto --skip-ci
       - git push origin main --follow-tags
       - git push origin main --tags
+      # Create Forgejo release if tag exists
+      - |
+        RELEASE_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
+        if [ -n "$RELEASE_TAG" ]; then
+          # Create release using Forgejo API
+          curl -X POST \
+               --header "Authorization: token $FORGEJO_TOKEN" \
+               --header "Content-Type: application/json" \
+               --data "{\"tag_name\": \"$RELEASE_TAG\", \"name\": \"$RELEASE_TAG\", \"body\": \"Release $RELEASE_TAG\"}" \
+               "https://codeberg.org/api/v1/repos/PurpleBooth/whatismyip/releases"
+        fi
 depends_on: [test, lint, build]
