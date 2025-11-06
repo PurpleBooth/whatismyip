@@ -34,11 +34,11 @@ steps:
       # Determine binary name and extension
       - |
         if [ "$TARGET" = *"windows"* ]; then
-          BINARY_NAME="whatismyip.exe"
-          ARCHIVE_NAME="whatismyip-${TARGET}.exe"
+          export BINARY_NAME="whatismyip.exe"
+          export ARCHIVE_NAME="whatismyip-${TARGET}.exe"
         else
-          BINARY_NAME="whatismyip"
-          ARCHIVE_NAME="whatismyip-${TARGET}"
+          export BINARY_NAME="whatismyip"
+          export ARCHIVE_NAME="whatismyip-${TARGET}"
         fi
 
       # Copy binary to standardized name
