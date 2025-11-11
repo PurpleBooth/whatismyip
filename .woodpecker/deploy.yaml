@@ -1,4 +1,6 @@
 ---
+depends_on:
+  - release
 when:
   event: [tag, release]
 matrix:
@@ -56,10 +58,11 @@ steps:
           # Setup cosign and sign the binary
           echo "$$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
           chmod 600 /tmp/cosign.key
-          COSIGN_PASSWORD=$$COSIGN_PASSWORD cosign sign-blob --yes --key /tmp/cosign.key --output-certificate "$$ARCHIVE_NAME.pem" --output-signature "$$ARCHIVE_NAME.sig" --bundle "$$ARCHIVE_NAME.bundle" "$$ARCHIVE_NAME"
+          cosign sign-blob --yes --key /tmp/cosign.key --output-certificate "$$ARCHIVE_NAME.pem" --output-signature "$$ARCHIVE_NAME.sig" --bundle "$$ARCHIVE_NAME.bundle" "$$ARCHIVE_NAME"
           rm -f /tmp/cosign.key
 
   upload-release-assets:
+    depends_on: [build-release-assets]
     image: woodpeckerci/plugin-release
     settings:
       api_key:
