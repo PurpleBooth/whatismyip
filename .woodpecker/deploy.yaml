@@ -12,7 +12,7 @@ matrix:
     - x86_64-unknown-linux-musl
     - aarch64-unknown-linux-musl
 steps:
-  build:
+  build-release-assets:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:
       CARGO_TERM_COLOR: always
@@ -24,76 +24,52 @@ steps:
         from_secret: COSIGN_PRIVATE_KEY
       COSIGN_PASSWORD:
         from_secret: COSIGN_PASSWORD
-      FORGEJO_TOKEN:
-        from_secret: FORGEJO_TOKEN
     commands:
       - rustup default stable
       - rustup target add "$$TARGET"
       - cargo zigbuild --release --target "$$TARGET"
+      - |
+          set -euo pipefail
+          # Determine binary name and standardized archive name
+          case "$$TARGET" in
+            *windows*)
+              BINARY_NAME="whatismyip.exe"
+              ARCHIVE_NAME="whatismyip-$$TARGET.exe"
+              ;;
+            *)
+              BINARY_NAME="whatismyip"
+              ARCHIVE_NAME="whatismyip-$$TARGET"
+              ;;
+          esac
+          export BINARY_NAME ARCHIVE_NAME
 
-      # Determine binary name and extension
-      - |
-        if [ "$TARGET" = *"windows"* ]; then
-          export BINARY_NAME="whatismyip.exe"
-          export ARCHIVE_NAME="whatismyip-$$TARGET.exe"
-        else
-          export BINARY_NAME="whatismyip"
-          export ARCHIVE_NAME="whatismyip-$$TARGET"
-        fi
+          # Copy binary to standardized name
+          cp "target/$$TARGET/release/$$BINARY_NAME" "$$ARCHIVE_NAME"
 
-      # Copy binary to standardized name
-      - cp "target/$$TARGET/release/$$BINARY_NAME" "$$ARCHIVE_NAME"
+          # Generate checksums
+          sha256sum "$$ARCHIVE_NAME" > "$$ARCHIVE_NAME.sha256"
 
-      # Generate checksums
-      - sha256sum "$$ARCHIVE_NAME" > "$$ARCHIVE_NAME.sha256"
+          # Import GPG key and create armored signature (.asc)
+          echo "$$GPG_PRIVATE_KEY" | gpg --batch --yes --import
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$$GPG_PASSWORD" --armor -o "$$ARCHIVE_NAME.asc" --detach-sign "$$ARCHIVE_NAME"
 
-      # Import GPG key and sign the binary
-      - echo "$$GPG_PRIVATE_KEY" | gpg --batch --yes --import
-      - echo "$$GPG_PASSWORD" | gpg --batch --yes --passphrase-fd 0 --pinentry-mode loopback --detach-sign "$$ARCHIVE_NAME"
+          # Setup cosign and sign the binary
+          echo "$$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
+          chmod 600 /tmp/cosign.key
+          COSIGN_PASSWORD=$$COSIGN_PASSWORD cosign sign-blob --yes --key /tmp/cosign.key --output-certificate "$$ARCHIVE_NAME.pem" --output-signature "$$ARCHIVE_NAME.sig" --bundle "$$ARCHIVE_NAME.bundle" "$$ARCHIVE_NAME"
+          rm -f /tmp/cosign.key
 
-      # Setup cosign and sign the binary
-      - echo "$$COSIGN_PRIVATE_KEY" > /tmp/cosign.key
-      - chmod 600 /tmp/cosign.key
-      - COSIGN_PASSWORD=$$COSIGN_PASSWORD cosign sign-blob --yes --key /tmp/cosign.key --output-certificate "$$ARCHIVE_NAME.pem" --output-signature "$$ARCHIVE_NAME.sig" --bundle "$$ARCHIVE_NAME.bundle" "$$ARCHIVE_NAME"
-      - rm -f /tmp/cosign.key
-
-      # Upload to forgejo release
-      - |
-          # Upload binary
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME" \
-               --form "attachment=$$ARCHIVE_NAME" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
-      - |
-          # Upload checksum
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME.sha256" \
-               --form "attachment=$$ARCHIVE_NAME.sha256" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
-      - |
-          # Upload signature
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME.asc" \
-               --form "attachment=$$ARCHIVE_NAME.asc" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
-      - |
-          # Upload cosign certificate
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME.pem" \
-               --form "attachment=$$ARCHIVE_NAME.pem" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
-      - |
-          # Upload cosign signature
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME.sig" \
-               --form "attachment=$$ARCHIVE_NAME.sig" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
-      - |
-          # Upload cosign bundle
-          curl --header "Authorization: token $$FORGEJO_TOKEN" \
-               --form "file=@$$ARCHIVE_NAME.bundle" \
-               --form "attachment=$$ARCHIVE_NAME.bundle" \
-               "https://codeberg.org/$$CI_REPO_OWNER/$$CI_REPO_NAME/api/v1/repos/$$CI_REPO_OWNER/$$CI_REPO_NAME/releases/$$CI_COMMIT_TAG/assets"
+  upload-release-assets:
+    image: woodpeckerci/plugin-release
+    settings:
+      api_key:
+        from_secret: FORGEJO_TOKEN
+      files:
+        - whatismyip-$$TARGET*
+      file_exists: overwrite
+      checksum: sha256
+      checksum_file: SHA256SUMS.txt
+      checksum_flatten: true
   publish:
     image: codeberg.org/purplebooth/rust-build-env:latest
     environment:

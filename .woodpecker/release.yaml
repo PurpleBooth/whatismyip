@@ -1,74 +1,24 @@
 ---
-runs_on: [success]
 when:
-  event: [push]
-  branch:
-    include: [main]
-clone:
-  git:
-    image: woodpeckerci/plugin-git@sha256:1ce87890a4996596c0f6c28f69afe5e07bf106c294f49fb2cfe5971b4a04f70c
-    settings:
-      partial: false
-      depth: 0
-      git-user-name: &git-user-name Solace System Renovate Fox [bot]
-      git-user-email: &git-user-email solace-system-renovate-fox@example.com
-      tags: true
+  event: [tag, release]
 steps:
-  release:
-    image: codeberg.org/purplebooth/rust-build-env:main
-    environment:
-      GIT_USER_NAME: *git-user-name
-      GIT_USER_EMAIL: *git-user-email
-      CARGO_TERM_COLOR: always
-      GIT_PRIVATE_KEY:
-        from_secret: GIT_PRIVATE_KEY
-      GPG_PRIVATE_KEY:
-        from_secret: SIGNING_PRIVATE_KEY
-      GPG_PASSWORD:
-        from_secret: SIGNING_PRIVATE_PASSWORD
-      FORGEJO_TOKEN:
+  create-release:
+    image: woodpeckerci/plugin-release
+    settings:
+      api_key:
         from_secret: FORGEJO_TOKEN
-    commands:
-      - rustup default stable
-      - git config user.name "$GIT_USER_NAME"
-      - git config user.email "$GIT_USER_EMAIL"
-      - git config --type bool push.autoSetupRemote true
-      # Configure ssh for auth Codeberg
-      - mkdir -p ~/.ssh/
-      - chmod 700 ~/.ssh/
-      - echo "$$GIT_PRIVATE_KEY" > ~/.ssh/id_rsa
-      - ssh-keyscan -t rsa codeberg.org >> ~/.ssh/known_hosts
-      - chmod 600 ~/.ssh/known_hosts ~/.ssh/id_rsa
-      - git config url."git@codeberg.org:".insteadOf "https://codeberg.org/"
-
-      # Import the PGP key
-      - echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
-      - gpg --export-ownertrust | sed 's/:.*/:5:/' | gpg --import-ownertrust
-      - echo "$$GPG_PASSWORD" > ~/.gpg-passphrase
-      - chmod 600 ~/.gpg-passphrase
-      - |
-        cat > ~/.gpg-wrapper.sh <<'EOF'
-        #!/bin/bash
-        gpg --batch --pinentry-mode loopback --passphrase-file ~/.gpg-passphrase "$@"
-        EOF
-      - chmod +x ~/.gpg-wrapper.sh
-      - git config gpg.program ~/.gpg-wrapper.sh
-      - git config gpg.format openpgp
-      - git config user.signingkey $(gpg --list-secret-keys --keyid-format LONG |
-        grep sec | awk '{print $2}' | cut -d'/' -f2)
-      - git config commit.gpgsign true
-      - cog bump --auto --skip-ci
-      - git push origin main --follow-tags
-      - git push origin main --tags
-      # Create Forgejo release if tag exists
-      - |
-        RELEASE_TAG=$(git describe --tags --exact-match 2>/dev/null || echo "")
-        if [ -n "$RELEASE_TAG" ]; then
-          # Create release using Forgejo API
-          curl -X POST \
-               --header "Authorization: token $FORGEJO_TOKEN" \
-               --header "Content-Type: application/json" \
-               --data "{\"tag_name\": \"$RELEASE_TAG\", \"name\": \"$RELEASE_TAG\", \"body\": \"Release $RELEASE_TAG\"}" \
-               "https://codeberg.org/api/v1/repos/PurpleBooth/whatismyip/releases"
-        fi
-depends_on: [test, lint, build]
+      draft: true
+      note: CHANGELOG.md
+      title: ${CI_COMMIT_TAG:-$CI_COMMIT_REF_NAME}
+      prerelease: false
+    when:
+      event: [tag, release]
+  publish-release:
+    image: woodpeckerci/plugin-release
+    settings:
+      api_key:
+        from_secret: FORGEJO_TOKEN
+      draft: false
+      overwrite: true
+    when:
+      event: release
