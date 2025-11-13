@@ -2,6 +2,20 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.4 - 2025-11-13
+#### Bug Fixes
+- (**deps**) pin woodpeckerci/plugin-release docker tag to b736e62 - (5a3301a) - Solace System Renovate Fox
+- add proper dependency ordering in woodpecker deploy pipeline - (9bed711) - Billie Thompson
+#### Refactoring
+- update woodpecker CI/CD pipeline configuration - (76a61ce) - Billie Thompson
+- replace manual release scripts with woodpecker release plugin - (d4825ce) - Billie Thompson
+#### Miscellaneous Chores
+- (**deps**) update dependency cargo-audit to 0.22.0 - (8e7a67f) - Solace System Renovate Fox
+- test commit - (a877c13) - Billie Thompson
+- remove redundant cargo publish step from woodpecker deploy - (1bee448) - Billie Thompson
+
+- - -
+
 ## v0.17.3 - 2025-11-06
 #### Bug Fixes
 - properly escape variables in Woodpecker CI deploy step - (bd3ba25) - Billie
