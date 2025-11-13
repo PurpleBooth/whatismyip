@@ -63,7 +63,7 @@ steps:
 
   upload-release-assets:
     depends_on: [build-release-assets]
-    image: woodpeckerci/plugin-release
+    image: woodpeckerci/plugin-release@sha256:b736e623e8fe27581b4a3999daef2dabd8fc9fe31db6bd3e93bab69add16ff1d
     settings:
       api_key:
         from_secret: CODEBERG_TOKEN
