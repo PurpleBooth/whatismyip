@@ -29,7 +29,6 @@ steps:
       - rustup target add "$$TARGET"
       - cargo zigbuild --release --target "$$TARGET"
       - |
-          set -euo pipefail
           # Determine binary name and standardized archive name
           case "$$TARGET" in
             *windows*)
