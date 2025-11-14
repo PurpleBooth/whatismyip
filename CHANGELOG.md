@@ -2,6 +2,12 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.5 - 2025-11-14
+#### Bug Fixes
+- (**deps**) update ubuntu docker digest to 4a5ffc0 - (42bebad) - Solace System Renovate Fox
+
+- - -
+
 ## v0.17.4 - 2025-11-13
 #### Bug Fixes
 - (**deps**) pin woodpeckerci/plugin-release docker tag to b736e62 - (5a3301a) - Solace System Renovate Fox
