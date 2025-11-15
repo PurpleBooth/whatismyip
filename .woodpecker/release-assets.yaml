@@ -14,8 +14,26 @@ matrix:
     - x86_64-unknown-linux-musl
     - aarch64-unknown-linux-musl
 steps:
+  cache:
+    image: sebastinez/plugin-sccache:latest
+    volumes:
+      - sccache:/sccache_data
+    settings:
+      s3-endpoint:
+        from_secret: SCCACHE_S3_ENDPOINT
+      s3-bucket:
+        from_secret: SCCACHE_S3_BUCKET
+      s3-key-prefix: $CI_REPO
+      s3-access_key:
+        from_secret: SCCACHE_S3_ACCESS_KEY
+      s3-secret_key:
+        from_secret: SCCACHE_S3_SECRET_KEY
+
   build-release-assets:
     image: codeberg.org/purplebooth/rust-build-env:latest
+    volumes:
+      - sccache:/sccache_data
+    depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
       GPG_PRIVATE_KEY:
@@ -27,6 +45,8 @@ steps:
       COSIGN_PASSWORD:
         from_secret: COSIGN_PASSWORD
     commands:
+      - export PATH="/sccache_data:$PATH"
+      - source .sccache
       - rustup default stable
       - rustup target add "$$TARGET"
       - cargo zigbuild --release --target "$$TARGET"

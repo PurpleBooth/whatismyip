@@ -12,22 +12,55 @@ when:
   branch:
     include: [main]
 steps:
+  cache:
+    image: sebastinez/plugin-sccache:latest
+    volumes:
+      - sccache:/sccache_data
+    settings:
+      s3-endpoint:
+        from_secret: SCCACHE_S3_ENDPOINT
+      s3-bucket:
+        from_secret: SCCACHE_S3_BUCKET
+      s3-key-prefix: $CI_REPO
+      s3-access_key:
+        from_secret: SCCACHE_S3_ACCESS_KEY
+      s3-secret_key:
+        from_secret: SCCACHE_S3_SECRET_KEY
+
   fix:
     image: codeberg.org/purplebooth/rust-build-env:latest
+    volumes:
+      - sccache:/sccache_data
+    depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
     commands:
+      - export PATH="/sccache_data:$PATH"
+      - source .sccache
       - cargo fix
       - cargo clippy --fix --all-features
       - cargo fmt --all
   lint:
-    depends_on: [fix]
+    depends_on:
+      - fix
+      - cache
     image: codeberg.org/purplebooth/rust-build-env:latest
-    commands: [cargo fmt --all -- --check, cargo clippy - cargo check]
-  test:
-    depends_on: [fix]
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    volumes:
+      - sccache:/sccache_data
     commands:
+      - export PATH="/sccache_data:$PATH"
+      - source .sccache
+      - cargo fmt --all -- --check
+      - cargo clippy
+      - cargo check
+  test:
+    depends_on: [fix, cache]
+    image: codeberg.org/purplebooth/rust-build-env:latest
+    volumes:
+      - sccache:/sccache_data
+    commands:
+      - export PATH="/sccache_data:$PATH"
+      - source .sccache
       - cargo test
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
@@ -35,6 +68,8 @@ steps:
   commit:
     depends_on: [test, lint]
     image: codeberg.org/purplebooth/rust-build-env:latest
+    volumes:
+      - sccache:/sccache_data
     environment:
       GIT_USER_NAME: *git-user-name
       GIT_USER_EMAIL: *git-user-email
@@ -46,6 +81,8 @@ steps:
       GPG_PASSWORD:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
+      - export PATH="/sccache_data:$PATH"
+      - source .sccache
       - git config user.name "$GIT_USER_NAME"
       - git config user.email "$GIT_USER_EMAIL"
 
