@@ -17,6 +17,7 @@ steps:
     volumes:
       - sccache:/sccache_data
     settings:
+      save-if: true
       s3-endpoint:
         from_secret: SCCACHE_S3_ENDPOINT
       s3-bucket:
