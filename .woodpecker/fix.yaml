@@ -37,7 +37,7 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - export PATH="/sccache_data:$PATH"
-      - source .sccache
+      - . .sccache
       - cargo fix
       - cargo clippy --fix --all-features
       - cargo fmt --all
@@ -50,7 +50,7 @@ steps:
       - sccache:/sccache_data
     commands:
       - export PATH="/sccache_data:$PATH"
-      - source .sccache
+      - . .sccache
       - cargo fmt --all -- --check
       - cargo clippy
       - cargo check
@@ -61,7 +61,7 @@ steps:
       - sccache:/sccache_data
     commands:
       - export PATH="/sccache_data:$PATH"
-      - source .sccache
+      - . .sccache
       - cargo test
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
@@ -83,7 +83,7 @@ steps:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - export PATH="/sccache_data:$PATH"
-      - source .sccache
+      - . .sccache
       - git config user.name "$GIT_USER_NAME"
       - git config user.email "$GIT_USER_EMAIL"
 
