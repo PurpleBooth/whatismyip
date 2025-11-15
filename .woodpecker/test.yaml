@@ -17,7 +17,7 @@ steps:
         from_secret: SCCACHE_S3_SECRET_KEY
 
   cargo-test:
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
@@ -27,7 +27,7 @@ steps:
 
       - cargo test
   specdown:
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always

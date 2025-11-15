@@ -27,7 +27,7 @@ steps:
         from_secret: SCCACHE_S3_SECRET_KEY
 
   fix:
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
@@ -41,7 +41,7 @@ steps:
     depends_on:
       - fix
       - cache
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     commands:
       - . ./.sccache
       - export RUSTC_WRAPPER=sccache
@@ -50,7 +50,7 @@ steps:
       - cargo check
   test:
     depends_on: [fix, cache]
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     commands:
       - . ./.sccache
       - export RUSTC_WRAPPER=sccache
@@ -60,7 +60,7 @@ steps:
         ./README.md
   commit:
     depends_on: [test, lint]
-    image: codeberg.org/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest
     environment:
       GIT_USER_NAME: *git-user-name
       GIT_USER_EMAIL: *git-user-email
