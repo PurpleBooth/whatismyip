@@ -37,7 +37,7 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - export PATH="/sccache_data:$PATH"
-      - . .sccache
+      - . /sccache_data/.sccache
       - rustup default stable
       - rustup target add $TARGET
       - cargo zigbuild --release --target $TARGET

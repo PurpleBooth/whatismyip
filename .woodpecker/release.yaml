@@ -47,7 +47,7 @@ steps:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - export PATH="/sccache_data:$PATH"
-      - . .sccache
+      - . /sccache_data/.sccache
       - rustup default stable
       - git config user.name "$GIT_USER_NAME"
       - git config user.email "$GIT_USER_EMAIL"

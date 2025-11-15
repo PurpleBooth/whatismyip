@@ -27,7 +27,7 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - export PATH="/sccache_data:$PATH"
-      - . .sccache
+      - . /sccache_data/.sccache
       - cargo test
   specdown:
     image: codeberg.org/purplebooth/rust-build-env:latest
@@ -38,7 +38,7 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - export PATH="/sccache_data:$PATH"
-      - . .sccache
+      - . /sccache_data/.sccache
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
         ./README.md

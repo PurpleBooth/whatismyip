@@ -33,7 +33,7 @@ steps:
     depends_on: [ cache ]
     commands:
       - export PATH="/sccache_data:$PATH"
-      - . .sccache
+      - . /sccache_data/.sccache
       - cog changelog --unified --at "$CI_COMMIT_TAG" > RELEASE_NOTES.md
 
   upload-changelog:
