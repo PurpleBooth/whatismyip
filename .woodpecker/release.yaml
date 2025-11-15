@@ -16,8 +16,6 @@ clone:
 steps:
   cache:
     image: quay.io/radicle_garden/plugin-sccache:latest
-    volumes:
-      - sccache:/sccache_data
     settings:
       save-if: true
       s3-endpoint:
@@ -32,8 +30,6 @@ steps:
 
   release:
     image: codeberg.org/purplebooth/rust-build-env:main
-    volumes:
-      - sccache:/sccache_data
     depends_on: [cache]
     environment:
       GIT_USER_NAME: *git-user-name
@@ -46,7 +42,6 @@ steps:
       GPG_PASSWORD:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
-      - export PATH="/sccache_data:$PATH"
       - . ./.sccache
       - rustup default stable
       - git config user.name "$GIT_USER_NAME"

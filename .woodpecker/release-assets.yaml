@@ -16,8 +16,7 @@ matrix:
 steps:
   cache:
     image: quay.io/radicle_garden/plugin-sccache:latest
-    volumes:
-      - sccache:/sccache_data
+
     settings:
       save-if: true
       s3-endpoint:
@@ -32,8 +31,6 @@ steps:
 
   build-release-assets:
     image: codeberg.org/purplebooth/rust-build-env:latest
-    volumes:
-      - sccache:/sccache_data
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
@@ -46,7 +43,6 @@ steps:
       COSIGN_PASSWORD:
         from_secret: COSIGN_PASSWORD
     commands:
-      - export PATH="/sccache_data:$PATH"
       - . ./.sccache
       - rustup default stable
       - rustup target add "$$TARGET"

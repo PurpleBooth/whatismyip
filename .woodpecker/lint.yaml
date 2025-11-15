@@ -6,10 +6,8 @@ when:
 steps:
   cache:
     image: quay.io/radicle_garden/plugin-sccache:latest
-    volumes:
-      - sccache:/sccache_data
     settings:
-      save-if: true
+      save-if: false
       s3-endpoint:
         from_secret: SCCACHE_S3_ENDPOINT
       s3-bucket:
@@ -22,13 +20,10 @@ steps:
 
   rust:
     image: codeberg.org/purplebooth/rust-build-env:latest
-    volumes:
-      - sccache:/sccache_data
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
     commands:
-      - export PATH="/sccache_data:$PATH"
       - . ./.sccache
       - rustup default stable
       - rustup component add rustfmt

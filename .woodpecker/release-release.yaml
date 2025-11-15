@@ -12,8 +12,6 @@ clone:
 steps:
   cache:
     image: quay.io/radicle_garden/plugin-sccache:latest
-    volumes:
-      - sccache:/sccache_data
     settings:
       save-if: true
       s3-endpoint:
@@ -28,11 +26,8 @@ steps:
 
   release:
     image: codeberg.org/purplebooth/rust-build-env:main
-    volumes:
-      - sccache:/sccache_data
     depends_on: [ cache ]
     commands:
-      - export PATH="/sccache_data:$PATH"
       - . ./.sccache
       - cog changelog --unified --at "$CI_COMMIT_TAG" > RELEASE_NOTES.md
 
