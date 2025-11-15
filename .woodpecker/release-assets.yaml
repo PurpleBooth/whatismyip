@@ -1,4 +1,6 @@
 ---
+depends_on:
+  - release-release
 when:
   event: [tag]
 matrix:
@@ -58,8 +60,6 @@ steps:
           cosign sign-blob --yes --key /tmp/cosign.key --output-certificate "$$ARCHIVE_NAME.pem" --output-signature "$$ARCHIVE_NAME.sig" --bundle "$$ARCHIVE_NAME.bundle" "$$ARCHIVE_NAME"
           rm -f /tmp/cosign.key
 
-      - cog changelog --unified --at "$$CI_COMMIT_TAG" > RELEASE_NOTES.md
-
   upload-release-assets:
     depends_on: [build-release-assets]
     image: woodpeckerci/plugin-release@sha256:b736e623e8fe27581b4a3999daef2dabd8fc9fe31db6bd3e93bab69add16ff1d
@@ -67,9 +67,8 @@ steps:
       api_key:
         from_secret: CODEBERG_TOKEN
       files:
-        - whatismyip-$$TARGET*
+        - whatismyip-$TARGET*
       file_exists: overwrite
       checksum: sha256
       checksum_file: SHA256SUMS.txt
       checksum_flatten: true
-      note: RELEASE_NOTES.md

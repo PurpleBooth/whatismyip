@@ -1,0 +1,26 @@
+---
+runs_on: [ success ]
+when:
+  event: [ tag ]
+clone:
+  git:
+    image: woodpeckerci/plugin-git@sha256:1ce87890a4996596c0f6c28f69afe5e07bf106c294f49fb2cfe5971b4a04f70c
+    settings:
+      partial: false
+      depth: 0
+      tags: true
+steps:
+  release:
+    image: codeberg.org/purplebooth/rust-build-env:main
+    commands:
+      - cog changelog --unified --at "$CI_COMMIT_TAG" > RELEASE_NOTES.md
+
+  upload-changelog:
+    depends_on: [ release ]
+    image: woodpeckerci/plugin-release@sha256:b736e623e8fe27581b4a3999daef2dabd8fc9fe31db6bd3e93bab69add16ff1d
+    settings:
+      api_key:
+        from_secret: CODEBERG_TOKEN
+      note: RELEASE_NOTES.md
+
+depends_on: [ test, lint, build ]
