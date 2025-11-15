@@ -25,6 +25,8 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
+
       - rustup default stable
       - rustup component add rustfmt
       - rustup component add clippy

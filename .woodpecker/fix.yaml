@@ -33,6 +33,7 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
       - cargo fix
       - cargo clippy --fix --all-features
       - cargo fmt --all
@@ -43,6 +44,7 @@ steps:
     image: codeberg.org/purplebooth/rust-build-env:latest
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
       - cargo fmt --all -- --check
       - cargo clippy
       - cargo check
@@ -51,6 +53,7 @@ steps:
     image: codeberg.org/purplebooth/rust-build-env:latest
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
       - cargo test
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
@@ -70,6 +73,7 @@ steps:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
       - git config user.name "$GIT_USER_NAME"
       - git config user.email "$GIT_USER_EMAIL"
 

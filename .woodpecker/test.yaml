@@ -23,6 +23,8 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
+
       - cargo test
   specdown:
     image: codeberg.org/purplebooth/rust-build-env:latest
@@ -31,6 +33,8 @@ steps:
       CARGO_TERM_COLOR: always
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
+
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
         ./README.md

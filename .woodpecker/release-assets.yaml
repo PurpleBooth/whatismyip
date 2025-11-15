@@ -44,6 +44,8 @@ steps:
         from_secret: COSIGN_PASSWORD
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
+
       - rustup default stable
       - rustup target add "$$TARGET"
       - cargo zigbuild --release --target "$$TARGET"

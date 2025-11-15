@@ -29,6 +29,8 @@ steps:
     depends_on: [ cache ]
     commands:
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
+
       - cog changelog --unified --at "$CI_COMMIT_TAG" > RELEASE_NOTES.md
 
   upload-changelog:

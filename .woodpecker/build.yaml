@@ -14,7 +14,6 @@ matrix:
 steps:
   cache:
     image: quay.io/radicle_garden/plugin-sccache:latest
-
     settings:
       save-if: false
       s3-endpoint:
@@ -29,13 +28,12 @@ steps:
 
   build:
     image: codeberg.org/purplebooth/rust-build-env:latest
-
     depends_on: [cache]
     environment:
       CARGO_TERM_COLOR: always
     commands:
-      
       - . ./.sccache
+      - export RUSTC_WRAPPER=sccache
       - rustup default stable
       - rustup target add $TARGET
       - cargo zigbuild --release --target $TARGET
