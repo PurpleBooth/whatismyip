@@ -5,7 +5,7 @@ when:
     exclude: [CHANGELOG.md]
 steps:
   cache:
-    image: sebastinez/plugin-sccache:latest
+    image: quay.io/radicle_garden/plugin-sccache:latest
     volumes:
       - sccache:/sccache_data
     settings:

@@ -15,7 +15,7 @@ matrix:
     - aarch64-unknown-linux-musl
 steps:
   cache:
-    image: sebastinez/plugin-sccache:latest
+    image: quay.io/radicle_garden/plugin-sccache:latest
     volumes:
       - sccache:/sccache_data
     settings:

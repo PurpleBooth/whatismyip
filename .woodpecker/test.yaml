@@ -3,7 +3,7 @@ when:
   event: [push, pull_request, cron, manual]
 steps:
   cache:
-    image: sebastinez/plugin-sccache:latest
+    image: quay.io/radicle_garden/plugin-sccache:latest
     volumes:
       - sccache:/sccache_data
     settings:
