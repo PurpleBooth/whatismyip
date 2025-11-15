@@ -2,6 +2,17 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.6 - 2025-11-15
+#### Bug Fixes
+- (**deps**) update ubuntu docker digest to e96e81f - (78c300a) - Solace System Renovate Fox
+#### Continuous Integration
+- remove pipefail on sh shell - (46a61c0) - Billie Thompson
+#### Miscellaneous Chores
+- (**deps**) update dependency mikefarah/yq to v4.48.2 - (b9f17cc) - Solace System Renovate Fox
+- test commit - (bd4912a) - Billie Thompson
+
+- - -
+
 ## v0.17.5 - 2025-11-14
 #### Bug Fixes
 - (**deps**) update ubuntu docker digest to 4a5ffc0 - (42bebad) - Solace System Renovate Fox
