@@ -3,15 +3,15 @@ runs_on: [ success ]
 variables:
   - &sccache-env
     CARGO_TERM_COLOR: always
-    CARGO_INCREMENTAL: "0"  # ← Added! Disables incremental compilation for better caching
-    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false"  # ← Changed from "true"
+    CARGO_INCREMENTAL: "0" 
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false" 
     SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
     RUSTC_WRAPPER: sccache
     SCCACHE_BUCKET:
       from_secret: SCCACHE_S3_BUCKET
     SCCACHE_ENDPOINT:
       from_secret: SCCACHE_S3_ENDPOINT
-    SCCACHE_REGION: fra1  # ← Changed from "auto" - DigitalOcean needs explicit region
+    SCCACHE_REGION: fra1 
     SCCACHE_S3_USE_SSL: "true"
     AWS_ACCESS_KEY_ID:
       from_secret: SCCACHE_S3_ACCESS_KEY
