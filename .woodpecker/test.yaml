@@ -21,12 +21,12 @@ when:
   event: [push, pull_request, cron, manual]
 steps:
   cargo-test:
-    image: code.billie.codes/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest@sha256:237f98dbf4d776c8723018d4e18c3605f7790fdcfafab039c139084f6f2f4c61
     environment:
       <<: *sccache-env
     commands: [cargo test, sccache --show-stats]
   specdown:
-    image: code.billie.codes/purplebooth/rust-build-env:latest
+    image: code.billie.codes/purplebooth/rust-build-env:latest@sha256:237f98dbf4d776c8723018d4e18c3605f7790fdcfafab039c139084f6f2f4c61
     environment:
       <<: *sccache-env
     commands:
