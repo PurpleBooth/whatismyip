@@ -76,6 +76,6 @@ steps:
       - git config gpg.format openpgp
       - git config user.signingkey "$$(gpg --list-secret-keys --keyid-format LONG | grep sec | awk '{print $$2}' | cut -d'/' -f2)"
       - git config commit.gpgsign true
-      - cog bump --auto --skip-ci
+      - cog bump --auto
       - sccache --show-stats
 depends_on: [test, lint, build]
