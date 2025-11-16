@@ -75,7 +75,5 @@ steps:
         grep sec | awk '{print $2}' | cut -d'/' -f2)
       - git config commit.gpgsign true
       - cog bump --auto --skip-ci
-      - git push origin main
-      - git push origin main "$(cog get-version -t)"
       - sccache --show-stats
 depends_on: [test, lint, build]
