@@ -108,7 +108,7 @@ services:
       SCCACHE_REGION:
         from_secret: SCCACHE_S3_REGION
       SCCACHE_S3_USE_SSL: "true"
-      SCCACHE_S3_KEY_PREFIX: $CI_REPO
+      SCCACHE_S3_KEY_PREFIX: ${CI_REPO}
       AWS_ACCESS_KEY_ID:
         from_secret: SCCACHE_S3_SECRET_KEY
       AWS_SECRET_ACCESS_KEY:
