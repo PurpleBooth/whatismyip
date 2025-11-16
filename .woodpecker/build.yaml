@@ -8,8 +8,7 @@ variables:
       from_secret: SCCACHE_S3_BUCKET
     SCCACHE_ENDPOINT:
       from_secret: SCCACHE_S3_ENDPOINT
-    SCCACHE_REGION:
-      from_secret: SCCACHE_S3_REGION
+    SCCACHE_REGION: auto
     SCCACHE_S3_USE_SSL: "true"
     AWS_ACCESS_KEY_ID:
       from_secret: SCCACHE_S3_ACCESS_KEY
