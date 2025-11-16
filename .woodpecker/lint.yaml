@@ -2,21 +2,21 @@
 variables:
   - &sccache-env
     CARGO_TERM_COLOR: always
-    CARGO_INCREMENTAL: "0"
+    CARGO_INCREMENTAL: '0'
     CMAKE_C_COMPILER_LAUNCHER: sccache
     CMAKE_CXX_COMPILER_LAUNCHER: sccache
-    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false"
-    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: 'false'
+    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: 'true'
     RUSTC_WRAPPER: sccache
-    SCCACHE_BUCKET: "uwu-stirring-cod"
-    SCCACHE_ENDPOINT: "https://fra1.digitaloceanspaces.com"
+    SCCACHE_BUCKET: uwu-stirring-cod
+    SCCACHE_ENDPOINT: https://fra1.digitaloceanspaces.com
     SCCACHE_REGION: fra1
-    SCCACHE_S3_USE_SSL: "true"
+    SCCACHE_S3_USE_SSL: 'true'
     AWS_ACCESS_KEY_ID:
       from_secret: SCCACHE_S3_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY:
       from_secret: SCCACHE_S3_SECRET_KEY
-    AWS_EC2_METADATA_DISABLED: "true"
+    AWS_EC2_METADATA_DISABLED: 'true'
 when:
   event: [push, pull_request, cron, manual]
   path:
@@ -24,7 +24,6 @@ when:
 steps:
   rust:
     image: code.billie.codes/purplebooth/rust-build-env:latest
-    
     environment:
       <<: *sccache-env
       CARGO_TERM_COLOR: always
@@ -35,10 +34,10 @@ steps:
       - cargo fmt --all -- --check
       - cargo clippy
       - cargo check
+      - sccache --show-stats
   homebrew:
     image: homebrew/brew:latest@sha256:b0072bfdebf5934ae24b93b44a1928a88057399b3283ffa0177bb86084fdedfd
     environment:
-      <<: *sccache-env
       YQ_VERSION: 4.43.1  # renovate: datasource=github-releases depName=mikefarah/yq
     commands:
       - curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz

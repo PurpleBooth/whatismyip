@@ -4,19 +4,19 @@ variables:
     CARGO_TERM_COLOR: always
     CMAKE_C_COMPILER_LAUNCHER: sccache
     CMAKE_CXX_COMPILER_LAUNCHER: sccache
-    CARGO_INCREMENTAL: "0"
-    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false"
-    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
+    CARGO_INCREMENTAL: '0'
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: 'false'
+    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: 'true'
     RUSTC_WRAPPER: sccache
-    SCCACHE_BUCKET: "uwu-stirring-cod"
-    SCCACHE_ENDPOINT: "https://fra1.digitaloceanspaces.com"
+    SCCACHE_BUCKET: uwu-stirring-cod
+    SCCACHE_ENDPOINT: https://fra1.digitaloceanspaces.com
     SCCACHE_REGION: fra1
-    SCCACHE_S3_USE_SSL: "true"
+    SCCACHE_S3_USE_SSL: 'true'
     AWS_ACCESS_KEY_ID:
       from_secret: SCCACHE_S3_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY:
       from_secret: SCCACHE_S3_SECRET_KEY
-    AWS_EC2_METADATA_DISABLED: "true"
+    AWS_EC2_METADATA_DISABLED: 'true'
 when:
   event: [push, pull_request, cron, manual]
 matrix:

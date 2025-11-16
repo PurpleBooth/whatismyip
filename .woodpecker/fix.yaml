@@ -2,21 +2,21 @@
 variables:
   - &sccache-env
     CARGO_TERM_COLOR: always
-    CARGO_INCREMENTAL: "0"
+    CARGO_INCREMENTAL: '0'
     CMAKE_C_COMPILER_LAUNCHER: sccache
     CMAKE_CXX_COMPILER_LAUNCHER: sccache
-    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false"
-    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: 'false'
+    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: 'true'
     RUSTC_WRAPPER: sccache
-    SCCACHE_BUCKET: "uwu-stirring-cod"
-    SCCACHE_ENDPOINT: "https://fra1.digitaloceanspaces.com"
+    SCCACHE_BUCKET: uwu-stirring-cod
+    SCCACHE_ENDPOINT: https://fra1.digitaloceanspaces.com
     SCCACHE_REGION: fra1
-    SCCACHE_S3_USE_SSL: "true"
+    SCCACHE_S3_USE_SSL: 'true'
     AWS_ACCESS_KEY_ID:
       from_secret: SCCACHE_S3_ACCESS_KEY
     AWS_SECRET_ACCESS_KEY:
       from_secret: SCCACHE_S3_SECRET_KEY
-    AWS_EC2_METADATA_DISABLED: "true"
+    AWS_EC2_METADATA_DISABLED: 'true'
 depends_on: [lint]
 runs_on: [failure]
 clone:
@@ -32,7 +32,6 @@ when:
 steps:
   fix:
     image: code.billie.codes/purplebooth/rust-build-env:latest
-    
     environment:
       <<: *sccache-env
       CARGO_TERM_COLOR: always
@@ -40,16 +39,17 @@ steps:
       - cargo fix
       - cargo clippy --fix --all-features
       - cargo fmt --all
+      - sccache --show-stats
   lint:
     environment:
       <<: *sccache-env
-    depends_on:
-      - fix
+    depends_on: [fix]
     image: code.billie.codes/purplebooth/rust-build-env:latest
     commands:
       - cargo fmt --all -- --check
       - cargo clippy
       - cargo check
+      - sccache --show-stats
   test:
     environment:
       RUSTC_WRAPPER: sccache
@@ -61,6 +61,7 @@ steps:
       - cargo zigbuild --release
       - specdown run --temporary-workspace-dir --add-path "$(pwd)/target/release"
         ./README.md
+      - sccache --show-stats
   commit:
     depends_on: [test, lint]
     image: code.billie.codes/purplebooth/rust-build-env:latest
@@ -105,3 +106,4 @@ steps:
       - git config commit.gpgsign true
       - 'git commit --all --message="chore: formatting"'
       - git push origin main
+      - sccache --show-stats
