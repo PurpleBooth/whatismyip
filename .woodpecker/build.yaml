@@ -2,6 +2,7 @@
 variables:
   - &sccache-env
     CARGO_TERM_COLOR: always
+    CMAKE_CXX_COMPILER_LAUNCHER: sccache
     CARGO_INCREMENTAL: "0"
     SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "false"
     SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
