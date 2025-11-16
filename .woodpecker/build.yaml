@@ -37,3 +37,4 @@ steps:
       - rustup default stable
       - rustup target add $TARGET
       - cargo zigbuild --release --target $TARGET
+      - sccache --show-stats
