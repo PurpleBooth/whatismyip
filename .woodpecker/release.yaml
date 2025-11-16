@@ -41,19 +41,13 @@ steps:
     image: codeberg.org/purplebooth/rust-build-env:main
     environment:
       <<: *sccache-env
-      GIT_USER_NAME: *git-user-name
-      GIT_USER_EMAIL: *git-user-email
       CARGO_TERM_COLOR: always
-      GIT_PRIVATE_KEY:
-        from_secret: GIT_PRIVATE_KEY
       GPG_PRIVATE_KEY:
         from_secret: SIGNING_PRIVATE_KEY
       GPG_PASSWORD:
         from_secret: SIGNING_PRIVATE_PASSWORD
     commands:
       - rustup default stable
-      - git config user.name "$GIT_USER_NAME"
-      - git config user.email "$GIT_USER_EMAIL"
       - git config --type bool push.autoSetupRemote true
       # Configure ssh for auth Codeberg
       - mkdir -p ~/.ssh/
