@@ -77,5 +77,6 @@ steps:
       - cog bump --auto --skip-ci
       - git push origin main --follow-tags
       - git push origin main --tags
+      - git push origin main "$(cog get-version -t)"
       - sccache --show-stats
 depends_on: [test, lint, build]
