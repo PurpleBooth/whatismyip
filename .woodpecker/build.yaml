@@ -1,4 +1,21 @@
 ---
+variables:
+  - &sccache-env
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "true"
+    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
+    RUSTC_WRAPPER: sccache
+    SCCACHE_BUCKET:
+      from_secret: SCCACHE_S3_BUCKET
+    SCCACHE_ENDPOINT:
+      from_secret: SCCACHE_S3_ENDPOINT
+    SCCACHE_REGION:
+      from_secret: SCCACHE_S3_REGION
+    SCCACHE_S3_USE_SSL: "true"
+    AWS_ACCESS_KEY_ID:
+      from_secret: SCCACHE_S3_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: SCCACHE_S3_SECRET_KEY
+    AWS_EC2_METADATA_DISABLED: "true"
 when:
   event: [push, pull_request, cron, manual]
 matrix:
@@ -15,23 +32,8 @@ steps:
   build:
     image: code.billie.codes/purplebooth/rust-build-env:latest
     environment:
+      <<: *sccache-env
       CARGO_TERM_COLOR: always
-      SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "true"
-      SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
-      RUSTC_WRAPPER: sccache
-      SCCACHE_BUCKET:
-        from_secret: SCCACHE_S3_BUCKET
-      SCCACHE_ENDPOINT:
-        from_secret: SCCACHE_S3_ENDPOINT
-      SCCACHE_REGION:
-        from_secret: SCCACHE_S3_REGION
-      SCCACHE_S3_USE_SSL: "true"
-      SCCACHE_S3_KEY_PREFIX: ${CI_REPO}
-      AWS_ACCESS_KEY_ID:
-        from_secret: SCCACHE_S3_ACCESS_KEY
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: SCCACHE_S3_SECRET_KEY
-      AWS_EC2_METADATA_DISABLED: "true"
     commands:
       - rustup default stable
       - rustup target add $TARGET

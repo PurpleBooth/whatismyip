@@ -1,4 +1,21 @@
 ---
+variables:
+  - &sccache-env
+    SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "true"
+    SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
+    RUSTC_WRAPPER: sccache
+    SCCACHE_BUCKET:
+      from_secret: SCCACHE_S3_BUCKET
+    SCCACHE_ENDPOINT:
+      from_secret: SCCACHE_S3_ENDPOINT
+    SCCACHE_REGION:
+      from_secret: SCCACHE_S3_REGION
+    SCCACHE_S3_USE_SSL: "true"
+    AWS_ACCESS_KEY_ID:
+      from_secret: SCCACHE_S3_ACCESS_KEY
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: SCCACHE_S3_SECRET_KEY
+    AWS_EC2_METADATA_DISABLED: "true"
 when:
   event: [push, pull_request, cron, manual]
   path:
@@ -8,23 +25,8 @@ steps:
     image: code.billie.codes/purplebooth/rust-build-env:latest
     
     environment:
+      <<: *sccache-env
       CARGO_TERM_COLOR: always
-      SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "true"
-      SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
-      RUSTC_WRAPPER: sccache
-      SCCACHE_BUCKET:
-        from_secret: SCCACHE_S3_BUCKET
-      SCCACHE_ENDPOINT:
-        from_secret: SCCACHE_S3_ENDPOINT
-      SCCACHE_REGION:
-        from_secret: SCCACHE_S3_REGION
-      SCCACHE_S3_USE_SSL: "true"
-      SCCACHE_S3_KEY_PREFIX: ${CI_REPO}
-      AWS_ACCESS_KEY_ID:
-        from_secret: SCCACHE_S3_ACCESS_KEY
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: SCCACHE_S3_SECRET_KEY
-      AWS_EC2_METADATA_DISABLED: "true"
     commands:
       - rustup default stable
       - rustup component add rustfmt
@@ -35,23 +37,8 @@ steps:
   homebrew:
     image: homebrew/brew:latest@sha256:b0072bfdebf5934ae24b93b44a1928a88057399b3283ffa0177bb86084fdedfd
     environment:
+      <<: *sccache-env
       YQ_VERSION: 4.43.1  # renovate: datasource=github-releases depName=mikefarah/yq
-      SCCACHE_S3_ENABLE_VIRTUAL_HOST_STYLE: "true"
-      SCCACHE_S3_SERVER_SIDE_ENCRYPTION: "true"
-      RUSTC_WRAPPER: sccache
-      SCCACHE_BUCKET:
-        from_secret: SCCACHE_S3_BUCKET
-      SCCACHE_ENDPOINT:
-        from_secret: SCCACHE_S3_ENDPOINT
-      SCCACHE_REGION:
-        from_secret: SCCACHE_S3_REGION
-      SCCACHE_S3_USE_SSL: "true"
-      SCCACHE_S3_KEY_PREFIX: ${CI_REPO}
-      AWS_ACCESS_KEY_ID:
-        from_secret: SCCACHE_S3_ACCESS_KEY
-      AWS_SECRET_ACCESS_KEY:
-        from_secret: SCCACHE_S3_SECRET_KEY
-      AWS_EC2_METADATA_DISABLED: "true"
     commands:
       - curl -L https://github.com/mikefarah/yq/releases/download/v$${YQ_VERSION}/yq_linux_amd64.tar.gz
         -o - | tar xz && mv yq_linux_amd64 /tmp/yq
