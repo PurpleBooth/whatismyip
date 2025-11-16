@@ -2,6 +2,53 @@
 All notable changes to this project will be documented in this file. See [conventional commits](https://www.conventionalcommits.org/) for commit guidelines.
 
 - - -
+## v0.17.7 - 2025-11-16
+#### Bug Fixes
+- (**deps**) update woodpeckerci/plugin-release docker digest to e1798c9 - (d64954f) - Solace System Renovate Fox
+- (**deps**) pin code.billie.codes/purplebooth/rust-build-env docker tag to 237f98d - (ade20f1) - Solace System Renovate Fox
+- (**deps**) update ubuntu docker digest to c35e29c - (ecb81be) - Billie Thompson
+- (**deps**) update ubuntu docker digest to c35e29c - (4647a87) - Solace System Renovate Fox
+- test pipeline run - (be06d3e) - Billie Thompson
+- simplify git push commands in release pipeline - (ca55c98) - Billie Thompson
+- test pipeline run - (58ca393) - Billie Thompson
+#### Continuous Integration
+- standardize yaml formatting and add sccache stats - (f912077) - Billie Thompson
+- add CMAKE_C_COMPILER_LAUNCHER to all woodpecker pipelines - (b5f7fd2) - Billie Thompson
+- add CMAKE_CXX_COMPILER_LAUNCHER to all woodpecker pipelines - (034be46) - Billie Thompson
+- add sccache stats display to build pipeline - (1edd004) - Billie Thompson
+- hardcode DigitalOcean Spaces configuration - (280d146) - Billie Thompson
+- remove inline comments from sccache configuration - (7193f65) - Billie Thompson
+- fix sccache configuration for DigitalOcean Spaces - (869b8ea) - Billie Thompson
+- replace SCCACHE_S3_REGION secret with auto value - (423b0a6) - Billie Thompson
+- consolidate sccache configuration using YAML anchors - (14f7ecc) - Billie Thompson
+- consolidate sccache configuration in pipeline steps - (f45db0e) - Billie Thompson
+- fix sccache AWS credentials mapping in all pipelines - (f20140f) - Billie Thompson
+- fix variable interpolation in sccache configuration - (6564b77) - Billie Thompson
+- remove cache dependency from fix pipeline - (ec3acc2) - Billie Thompson
+- remove cache dependency from release pipeline - (9965e9b) - Billie Thompson
+- remove unnecessary cache dependencies from pipeline steps - (eb4e6f9) - Billie Thompson
+- replace sccache plugin with native service in all pipelines - (4ae2263) - Billie Thompson
+- enable sccache cache saving in all pipeline steps - (6c36f98) - Billie Thompson
+- update Docker image references to code.billie.codes - (a28c6f3) - Billie Thompson
+- ensure RUSTC_WRAPPER=sccache is explicitly set in all pipeline steps - (c53aac1) - Billie Thompson
+- remove shared volume, sccache is on the image - (c71580f) - Billie Thompson
+- fix sccache path references from /sccache_data to current directory - (dd22b3d) - Billie Thompson
+- enhance sccache debugging with detailed directory listing - (5838386) - Billie Thompson
+- add debugging commands to check sccache directories - (1306bb4) - Billie Thompson
+- correct path to sccache - (9d8d95e) - Billie Thompson
+- we use sh which has . not source - (6ea260a) - Billie Thompson
+- set plugin save-if env - (62afd33) - Billie Thompson
+- use image from plugin page - (7383d39) - Billie Thompson
+- try sccache - (41ec3f8) - Billie Thompson
+- correct double'd dollar - (4c23de1) - Billie Thompson
+#### Miscellaneous Chores
+- (**deps**) update dependency cargo-binstall to 1.16.0 - (7b91f7b) - Solace System Renovate Fox
+- add version tag push to release pipeline - (f67b43e) - Billie Thompson
+- test pipeline run - (9ab5085) - Billie Thompson
+- delete rust-toolchain.toml file - (41696e3) - Billie Thompson
+
+- - -
+
 ## v0.17.6 - 2025-11-15
 #### Bug Fixes
 - (**deps**) update ubuntu docker digest to e96e81f - (78c300a) - Solace System Renovate Fox
