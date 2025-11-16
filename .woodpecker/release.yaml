@@ -18,6 +18,8 @@ variables:
     AWS_SECRET_ACCESS_KEY:
       from_secret: SCCACHE_S3_SECRET_KEY
     AWS_EC2_METADATA_DISABLED: 'true'
+  - &git-user-name Solace System Renovate Fox [bot]
+  - &git-user-email solace-system-renovate-fox@example.com
 when:
   event: [push]
   branch:
@@ -28,9 +30,12 @@ clone:
     settings:
       partial: false
       depth: 0
-      git-user-name: &git-user-name Solace System Renovate Fox [bot]
-      git-user-email: &git-user-email solace-system-renovate-fox@example.com
+      git-user-name: *git-user-name
+      git-user-email: *git-user-email
       tags: true
+      use-ssh: true
+      ssh-key:
+        from_secret: GIT_PRIVATE_KEY
 steps:
   release:
     image: codeberg.org/purplebooth/rust-build-env:main
@@ -57,6 +62,7 @@ steps:
       - ssh-keyscan -t rsa codeberg.org >> ~/.ssh/known_hosts
       - chmod 600 ~/.ssh/known_hosts ~/.ssh/id_rsa
       - git config url."git@codeberg.org:".insteadOf "https://codeberg.org/"
+      - git config url."git@code.billie.codes:".insteadOf "https://code.billie.codes/"
 
       # Import the PGP key
       - echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --import
