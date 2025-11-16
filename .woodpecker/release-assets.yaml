@@ -16,7 +16,7 @@ matrix:
 steps:
   build-release-assets:
     image: code.billie.codes/purplebooth/rust-build-env:latest
-    depends_on: [cache]
+    
     environment:
       RUSTC_WRAPPER: sccache
       SCCACHE_SERVER_PORT: sccache:4226

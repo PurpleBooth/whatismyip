@@ -6,7 +6,7 @@ when:
 steps:
   rust:
     image: code.billie.codes/purplebooth/rust-build-env:latest
-    depends_on: [cache]
+    
     environment:
       CARGO_TERM_COLOR: always
       RUSTC_WRAPPER: sccache
