@@ -33,9 +33,6 @@ clone:
       git-user-name: *git-user-name
       git-user-email: *git-user-email
       tags: true
-      use-ssh: true
-      ssh-key:
-        from_secret: GIT_PRIVATE_KEY
 steps:
   release:
     image: codeberg.org/purplebooth/rust-build-env:main
