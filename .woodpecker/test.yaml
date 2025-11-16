@@ -45,8 +45,8 @@ services:
       SCCACHE_S3_USE_SSL: "true"
       SCCACHE_S3_KEY_PREFIX: ${CI_REPO}
       AWS_ACCESS_KEY_ID:
-        from_secret: SCCACHE_S3_SECRET_KEY
-      AWS_SECRET_ACCESS_KEY:
         from_secret: SCCACHE_S3_ACCESS_KEY
+      AWS_SECRET_ACCESS_KEY:
+        from_secret: SCCACHE_S3_SECRET_KEY
       AWS_EC2_METADATA_DISABLED: "true"
       SCCACHE_SERVER_PORT: 0.0.0.0:4226
