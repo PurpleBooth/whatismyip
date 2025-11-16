@@ -12,7 +12,6 @@ clone:
 steps:
   release:
     image: codeberg.org/purplebooth/rust-build-env:main
-    depends_on: [ cache ]
     environment:
       RUSTC_WRAPPER: sccache
       SCCACHE_SERVER_PORT: sccache:4226
