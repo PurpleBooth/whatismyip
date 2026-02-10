@@ -26,7 +26,7 @@ when:
     include: [main]
 clone:
   git:
-    image: woodpeckerci/plugin-git@sha256:1ce87890a4996596c0f6c28f69afe5e07bf106c294f49fb2cfe5971b4a04f70c
+    image: woodpeckerci/plugin-git@sha256:e6326a142d9bf08c6cc79cee3b3b26c87c15c999f89fb0b14c98d6031639968a
     settings:
       partial: false
       depth: 0
