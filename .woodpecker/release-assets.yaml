@@ -80,7 +80,7 @@ steps:
       - sccache --show-stats
   upload-release-assets:
     depends_on: [build-release-assets]
-    image: woodpeckerci/plugin-release@sha256:700e6a6ceff25fa97b90d159332f5d060c43737853c77378c312a7e1a9fd11f2
+    image: woodpeckerci/plugin-release@sha256:f59f8a139431f67f3595cb89372debd688fad5a4c6e09d44004ff7cfb9aaee0d
     settings:
       api_key:
         from_secret: CODEBERG_TOKEN
