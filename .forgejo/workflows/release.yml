@@ -11,7 +11,7 @@ env:
 
 jobs:
   release:
-    name: Create release and formula
+    name: Build, sign, and release
     runs-on: codeberg-small
     steps:
       - uses: actions/checkout@v4
@@ -20,14 +20,6 @@ jobs:
 
       - name: Install Rust
         run: rustup default stable
-
-      - name: Build release binary
-        run: cargo build --release
-
-      - name: Generate checksums
-        run: |
-          cd target/release
-          sha256sum whatismyip > whatismyip.sha256
 
       - name: Install tools
         run: |
@@ -39,23 +31,93 @@ jobs:
           curl -L "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" -o /tmp/yq
           chmod +x /tmp/yq
 
+      - name: Install zig
+        run: |
+          curl -L "https://ziglang.org/download/0.13.0/zig-linux-x86_64-0.13.0.tar.xz" -o /tmp/zig.tar.xz
+          tar -xf /tmp/zig.tar.xz -C /tmp
+          sudo install -m 755 /tmp/zig-linux-x86_64-0.13.0/zig /usr/local/bin/zig
+
+      - name: Install cargo-zigbuild
+        run: cargo binstall --no-confirm --locked cargo-zigbuild
+
+      - name: Add cross-compilation targets
+        run: |
+          rustup target add x86_64-apple-darwin
+          rustup target add x86_64-pc-windows-gnu
+
+      - name: Build Linux x86_64
+        run: |
+          cargo build --release --target x86_64-unknown-linux-gnu
+          cp target/x86_64-unknown-linux-gnu/release/whatismyip ./whatismyip-x86_64-unknown-linux-gnu
+          chmod +x ./whatismyip-x86_64-unknown-linux-gnu
+          sha256sum ./whatismyip-x86_64-unknown-linux-gnu > ./whatismyip-x86_64-unknown-linux-gnu.sha256
+
+      - name: Build macOS x86_64
+        id: build-macos
+        continue-on-error: true
+        run: |
+          cargo zigbuild --release --target x86_64-apple-darwin
+          cp target/x86_64-apple-darwin/release/whatismyip ./whatismyip-x86_64-apple-darwin
+          chmod +x ./whatismyip-x86_64-apple-darwin
+          sha256sum ./whatismyip-x86_64-apple-darwin > ./whatismyip-x86_64-apple-darwin.sha256
+
+      - name: Build Windows x86_64
+        id: build-windows
+        continue-on-error: true
+        run: |
+          cargo zigbuild --release --target x86_64-pc-windows-gnu
+          cp target/x86_64-pc-windows-gnu/release/whatismyip.exe ./whatismyip-x86_64-pc-windows-gnu.exe
+          sha256sum ./whatismyip-x86_64-pc-windows-gnu.exe > ./whatismyip-x86_64-pc-windows-gnu.exe.sha256
+
+      - name: Install Cosign
+        run: |
+          curl -LO https://github.com/sigstore/cosign/releases/latest/download/cosign-linux-amd64
+          chmod +x cosign-linux-amd64
+          sudo mv cosign-linux-amd64 /usr/local/bin/cosign
+
+      - name: Sign binaries with cosign
+        env:
+          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
+        run: |
+          for binary in whatismyip-x86_64-unknown-linux-gnu whatismyip-x86_64-apple-darwin whatismyip-x86_64-pc-windows-gnu.exe; do
+            if [ -f "$binary" ]; then
+              echo "Signing $binary"
+              cosign sign-blob --key env://COSIGN_KEY --yes "$binary"
+            fi
+          done
+
       - name: Generate release notes
         run: |
           cog changelog --unified --at "$GITHUB_REF_NAME" > RELEASE_NOTES.md
 
-      - name: Create Codeberg release
+      - name: Create Codeberg release and upload assets
         env:
           CODEBERG_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           RELEASE_NAME="${GITHUB_REF_NAME}"
           RELEASE_BODY=$(jq -s -R '.' < RELEASE_NOTES.md)
-          curl -X POST \
+
+          # Create release
+          RELEASE_RESPONSE=$(curl -s -X POST \
             -H "Authorization: token ${CODEBERG_TOKEN}" \
             -H "Content-Type: application/json" \
             "https://codeberg.org/api/v1/repos/${GITHUB_REPOSITORY}/releases" \
-            -d "{\"tag_name\":\"${RELEASE_NAME}\",\"name\":\"${RELEASE_NAME}\",\"body\":${RELEASE_BODY}}"
+            -d "{\"tag_name\":\"${RELEASE_NAME}\",\"name\":\"${RELEASE_NAME}\",\"body\":${RELEASE_BODY}}")
 
-      - name: Generate updated formula
+          RELEASE_ID=$(echo "$RELEASE_RESPONSE" | jq -r '.id')
+
+          # Upload all assets (binaries, checksums, signatures)
+          for file in whatismyip-x86_64-* whatismyip-x86_64-*.sha256 whatismyip-x86_64-*.sig; do
+            if [ -f "$file" ]; then
+              echo "Uploading $file"
+              curl -s -X POST \
+                -H "Authorization: token ${CODEBERG_TOKEN}" \
+                -F "attachment=@$file" \
+                "https://codeberg.org/api/v1/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" > /dev/null
+            fi
+          done
+
+      - name: Generate updated homebrew formula
         id: formula
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
