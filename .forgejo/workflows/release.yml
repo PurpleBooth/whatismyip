@@ -86,6 +86,59 @@ jobs:
             fi
           done
 
+      - name: Install nfpm
+        run: |
+          curl -LO https://github.com/goreleaser/nfpm/releases/latest/download/nfpm_linux_amd64
+          chmod +x nfpm_linux_amd64
+          sudo mv nfpm_linux_amd64 /usr/local/bin/nfpm
+
+      - name: Build packages
+        env:
+          GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          mkdir -p target/release
+          cp whatismyip-x86_64-unknown-linux-gnu target/release/whatismyip
+          chmod +x target/release/whatismyip
+
+          export VER="$VERSION" GOARCH="amd64" GOOS="linux"
+
+          if [ -n "$GPG_PRIVATE_KEY" ]; then
+            echo "$GPG_PRIVATE_KEY" > /tmp/nfpm-signing.key
+            chmod 600 /tmp/nfpm-signing.key
+            export NFPM_SIGNING_KEY_FILE="/tmp/nfpm-signing.key"
+            export NFPM_PASSPHRASE="$GPG_PASSPHRASE"
+          fi
+
+          nfpm pkg --packager archlinux --config nfpm.yaml
+          nfpm pkg --packager rpm --config nfpm.yaml
+          nfpm pkg --packager apk --config nfpm.yaml
+          nfpm pkg --packager deb --config nfpm.yaml
+
+          # Generate checksums for packages
+          for pkg in *.pkg.tar.zst *.rpm *.apk *.deb; do
+            [ -f "$pkg" ] && sha256sum "$pkg" > "$pkg.sha256"
+          done
+
+      - name: Build and push container image
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          docker login codeberg.org -u "$GITHUB_ACTOR" -p "$GITHUB_TOKEN"
+
+          cat > Containerfile <<'EOF'
+          FROM scratch
+          COPY whatismyip-x86_64-unknown-linux-gnu /whatismyip
+          USER 65532:65532
+          ENTRYPOINT ["/whatismyip"]
+          EOF
+
+          docker build -t "codeberg.org/$GITHUB_REPOSITORY:$VERSION" -t "codeberg.org/$GITHUB_REPOSITORY:latest" -f Containerfile .
+          docker push "codeberg.org/$GITHUB_REPOSITORY:$VERSION"
+          docker push "codeberg.org/$GITHUB_REPOSITORY:latest"
+
       - name: Generate release notes
         run: |
           cog changelog --unified --at "$GITHUB_REF_NAME" > RELEASE_NOTES.md
@@ -106,13 +159,24 @@ jobs:
 
           RELEASE_ID=$(echo "$RELEASE_RESPONSE" | jq -r '.id')
 
-          # Upload all assets (binaries, checksums, signatures)
+          # Upload binary assets
           for file in whatismyip-x86_64-* whatismyip-x86_64-*.sha256 whatismyip-x86_64-*.sig; do
             if [ -f "$file" ]; then
               echo "Uploading $file"
               curl -s -X POST \
                 -H "Authorization: token ${CODEBERG_TOKEN}" \
                 -F "attachment=@$file" \
+                "https://codeberg.org/api/v1/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" > /dev/null
+            fi
+          done
+
+          # Upload package assets
+          for pkg in *.pkg.tar.zst *.rpm *.apk *.deb *.sha256; do
+            if [ -f "$pkg" ]; then
+              echo "Uploading $pkg"
+              curl -s -X POST \
+                -H "Authorization: token ${CODEBERG_TOKEN}" \
+                -F "attachment=@$pkg" \
                 "https://codeberg.org/api/v1/repos/${GITHUB_REPOSITORY}/releases/${RELEASE_ID}/assets" > /dev/null
             fi
           done
@@ -128,7 +192,7 @@ jobs:
 
           export GITHUB_REF_NAME="v${VERSION}"
           export FILE_SHA
-          envsubst < homebrew/formula.rb.envsubst > whatismyip.rb
+          envsubst < homebrew/formula.rb.envsubstr > whatismyip.rb
 
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
           echo "sha256=${FILE_SHA}" >> "$GITHUB_OUTPUT"
