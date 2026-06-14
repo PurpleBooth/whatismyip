@@ -423,7 +423,7 @@ mod tests {
         use std::net::{IpAddr, Ipv4Addr};
 
         // Create a test IP
-        let test_ip = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
+        let test_ip = MyIp::new_plain(IpAddr::V4(Ipv4Addr::LOCALHOST));
 
         // Use the mock function to get a reverse DNS entry
         let reversed = mock_reverse_ip(&test_ip);

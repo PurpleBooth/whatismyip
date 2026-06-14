@@ -188,8 +188,12 @@ fn test_condition_not_only_6_and_not_only_local() -> TestResult {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_4() -> TestResult {
-    // Check if we can connect to an IPv4 service using TCP
-    let ipv4_available = std::net::TcpStream::connect("8.8.8.8:53").is_ok();
+    // Check if we can connect to an IPv4 service using TCP (with timeout)
+    let ipv4_available = std::net::TcpStream::connect_timeout(
+        &std::net::SocketAddr::from(([8, 8, 8, 8], 53)),
+        std::time::Duration::from_secs(2),
+    )
+    .is_ok();
 
     if !ipv4_available {
         println!("Skipping test_cargo_run_with_only_wan_and_only_4: No IPv4 connectivity");
@@ -215,8 +219,12 @@ fn test_cargo_run_with_only_wan_and_only_4() -> TestResult {
 
 #[test]
 fn test_cargo_run_with_only_wan_and_only_6() -> TestResult {
-    // Check if we can connect to an IPv6 service using TCP
-    let ipv6_available = std::net::TcpStream::connect("[2001:4860:4860::8888]:53").is_ok();
+    // Check if we can connect to an IPv6 service using TCP (with timeout)
+    let ipv6_available = std::net::TcpStream::connect_timeout(
+        &std::net::SocketAddr::from(([0x2001, 0x4860, 0x4860, 0, 0, 0, 0, 0x8888], 53)),
+        std::time::Duration::from_secs(2),
+    )
+    .is_ok();
 
     if !ipv6_available {
         println!("Skipping test_cargo_run_with_only_wan_and_only_6: No IPv6 connectivity");

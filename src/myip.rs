@@ -154,7 +154,7 @@ mod tests {
         let actual = format!(
             "{}",
             MyIp::new_reversed(
-                IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
+                IpAddr::V4(Ipv4Addr::LOCALHOST),
                 "www.example.com".to_string().into(),
             )
         );
@@ -185,10 +185,7 @@ mod tests {
 
     #[test]
     fn can_format_plain_ip() -> TestResult {
-        let actual = format!(
-            "{}",
-            MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)))
-        );
+        let actual = format!("{}", MyIp::new_plain(IpAddr::V4(Ipv4Addr::LOCALHOST)));
 
         if actual != *"127.0.0.1" {
             return Err(miette!("Expected '127.0.0.1', got '{}'", actual));
@@ -197,8 +194,8 @@ mod tests {
     }
     #[test]
     fn can_get_the_ip_v4() -> TestResult {
-        let actual = MyIp::new_plain(IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)));
-        let expected = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+        let actual = MyIp::new_plain(IpAddr::V4(Ipv4Addr::LOCALHOST));
+        let expected = IpAddr::V4(Ipv4Addr::LOCALHOST);
 
         if actual.ip() != expected {
             return Err(miette!("Expected IP '{}', got '{}'", expected, actual.ip()));
@@ -208,10 +205,10 @@ mod tests {
     #[test]
     fn can_get_the_ip_v6() -> TestResult {
         let actual = MyIp::new_reversed(
-            IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1)),
+            IpAddr::V4(Ipv4Addr::LOCALHOST),
             "www.example.com".to_string().into(),
         );
-        let expected = IpAddr::V4(Ipv4Addr::new(127, 0, 0, 1));
+        let expected = IpAddr::V4(Ipv4Addr::LOCALHOST);
 
         if actual.ip() != expected {
             return Err(miette!("Expected IP '{}', got '{}'", expected, actual.ip()));

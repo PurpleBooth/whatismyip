@@ -33,8 +33,9 @@
 
 use crate::IpVersion::{Ipv4, Ipv6};
 use futures::{StreamExt, stream};
-use hickory_resolver::config::{LookupIpStrategy, NameServerConfigGroup, ResolverConfig};
-use hickory_resolver::name_server::TokioConnectionProvider;
+use hickory_resolver::config::{LookupIpStrategy, NameServerConfig, ResolverConfig};
+use hickory_resolver::net::runtime::TokioRuntimeProvider;
+use hickory_resolver::proto::rr::RData;
 use hickory_resolver::{Resolver, TokioResolver};
 use local_ip_address::list_afinet_netifas;
 use miette::{IntoDiagnostic, Result, miette};
@@ -151,8 +152,8 @@ pub async fn find_wan_ip(strategy: IpVersion) -> Result<MyIps> {
             Ok(ip) => {
                 // Create and cache the resolver
                 let dns_resolver = resolver_cell
-                    .get_or_init(|| async { resolver(ip, lookup_ip_strategy) })
-                    .await;
+                    .get_or_try_init(|| async { resolver(ip, lookup_ip_strategy) })
+                    .await?;
                 return user_ips(dns_resolver).await;
             }
             Err(_e) if retries > 0 => {
@@ -250,7 +251,7 @@ pub fn find_local_ip(strategy: Option<IpVersion>) -> Result<MyIps> {
 /// - The DNS lookup fails to complete
 /// - The resolver encounters network issues
 /// - The TXT records cannot be retrieved
-pub async fn user_ips(resolver: &Resolver<TokioConnectionProvider>) -> Result<MyIps> {
+pub async fn user_ips(resolver: &Resolver<TokioRuntimeProvider>) -> Result<MyIps> {
     // Perform the DNS lookup
     let txt_records = resolver.txt_lookup(MYADDR_RECORD).await.into_diagnostic()?;
 
@@ -259,13 +260,15 @@ pub async fn user_ips(resolver: &Resolver<TokioConnectionProvider>) -> Result<My
     let mut result = Vec::with_capacity(2);
 
     // Process each TXT record
-    for record in txt_records.iter() {
-        // Convert to string only once
-        let ip_str = record.to_string();
+    for record in txt_records.answers() {
+        // Extract IP from TXT record data
+        if let RData::TXT(txt) = &record.data {
+            let ip_str = txt.to_string();
 
-        // Try to parse as IP address
-        if let Ok(ip) = IpAddr::from_str(&ip_str) {
-            result.push(myip::MyIp::new_plain(ip));
+            // Try to parse as IP address
+            if let Ok(ip) = IpAddr::from_str(&ip_str) {
+                result.push(myip::MyIp::new_plain(ip));
+            }
         }
     }
 
@@ -282,18 +285,17 @@ pub async fn user_ips(resolver: &Resolver<TokioConnectionProvider>) -> Result<My
 /// # Returns
 ///
 /// A configured DNS resolver
-#[must_use]
-pub fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> TokioResolver {
+///
+/// # Errors
+///
+/// Returns an error if the resolver cannot be built
+pub fn resolver(ip: IpAddr, ip_strategy: LookupIpStrategy) -> Result<TokioResolver> {
     let mut builder = Resolver::builder_with_config(
-        ResolverConfig::from_parts(
-            None,
-            vec![],
-            NameServerConfigGroup::from_ips_clear(&[ip], 53, true),
-        ),
-        TokioConnectionProvider::default(),
+        ResolverConfig::from_parts(None, vec![], vec![NameServerConfig::udp_and_tcp(ip)]),
+        TokioRuntimeProvider::default(),
     );
     builder.options_mut().ip_strategy = ip_strategy;
-    builder.build()
+    builder.build().into_diagnostic()
 }
 
 /// Resolve a nameserver hostname to an IP address
@@ -345,7 +347,7 @@ pub async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result
                 .get_or_try_init::<miette::Error, _, _>(|| async {
                     let mut builder = Resolver::builder_tokio().into_diagnostic()?;
                     builder.options_mut().ip_strategy = LookupIpStrategy::Ipv4Only;
-                    miette::Result::Ok(builder.build())
+                    builder.build().into_diagnostic()
                 })
                 .await
         }
@@ -354,7 +356,7 @@ pub async fn resolver_ip(ns_host: &str, ip_strategy: LookupIpStrategy) -> Result
                 .get_or_try_init(|| async {
                     let mut builder = Resolver::builder_tokio().into_diagnostic()?;
                     builder.options_mut().ip_strategy = LookupIpStrategy::Ipv6Only;
-                    miette::Result::Ok(builder.build())
+                    builder.build().into_diagnostic()
                 })
                 .await
         }
@@ -392,7 +394,10 @@ pub async fn reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
 
     let resolver = RESOLVER
         .get_or_try_init::<miette::Error, _, _>(|| async {
-            miette::Result::Ok(Resolver::builder_tokio().into_diagnostic()?.build())
+            Resolver::builder_tokio()
+                .into_diagnostic()?
+                .build()
+                .into_diagnostic()
         })
         .await
         .ok()?;
@@ -401,8 +406,12 @@ pub async fn reverse_ip(ip: &myip::MyIp) -> Option<myip::ReversedIp> {
         .reverse_lookup(ip.ip())
         .await
         .ok()?
+        .answers()
         .iter()
-        .map(ToString::to_string)
+        .filter_map(|record| match &record.data {
+            RData::PTR(ptr) => Some(ptr.to_string()),
+            _ => None,
+        })
         .map(myip::ReversedIp::from)
         .next()
 }
@@ -497,37 +506,11 @@ pub fn format_ips<S: ::std::hash::BuildHasher>(ips: HashSet<String, S>) -> Strin
         return String::new();
     }
 
-    // For small sets, the overhead of sorting might not be worth it
-    if ips.len() <= 5 {
-        // Calculate total capacity needed to avoid reallocations
-        let total_len = ips.iter().map(std::string::String::len).sum::<usize>() + ips.len() - 1;
-
-        // Use with_capacity for better performance
-        let mut result = String::with_capacity(total_len);
-
-        // Use iterator to build the string efficiently
-        let mut iter = ips.into_iter();
-
-        // Add the first item (we know there's at least one because we checked is_empty)
-        if let Some(first) = iter.next() {
-            result.push_str(&first);
-
-            // Add remaining items with newline prefix
-            for ip in iter {
-                result.push('\n');
-                result.push_str(&ip);
-            }
-        }
-
-        return result;
-    }
-
-    // For larger sets, convert to a sorted Vec for more predictable output
-    // This can improve caching behavior and make the output more user-friendly
+    // Convert to a sorted Vec for predictable, user-friendly output
     let mut ips_vec: Vec<_> = ips.into_iter().collect();
-    ips_vec.sort_unstable(); // sort_unstable is faster than sort
+    ips_vec.sort_unstable();
 
-    // Calculate capacity more precisely now that we know the exact order
+    // Calculate total capacity needed to avoid reallocations
     let total_len = ips_vec.iter().map(std::string::String::len).sum::<usize>() + ips_vec.len() - 1;
 
     // Pre-allocate the result string
@@ -635,11 +618,54 @@ mod tests {
     }
 
     #[test]
+    fn format_ips_sorts_small_sets() -> TestResult {
+        let mut ips = HashSet::new();
+        ips.insert("192.168.1.1".to_string());
+        ips.insert("10.0.0.1".to_string());
+        ips.insert("127.0.0.1".to_string());
+
+        let actual = format_ips(ips);
+        let expected = "10.0.0.1\n127.0.0.1\n192.168.1.1";
+
+        if actual != expected {
+            return Err(miette!(
+                "Expected sorted output '{}', got '{}'",
+                expected,
+                actual
+            ));
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn format_ips_sorts_large_sets() -> TestResult {
+        let mut ips = HashSet::new();
+        ips.insert("10.0.0.1".to_string());
+        ips.insert("192.168.1.1".to_string());
+        ips.insert("172.16.0.1".to_string());
+        ips.insert("127.0.0.1".to_string());
+        ips.insert("8.8.8.8".to_string());
+        ips.insert("1.1.1.1".to_string());
+
+        let actual = format_ips(ips);
+        let expected = "1.1.1.1\n10.0.0.1\n127.0.0.1\n172.16.0.1\n192.168.1.1\n8.8.8.8";
+
+        if actual != expected {
+            return Err(miette!(
+                "Expected sorted output '{}', got '{}'",
+                expected,
+                actual
+            ));
+        }
+
+        Ok(())
+    }
+
+    #[test]
     fn test_user_ips_parsing() -> TestResult {
-        // This test verifies the parsing logic in user_ips without making network calls
         use std::str::FromStr;
 
-        // Test IPv4 parsing
         let ipv4_str = "192.168.1.1";
         let ipv4 = IpAddr::from_str(ipv4_str)
             .map_err(|e| miette!("Failed to parse IPv4 address: {}", e))?;
@@ -649,7 +675,6 @@ mod tests {
             return Err(miette!("IPv4 address mismatch"));
         }
 
-        // Test IPv6 parsing
         let ipv6_str = "2001:db8::1";
         let ipv6 = IpAddr::from_str(ipv6_str)
             .map_err(|e| miette!("Failed to parse IPv6 address: {}", e))?;

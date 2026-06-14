@@ -12,7 +12,7 @@ specdown: build
 
 # Run a smoke test and see if the app runs
 smoke-test: build
-        cargo run --bin ellipsis -- -h
+        cargo run --bin whatismyip -- -h
 
 # Build release version
 build:
