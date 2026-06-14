@@ -23,6 +23,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install Rust Toolchain
+        uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Set up Rust ${{ matrix.rust }}
         run: rustup default ${{ matrix.rust }}
 
@@ -37,6 +42,11 @@ jobs:
         rust: [stable, beta, nightly]
     steps:
       - uses: actions/checkout@v4
+
+      - name: Install Rust Toolchain
+        uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Rust ${{ matrix.rust }}
         run: |
@@ -58,14 +68,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install cargo-binstall
-        run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - name: Install Rust Toolchain
+        uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run cargo audit
-        run: |
-          cargo binstall --no-confirm --locked cargo-audit
-          cargo audit
+        run: cargo audit
 
       - name: Run Trivy filesystem scan
         run: |
@@ -78,12 +87,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Rust
-        run: rustup default stable
-
-      - name: Install cargo-binstall
-        run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - name: Install Rust Toolchain
+        uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install specdown
         run: cargo binstall --no-confirm --locked specdown
@@ -139,17 +146,13 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install Rust
-        run: rustup default stable
-
-      - name: Install cargo-binstall
-        run: |
-          curl -L --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/cargo-bins/cargo-binstall/main/install-from-binstall-release.sh | bash
+      - name: Install Rust Toolchain
+        uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
+        with:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install tools
-        run: |
-          cargo binstall --no-confirm --locked cargo-edit
-          cargo binstall --no-confirm --locked cocogitto
+        run: cargo binstall --no-confirm --locked cocogitto
 
       - name: Configure Git user
         run: |
