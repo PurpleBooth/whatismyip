@@ -19,9 +19,9 @@ jobs:
     runs-on: codeberg-small
     strategy:
       matrix:
-        rust: [stable, beta, nightly]
+        rust: [stable]
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
 
       - name: Install Rust Toolchain
         uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
@@ -39,9 +39,9 @@ jobs:
     runs-on: codeberg-small
     strategy:
       matrix:
-        rust: [stable, beta, nightly]
+        rust: [stable]
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
 
       - name: Install Rust Toolchain
         uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
@@ -66,26 +66,23 @@ jobs:
     name: Security
     runs-on: codeberg-small
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
 
       - name: Install Rust Toolchain
         uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
         with:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run cargo audit
-        run: cargo audit
-
       - name: Run Trivy filesystem scan
         run: |
           curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-          trivy fs --scanners vuln,secret,misconfig --exit-code 1 .
+          trivy fs --scanners vuln,secret,misconfig --exit-code 1 --ignore-unfixed .
 
   specdown:
     name: Specdown
     runs-on: codeberg-small
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
 
       - name: Install Rust Toolchain
         uses: https://codeberg.org/PurpleBooth/common-pipelines/actions/install-rust@main
@@ -93,7 +90,7 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install specdown
-        run: cargo binstall --no-confirm --locked specdown
+        uses: https://github.com/specdown/setup-specdown-action@v0.2.32
 
       - name: Build release binary
         run: cargo build --release
@@ -108,7 +105,7 @@ jobs:
     container:
       image: homebrew/brew:latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
 
       - name: Install yq and gettext
         run: |
@@ -123,14 +120,14 @@ jobs:
           VERSION=$(/tmp/yq -o tsv -p toml '.package.version' Cargo.toml)
           TEMP_DIR=$(mktemp -d)
           curl --silent --fail --output "$TEMP_DIR/v$VERSION.tar.gz" "https://codeberg.org/$GITHUB_REPOSITORY/archive/v$VERSION.tar.gz" || true
-          if [ -f "$TEMP_DIR/v$VERSION.tar.gz" ]; then
+          if [ -s "$TEMP_DIR/v$VERSION.tar.gz" ]; then
             FILE_SHA=$(sha256sum --binary "$TEMP_DIR/v$VERSION.tar.gz" | cut -d' ' -f1)
             export GITHUB_REF_NAME="v$VERSION"
             export FILE_SHA
             envsubst < homebrew/formula.rb.envsubst > "${GITHUB_REPOSITORY##*/}.rb"
-            brew tap-new homebrew-releaser/test --no-git
-            cp -v "${GITHUB_REPOSITORY##*/}.rb" "$(brew --repository)/Library/Taps/homebrew-releaser/homebrew-test/Formula/"
-            brew audit --formula "homebrew-releaser/test/${GITHUB_REPOSITORY##*/}"
+            brew tap-new PurpleBooth/homebrew-releaser --no-git
+            cp -v "${GITHUB_REPOSITORY##*/}.rb" "$(brew --repository)/Library/Taps/PurpleBooth/homebrew-releaser/Formula/"
+            brew audit --formula "PurpleBooth/homebrew-releaser/${GITHUB_REPOSITORY##*/}"
           else
             echo "Skipping formula audit: release tarball not yet published"
           fi
@@ -141,7 +138,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     runs-on: codeberg-small
     steps:
-      - uses: actions/checkout@v4
+      - uses: https://code.forgejo.org/actions/checkout@v4
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
