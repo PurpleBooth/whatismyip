@@ -111,13 +111,10 @@ jobs:
           git fetch origin "${{ github.event.pull_request.head.sha || github.sha }}" 2>/dev/null || true
           git checkout FETCH_HEAD 2>/dev/null || git checkout "${{ github.sha }}" 2>/dev/null || true
 
-      - name: Install yq and gettext
+      - name: Install yq
         run: |
           curl -L "https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64" -o /tmp/yq
           chmod +x /tmp/yq
-          apt-get update
-          apt-get install -y gettext
-          apt-get clean
 
       - name: Generate and audit formula
         run: |
